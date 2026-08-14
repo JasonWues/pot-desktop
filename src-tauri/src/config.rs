@@ -2,27 +2,36 @@ use crate::{error::Error, APP};
 use dirs::config_dir;
 use log::{info, warn};
 use serde_json::{json, Value};
-use std::sync::Mutex;
+use std::sync::Arc;
 use tauri::{Manager, Wry};
-use tauri_plugin_store::{Store, StoreBuilder};
+use tauri_plugin_store::{Store, StoreBuilder, StoreExt};
 
-pub struct StoreWrapper(pub Mutex<Store<Wry>>);
+pub struct StoreWrapper(pub Arc<Store<Wry>>);
 
 pub fn init_config(app: &mut tauri::App) {
     let config_path = config_dir().unwrap();
-    let config_path = config_path.join(app.config().tauri.bundle.identifier.clone());
+    let config_path = config_path.join(app.config().identifier.clone());
     let config_path = config_path.join("config.json");
     info!("Load config from: {:?}", config_path);
-    let mut store = StoreBuilder::new(app.handle(), config_path).build();
-
-    match store.load() {
-        Ok(_) => info!("Config loaded"),
+    // `store` loads the file when it exists and starts empty otherwise; it only
+    // errors when the existing file cannot be read, so fall back to a fresh store
+    // the same way v1 did.
+    let store = match app.store(config_path.clone()) {
+        Ok(v) => {
+            info!("Config loaded");
+            v
+        }
         Err(e) => {
             warn!("Config load error: {:?}", e);
-            info!("Config not found, creating new config");
+            info!("Config not readable, creating new config");
+            StoreBuilder::new(app, config_path)
+                .create_new()
+                .build()
+                .expect("Failed to create config store")
         }
-    }
-    app.manage(StoreWrapper(Mutex::new(store)));
+    };
+
+    app.manage(StoreWrapper(store));
     let _ = check_service_available();
 }
 
@@ -140,7 +149,7 @@ pub fn check_service_available() -> Result<(), Error> {
 pub fn get_plugin_list(plugin_type: &str) -> Option<Vec<String>> {
     let app_handle = APP.get().unwrap();
     let config_dir = dirs::config_dir()?;
-    let config_dir = config_dir.join(app_handle.config().tauri.bundle.identifier.clone());
+    let config_dir = config_dir.join(app_handle.config().identifier.clone());
     let plugin_dir = config_dir.join("plugins");
     let plugin_dir = plugin_dir.join(plugin_type);
 
@@ -167,22 +176,16 @@ pub fn get_plugin_list(plugin_type: &str) -> Option<Vec<String>> {
 
 pub fn get(key: &str) -> Option<Value> {
     let state = APP.get().unwrap().state::<StoreWrapper>();
-    let store = state.0.lock().unwrap();
-    match store.get(key) {
-        Some(value) => Some(value.clone()),
-        None => None,
-    }
+    state.0.get(key)
 }
 
 pub fn set<T: serde::ser::Serialize>(key: &str, value: T) {
     let state = APP.get().unwrap().state::<StoreWrapper>();
-    let mut store = state.0.lock().unwrap();
-    store.insert(key.to_string(), json!(value)).unwrap();
-    store.save().unwrap();
+    state.0.set(key.to_string(), json!(value));
+    state.0.save().unwrap();
 }
 
 pub fn is_first_run() -> bool {
     let state = APP.get().unwrap().state::<StoreWrapper>();
-    let store = state.0.lock().unwrap();
-    store.is_empty()
+    state.0.is_empty()
 }

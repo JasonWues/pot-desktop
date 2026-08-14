@@ -25,7 +25,8 @@ export const useConfig = (key, defaultValue, options = {}) => {
             setPropertyState(v);
         } else {
             store.get(key).then((v) => {
-                if (v === null) {
+                // Tauri 2's store resolves to `undefined` for a missing key, v1 gave `null`
+                if (v === null || v === undefined) {
                     setPropertyState(defaultValue);
                     store.set(key, defaultValue);
                     store.save();
