@@ -1,5 +1,18 @@
 /*
-  In `components`, not at the top level. Tailwind 4 puts its utilities in
+  Declared here, not just in src/style.css. Cascade layer order is fixed by
+  where each name is FIRST seen, and this file is bundled before the Tailwind
+  entry (Config/index.jsx is imported before App.jsx reaches its own
+  `import './style.css'`). Tailwind emits its own `@layer theme, base,
+  components, utilities;` statement, but that statement does not survive
+  bundling, so without this line `components` was established first and ended
+  up the LOWEST priority layer -- below `base`, which is where Tailwind's
+  preflight `* { margin: 0 }` lives. That silently ate `.config-item`'s margin
+  while leaving its display rules intact.
+*/
+@layer theme, base, components, utilities;
+
+/*
+  In `components`, not at the top level: Tailwind 4 puts utilities in
   `@layer utilities`, and unlayered CSS outranks every cascade layer, so a top
   level `display: flex` here beats `.hidden` -- and roughly nine config rows are
   written as `config-item ${cond && 'hidden'}`, which would never hide again.
