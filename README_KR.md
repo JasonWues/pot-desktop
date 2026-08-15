@@ -126,7 +126,12 @@
 
 ## 문자-음성변환
 
+-   [x] System TTS (Offline)
+    -   [x] [Windows.Media.SpeechSynthesis](https://learn.microsoft.com/en-us/uwp/api/windows.media.speechsynthesis.speechsynthesizer) on Windows
+    -   [x] `say` on MacOS
+    -   [x] [eSpeak NG](https://github.com/espeak-ng/espeak-ng) on Linux
 -   [x] [Lingva](https://github.com/thedaviddelta/lingva-translate)
+-   [x] [OpenAI](https://platform.openai.com/docs/guides/text-to-speech) (works with any OpenAI compatible endpoint)
 
 추가항목은 다음을 참고 [Plugin System](#plugin-system)
 

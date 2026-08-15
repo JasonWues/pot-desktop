@@ -214,6 +214,18 @@ pub fn font_list() -> Result<Vec<String>, Error> {
     Ok(source.all_families()?)
 }
 
+// The history export writes to a path the user picked in a save dialog, which
+// is outside the fs plugin's `$APPCONFIG`/`$APPCACHE` scope. Going through a
+// command keeps that scope closed, the same way the local backup does.
+// Not `command(async)`: `Error` carries a `Box<dyn std::error::Error>`, which is
+// not `Send`, so the generated future could not be spawned. The other commands
+// returning `Error` (`install_plugin`, `run_binary`) are sync for the same reason.
+#[tauri::command]
+pub fn export_history(path: String, content: String) -> Result<(), Error> {
+    std::fs::write(path, content)?;
+    Ok(())
+}
+
 #[tauri::command]
 pub fn open_devtools(window: tauri::WebviewWindow) {
     if !window.is_devtools_open() {

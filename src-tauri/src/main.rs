@@ -12,6 +12,7 @@ mod screenshot;
 mod server;
 mod system_ocr;
 mod tray;
+mod tts;
 mod updater;
 mod window;
 
@@ -31,6 +32,7 @@ use tauri::Manager;
 use tauri_plugin_log::{Target, TargetKind};
 use tauri_plugin_notification::NotificationExt;
 use tray::*;
+use tts::*;
 use updater::check_update;
 use window::config_window;
 use window::updater_window;
@@ -157,6 +159,8 @@ fn main() {
             get_base64,
             copy_img,
             system_ocr,
+            system_tts,
+            system_tts_voices,
             set_proxy,
             unset_proxy,
             run_binary,
@@ -169,6 +173,7 @@ fn main() {
             webdav,
             local,
             install_plugin,
+            export_history,
             font_list,
             aliyun
         ])

@@ -12,6 +12,7 @@ import {
     getServiceSouceType,
 } from '../../../../../../utils/service_instance';
 import * as builtinServices from '../../../../../../services/tts';
+import { osType } from '../../../../../../utils/env';
 import { useConfig } from '../../../../../../hooks';
 
 export default function ServiceItem(props) {
@@ -40,7 +41,11 @@ export default function ServiceItem(props) {
                     {serviceSourceType === ServiceSourceType.BUILDIN && (
                         <>
                             <img
-                                src={`${builtinServices[serviceName].info.icon}`}
+                                src={
+                                    serviceName === 'system_tts'
+                                        ? `logo/${osType}.svg`
+                                        : builtinServices[serviceName].info.icon
+                                }
                                 className='h-[24px] w-[24px] my-auto'
                                 draggable={false}
                             />

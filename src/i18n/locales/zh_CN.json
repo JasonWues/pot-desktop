@@ -103,6 +103,12 @@
                 "source_target": "原文+译文",
                 "disable": "禁用",
                 "history_disable": "禁用历史记录",
+                "cache_enable": "缓存翻译结果",
+                "cache_ttl": "缓存有效期",
+                "cache_ttl_value": "{{days}} 天",
+                "cache_clear": "已缓存翻译",
+                "cache_count": "清除（{{n}} 条）",
+                "cache_cleared": "缓存已清除",
                 "incremental_translate": "增量翻译",
                 "dynamic_translate": "动态翻译",
                 "delete_newline": "自动删除换行",
@@ -174,6 +180,13 @@
             },
             "history": {
                 "label": "历史记录",
+                "search": "搜索原文或译文",
+                "all_services": "全部服务",
+                "all_languages": "全部语言",
+                "export_csv": "导出 CSV",
+                "export_json": "导出 JSON",
+                "export_success": "已导出",
+                "delete": "删除",
                 "title": "历史记录"
             },
             "backup": {
@@ -433,9 +446,24 @@
                 }
             },
             "tts": {
+                "system_tts": {
+                    "title": "系统语音",
+                    "rate": "语速",
+                    "language": "语言",
+                    "voice": "音色",
+                    "auto_voice": "自动选择"
+                },
                 "lingva_tts": {
                     "title": "Lingva",
                     "request_path": "请求地址"
+                },
+                "openai_tts": {
+                    "title": "OpenAI 语音",
+                    "request_path": "请求地址",
+                    "api_key": "API Key",
+                    "model": "模型",
+                    "voice": "音色",
+                    "speed": "语速"
                 }
             },
             "collection": {

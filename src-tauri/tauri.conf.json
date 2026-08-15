@@ -52,10 +52,10 @@
         ],
         "linux": {
             "deb": {
-                "depends": ["libxdo-dev", "libxcb1", "libxrandr2", "tesseract-ocr"]
+                "depends": ["libxdo-dev", "libxcb1", "libxrandr2", "tesseract-ocr", "espeak-ng"]
             },
             "rpm": {
-                "depends": ["libxdo-dev", "libxcb1", "libxrandr2", "tesseract-ocr"]
+                "depends": ["libxdo-dev", "libxcb1", "libxrandr2", "tesseract-ocr", "espeak-ng"]
             }
         },
         "macOS": {

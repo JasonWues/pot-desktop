@@ -9,6 +9,7 @@ import {
     whetherPluginService,
 } from '../../../../../../utils/service_instance';
 import * as builtinServices from '../../../../../../services/tts';
+import { osType } from '../../../../../../utils/env';
 import { PluginConfig } from '../../PluginConfig';
 
 export default function ConfigModal(props) {
@@ -35,7 +36,11 @@ export default function ConfigModal(props) {
                             {serviceSourceType === ServiceSourceType.BUILDIN && (
                                 <>
                                     <img
-                                        src={builtinServices[serviceName].info.icon}
+                                        src={
+                                            serviceName === 'system_tts'
+                                                ? `logo/${osType}.svg`
+                                                : builtinServices[serviceName].info.icon
+                                        }
                                         className='h-[24px] w-[24px] my-auto'
                                         draggable={false}
                                     />

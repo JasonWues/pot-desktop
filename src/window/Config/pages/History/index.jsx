@@ -1,20 +1,24 @@
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from '@nextui-org/react';
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@nextui-org/react';
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@nextui-org/react';
 import { readDir, BaseDirectory, readTextFile, exists } from '@tauri-apps/plugin-fs';
-import { Textarea, Button, ButtonGroup } from '@nextui-org/react';
+import { Textarea, Button, ButtonGroup, Input } from '@nextui-org/react';
 import { appConfigDir, join } from '@tauri-apps/api/path';
 import { convertFileSrc } from '@tauri-apps/api/core';
 import React, { useEffect, useState } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
+import { save } from '@tauri-apps/plugin-dialog';
 import { Pagination } from '@nextui-org/react';
+import { MdDeleteOutline } from 'react-icons/md';
 import { useTranslation } from 'react-i18next';
-import Database from '@tauri-apps/plugin-sql';
+import { invoke } from '@tauri-apps/api/core';
 
 import * as builtinCollectionServices from '../../../../services/collection';
 import { invoke_plugin } from '../../../../utils/invoke_plugin';
 import * as builtinServices from '../../../../services/translate';
 import { useConfig, useToastStyle } from '../../../../hooks';
 import { LanguageFlag } from '../../../../utils/language';
+import { getDatabase } from '../../../../utils/db';
 import { store } from '../../../../utils/store';
 import { osType } from '../../../../utils/env';
 import {
@@ -25,6 +29,25 @@ import {
     whetherAvailableService,
 } from '../../../../utils/service_instance';
 
+const PAGE_SIZE = 20;
+const ALL = '__all__';
+
+// `text`/`result` come straight from the user, so every field is quoted and
+// embedded quotes are doubled. The BOM makes Excel read it as UTF-8.
+function toCsv(rows) {
+    const columns = ['id', 'text', 'source', 'target', 'service', 'result', 'timestamp'];
+    const escape = (value) => `"${String(value ?? '').replaceAll('"', '""')}"`;
+    const lines = [columns.join(',')];
+    for (const row of rows) {
+        lines.push(
+            columns
+                .map((column) => escape(column === 'timestamp' ? new Date(row.timestamp).toISOString() : row[column]))
+                .join(',')
+        );
+    }
+    return '\uFEFF' + lines.join('\r\n');
+}
+
 export default function History() {
     const [collectionServiceList] = useConfig('collection_service_list', []);
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -33,51 +56,141 @@ export default function History() {
     const [page, setPage] = useState(1);
     const [total, setTotal] = useState(0);
     const [items, setItems] = useState([]);
+    const [search, setSearch] = useState('');
+    const [serviceFilter, setServiceFilter] = useState(ALL);
+    const [targetFilter, setTargetFilter] = useState(ALL);
+    const [serviceOptions, setServiceOptions] = useState([]);
+    const [targetOptions, setTargetOptions] = useState([]);
     const toastStyle = useToastStyle();
     const { t } = useTranslation();
+
     useEffect(() => {
-        init();
         loadPluginList();
     }, []);
 
+    // Filter changes restart paging; without this a narrowed result set can
+    // leave the view on a page that no longer exists.
     useEffect(() => {
-        getData();
-    }, [total, page]);
+        setPage(1);
+    }, [search, serviceFilter, targetFilter]);
 
-    const init = async () => {
-        const db = await Database.load('sqlite:history.db');
-        const result = await db.select('SELECT COUNT(*) FROM history');
-        if (result[0] && result[0]['COUNT(*)']) {
-            setTotal(result[0]['COUNT(*)']);
+    useEffect(() => {
+        // Debounced because this also runs on every keystroke in the search box.
+        const timer = setTimeout(() => {
+            getData();
+            loadFilterOptions();
+        }, 250);
+        return () => clearTimeout(timer);
+    }, [search, serviceFilter, targetFilter, page]);
+
+    // Builds the shared WHERE clause. sqlite takes positional `$n` parameters,
+    // so the index has to track the params array as it grows.
+    const buildFilter = () => {
+        const clauses = [];
+        const params = [];
+        const keyword = search.trim();
+        if (keyword !== '') {
+            params.push(`%${keyword}%`, `%${keyword}%`);
+            clauses.push(`(text LIKE $${params.length - 1} OR result LIKE $${params.length})`);
+        }
+        if (serviceFilter !== ALL) {
+            params.push(serviceFilter);
+            clauses.push(`service = $${params.length}`);
+        }
+        if (targetFilter !== ALL) {
+            params.push(targetFilter);
+            clauses.push(`target = $${params.length}`);
+        }
+        return { where: clauses.length > 0 ? ` WHERE ${clauses.join(' AND ')}` : '', params };
+    };
+
+    const getData = async () => {
+        try {
+            const db = await getDatabase();
+            const { where, params } = buildFilter();
+            const countRows = await db.select(`SELECT COUNT(*) AS count FROM history${where}`, params);
+            setTotal(countRows[0]?.count ?? 0);
+            const rows = await db.select(
+                `SELECT * FROM history${where} ORDER BY timestamp DESC, id DESC LIMIT $${params.length + 1} OFFSET $${
+                    params.length + 2
+                }`,
+                [...params, PAGE_SIZE, PAGE_SIZE * (page - 1)]
+            );
+            setItems(rows);
+        } catch (e) {
+            toast.error(e.toString(), { style: toastStyle });
         }
     };
-    const getData = async () => {
-        const db = await Database.load('sqlite:history.db');
-        let result = await db.select('SELECT * FROM history ORDER BY id DESC LIMIT 20 OFFSET $1', [20 * (page - 1)]);
-        setItems(result);
+
+    // Only offer filters that actually match something in the table.
+    const loadFilterOptions = async () => {
+        try {
+            const db = await getDatabase();
+            const services = await db.select('SELECT DISTINCT service FROM history ORDER BY service');
+            setServiceOptions(services.map((row) => row.service));
+            const targets = await db.select('SELECT DISTINCT target FROM history ORDER BY target');
+            setTargetOptions(targets.map((row) => row.target));
+        } catch {
+            setServiceOptions([]);
+            setTargetOptions([]);
+        }
     };
 
     const getSelectedData = async (id) => {
-        const db = await Database.load('sqlite:history.db');
+        const db = await getDatabase();
         let result = await db.select('SELECT * FROM history WHERE id=$1', [id]);
         setSelectItem(result[0]);
     };
+
     const clearData = async () => {
-        const db = await Database.load('sqlite:history.db');
-        await db.execute('DROP TABLE history');
+        const db = await getDatabase();
+        // DELETE rather than DROP: the table has to survive so the next
+        // translation does not have to recreate it.
+        await db.execute('DELETE FROM history');
         await db.execute('VACUUM');
         setItems([]);
         setTotal(0);
         setPage(1);
+        setServiceOptions([]);
+        setTargetOptions([]);
     };
+
+    const deleteItem = async (id) => {
+        const db = await getDatabase();
+        await db.execute('DELETE FROM history WHERE id=$1', [id]);
+        await getData();
+        await loadFilterOptions();
+    };
+
     const updateData = async () => {
-        const db = await Database.load('sqlite:history.db');
+        const db = await getDatabase();
         await db.execute('UPDATE history SET text=$1, result=$2 WHERE id=$3', [
             selectedItem.text,
             selectedItem.result,
             selectedItem.id,
         ]);
         await getData();
+    };
+
+    // Exports everything the current filters match, not just the visible page.
+    const exportData = async (format) => {
+        try {
+            const selected = await save({
+                defaultPath: `pot-history.${format}`,
+                filters: [{ name: format.toUpperCase(), extensions: [format] }],
+            });
+            if (selected === null) {
+                return;
+            }
+            const db = await getDatabase();
+            const { where, params } = buildFilter();
+            const rows = await db.select(`SELECT * FROM history${where} ORDER BY timestamp DESC, id DESC`, params);
+            const content = format === 'csv' ? toCsv(rows) : JSON.stringify(rows, null, 2);
+            await invoke('export_history', { path: selected, content });
+            toast.success(t('config.history.export_success'), { style: toastStyle });
+        } catch (e) {
+            toast.error(e.toString(), { style: toastStyle });
+        }
     };
 
     const formatDate = (date) => {
@@ -92,6 +205,15 @@ export default function History() {
         const second = padTo2Digits(date.getSeconds());
         return `${year}/${month}/${day} ${hour}:${minute}:${second}`;
     };
+
+    const serviceLabel = (service) => {
+        const name = getServiceName(service);
+        if (getServiceSouceType(service) === ServiceSourceType.PLUGIN) {
+            return pluginList?.['translate']?.[name]?.display ?? name;
+        }
+        return t(`services.translate.${name}.title`, { defaultValue: name });
+    };
+
     const loadPluginList = async () => {
         const serviceTypeList = ['translate', 'collection'];
         let temp = {};
@@ -123,6 +245,64 @@ export default function History() {
         pluginList !== null && (
             <>
                 <Toaster />
+                <div className='flex gap-[8px] mb-[8px]'>
+                    <Input
+                        size='sm'
+                        isClearable
+                        variant='bordered'
+                        className='max-w-[40%]'
+                        placeholder={t('config.history.search')}
+                        value={search}
+                        onValueChange={setSearch}
+                        onClear={() => setSearch('')}
+                    />
+                    <Dropdown>
+                        <DropdownTrigger>
+                            <Button
+                                size='sm'
+                                variant='bordered'
+                                className='my-auto'
+                            >
+                                {serviceFilter === ALL ? t('config.history.all_services') : serviceLabel(serviceFilter)}
+                            </Button>
+                        </DropdownTrigger>
+                        <DropdownMenu
+                            aria-label='service filter'
+                            className='max-h-[50vh] overflow-y-auto'
+                            onAction={(key) => setServiceFilter(key)}
+                        >
+                            <DropdownItem key={ALL}>{t('config.history.all_services')}</DropdownItem>
+                            {serviceOptions.map((service) => (
+                                <DropdownItem key={service}>{serviceLabel(service)}</DropdownItem>
+                            ))}
+                        </DropdownMenu>
+                    </Dropdown>
+                    <Dropdown>
+                        <DropdownTrigger>
+                            <Button
+                                size='sm'
+                                variant='bordered'
+                                className='my-auto'
+                            >
+                                {targetFilter === ALL
+                                    ? t('config.history.all_languages')
+                                    : t(`languages.${targetFilter}`, { defaultValue: targetFilter })}
+                            </Button>
+                        </DropdownTrigger>
+                        <DropdownMenu
+                            aria-label='language filter'
+                            className='max-h-[50vh] overflow-y-auto'
+                            onAction={(key) => setTargetFilter(key)}
+                        >
+                            <DropdownItem key={ALL}>{t('config.history.all_languages')}</DropdownItem>
+                            {targetOptions.map((language) => (
+                                <DropdownItem key={language}>
+                                    {t(`languages.${language}`, { defaultValue: language })}
+                                </DropdownItem>
+                            ))}
+                        </DropdownMenu>
+                    </Dropdown>
+                </div>
                 <Table
                     fullWidth
                     hideHeader
@@ -131,7 +311,7 @@ export default function History() {
                     aria-label='History Table'
                     classNames={{
                         base: `${
-                            osType === 'Linux' ? 'h-[calc(100vh-130px)]' : 'h-[calc(100vh-100px)]'
+                            osType === 'Linux' ? 'h-[calc(100vh-180px)]' : 'h-[calc(100vh-150px)]'
                         } overflow-y-auto`,
                         td: 'px-0',
                     }}
@@ -215,10 +395,24 @@ export default function History() {
                     <Pagination
                         showControls
                         isCompact
-                        total={Math.ceil(total / 20)}
+                        total={Math.ceil(total / PAGE_SIZE)}
                         page={page}
                         onChange={setPage}
                     />
+                    <ButtonGroup className='my-auto'>
+                        <Button
+                            size='sm'
+                            onPress={() => exportData('csv')}
+                        >
+                            {t('config.history.export_csv')}
+                        </Button>
+                        <Button
+                            size='sm'
+                            onPress={() => exportData('json')}
+                        >
+                            {t('config.history.export_json')}
+                        </Button>
+                    </ButtonGroup>
                     <Button
                         size='sm'
                         className='my-auto'
@@ -272,15 +466,29 @@ export default function History() {
                                         />
                                     </ModalBody>
                                     <ModalFooter className='flex justify-between'>
-                                        <Button
-                                            color='primary'
-                                            onPress={async () => {
-                                                await updateData();
-                                                onClose();
-                                            }}
-                                        >
-                                            {t('common.save')}
-                                        </Button>
+                                        <ButtonGroup>
+                                            <Button
+                                                color='primary'
+                                                onPress={async () => {
+                                                    await updateData();
+                                                    onClose();
+                                                }}
+                                            >
+                                                {t('common.save')}
+                                            </Button>
+                                            <Button
+                                                isIconOnly
+                                                color='danger'
+                                                variant='flat'
+                                                aria-label={t('config.history.delete')}
+                                                onPress={async () => {
+                                                    await deleteItem(selectedItem.id);
+                                                    onClose();
+                                                }}
+                                            >
+                                                <MdDeleteOutline />
+                                            </Button>
+                                        </ButtonGroup>
                                         <ButtonGroup>
                                             {collectionServiceList &&
                                                 collectionServiceList.map((instanceKey) => {

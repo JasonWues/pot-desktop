@@ -103,6 +103,12 @@
                 "source_target": "Source+Target",
                 "disable": "Disable",
                 "history_disable": "Disable History",
+                "cache_enable": "Cache Translations",
+                "cache_ttl": "Cache Lifetime",
+                "cache_ttl_value": "{{days}} days",
+                "cache_clear": "Cached Translations",
+                "cache_count": "Clear ({{n}})",
+                "cache_cleared": "Cache cleared",
                 "incremental_translate": "Incremental Translation",
                 "dynamic_translate": "Dynamic Translation",
                 "delete_newline": "Delete Newline",
@@ -174,6 +180,13 @@
             },
             "history": {
                 "label": "History",
+                "search": "Search text or result",
+                "all_services": "All Services",
+                "all_languages": "All Languages",
+                "export_csv": "Export CSV",
+                "export_json": "Export JSON",
+                "export_success": "Exported",
+                "delete": "Delete",
                 "title": "History"
             },
             "backup": {
@@ -433,9 +446,24 @@
                 }
             },
             "tts": {
+                "system_tts": {
+                    "title": "System TTS",
+                    "rate": "Speed",
+                    "language": "Language",
+                    "voice": "Voice",
+                    "auto_voice": "Auto"
+                },
                 "lingva_tts": {
                     "title": "Lingva",
                     "request_path": "Request Path"
+                },
+                "openai_tts": {
+                    "title": "OpenAI TTS",
+                    "request_path": "Request Path",
+                    "api_key": "API Key",
+                    "model": "Model",
+                    "voice": "Voice",
+                    "speed": "Speed"
                 }
             },
             "collection": {

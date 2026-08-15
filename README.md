@@ -126,7 +126,12 @@
 
 ## 语音合成
 
+-   [x] 系统语音合成 (离线)
+    -   [x] [Windows.Media.SpeechSynthesis](https://learn.microsoft.com/zh-cn/uwp/api/windows.media.speechsynthesis.speechsynthesizer) on Windows
+    -   [x] `say` on MacOS
+    -   [x] [eSpeak NG](https://github.com/espeak-ng/espeak-ng) on Linux
 -   [x] [Lingva](https://github.com/thedaviddelta/lingva-translate)
+-   [x] [OpenAI](https://platform.openai.com/docs/guides/text-to-speech) (兼容 OpenAI 接口的服务均可使用)
 
 更多接口支持见 [插件系统](#插件系统)
 

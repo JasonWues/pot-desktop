@@ -23,7 +23,6 @@ import { semanticColors } from '@nextui-org/theme';
 import toast, { Toaster } from 'react-hot-toast';
 import { MdContentCopy } from 'react-icons/md';
 import { useTranslation } from 'react-i18next';
-import Database from '@tauri-apps/plugin-sql';
 import { GiCycle } from 'react-icons/gi';
 import { useTheme } from 'next-themes';
 import { useAtomValue } from 'jotai';
@@ -38,6 +37,7 @@ import { sourceTextAtom, detectLanguageAtom } from '../SourceArea';
 import { invoke_plugin } from '../../../../utils/invoke_plugin';
 import * as builtinServices from '../../../../services/translate';
 import * as builtinTtsServices from '../../../../services/tts';
+import { addToHistory, buildCacheKey, getCachedTranslation, setCachedTranslation } from '../../../../utils/db';
 
 import { info, error as logError } from '@tauri-apps/plugin-log';
 import {
@@ -65,6 +65,8 @@ export default function TargetArea(props) {
     const [ttsServiceList] = useConfig('tts_service_list', ['lingva_tts']);
     const [translateSecondLanguage] = useConfig('translate_second_language', 'en');
     const [historyDisable] = useConfig('history_disable', false);
+    const [cacheEnable] = useConfig('translate_cache_enable', true);
+    const [cacheTtlDays] = useConfig('translate_cache_ttl', 7);
     const [isLoading, setIsLoading] = useState(false);
     const [hide, setHide] = useState(true);
 
@@ -123,30 +125,6 @@ export default function TargetArea(props) {
         clipboardMonitor,
     ]);
 
-    // todo: history panel use service instance key
-    const addToHistory = async (text, source, target, serviceInstanceKey, result) => {
-        const db = await Database.load('sqlite:history.db');
-
-        await db
-            .execute(
-                'INSERT into history (text, source, target, service, result, timestamp) VALUES ($1, $2, $3, $4, $5, $6)',
-                [text, source, target, serviceInstanceKey, result, Date.now()]
-            )
-            .then(
-                (v) => {
-                    db.close();
-                },
-                (e) => {
-                    db.execute(
-                        'CREATE TABLE history(id INTEGER PRIMARY KEY AUTOINCREMENT, text TEXT NOT NULL,source TEXT NOT NULL,target TEXT NOT NULL,service TEXT NOT NULL, result TEXT NOT NULL,timestamp INTEGER NOT NULL)'
-                    ).then(() => {
-                        db.close();
-                        addToHistory(text, source, target, serviceInstanceKey, result);
-                    });
-                }
-            );
-    };
-
     function invokeOnce(fn) {
         let isInvoke = false;
 
@@ -165,154 +143,142 @@ export default function TargetArea(props) {
         translateID[index] = id;
 
         const translateServiceName = getServiceName(currentTranslateServiceInstanceKey);
+        const isPluginService = whetherPluginService(currentTranslateServiceInstanceKey);
+        const instanceConfig = serviceInstanceConfigMap[currentTranslateServiceInstanceKey];
+        if (isPluginService && instanceConfig) {
+            // The plugin protocol expects this flag on the config. Setting it
+            // before the cache key is derived keeps the key stable across calls.
+            instanceConfig['enable'] = 'true';
+        }
 
-        if (whetherPluginService(currentTranslateServiceInstanceKey)) {
-            const pluginInfo = pluginList['translate'][translateServiceName];
-            if (sourceLanguage in pluginInfo.language && targetLanguage in pluginInfo.language) {
-                let newTargetLanguage = targetLanguage;
-                if (sourceLanguage === 'auto' && targetLanguage === detectLanguage) {
-                    newTargetLanguage = translateSecondLanguage;
+        // Plugins declare their languages in info.json, built-in services in a
+        // Language enum; both are keyed by pot's own language codes.
+        const languageMap = isPluginService
+            ? pluginList['translate'][translateServiceName].language
+            : builtinServices[translateServiceName].Language;
+        if (!(sourceLanguage in languageMap && targetLanguage in languageMap)) {
+            setError('Language not supported');
+            return;
+        }
+
+        // Translating into the language the text is already written in is not
+        // useful, so fall back to the configured second language.
+        const newTargetLanguage =
+            sourceLanguage === 'auto' && targetLanguage === detectLanguage ? translateSecondLanguage : targetLanguage;
+
+        const setHideOnce = invokeOnce(setHide);
+
+        // Everything that has to happen once a translation exists, whether it
+        // came back from the service or straight out of the cache.
+        const finishTranslate = (v) => {
+            setResult(typeof v === 'string' ? v.trim() : v);
+            setIsLoading(false);
+            if (v !== '') {
+                setHideOnce(false);
+            }
+            if (!historyDisable) {
+                addToHistory(
+                    sourceText.trim(),
+                    detectLanguage,
+                    newTargetLanguage,
+                    translateServiceName,
+                    typeof v === 'string' ? v.trim() : v
+                ).catch((e) => logError(`write history failed: ${e}`));
+            }
+            if (index === 0 && !clipboardMonitor) {
+                switch (autoCopy) {
+                    case 'target':
+                        writeText(v).then(() => {
+                            if (hideWindow) {
+                                sendNotification({ title: t('common.write_clipboard'), body: v });
+                            }
+                        });
+                        break;
+                    case 'source_target':
+                        writeText(sourceText.trim() + '\n\n' + v).then(() => {
+                            if (hideWindow) {
+                                sendNotification({
+                                    title: t('common.write_clipboard'),
+                                    body: sourceText.trim() + '\n\n' + v,
+                                });
+                            }
+                        });
+                        break;
+                    default:
+                        break;
                 }
-                setIsLoading(true);
-                setHide(true);
-                const instanceConfig = serviceInstanceConfigMap[currentTranslateServiceInstanceKey];
-                instanceConfig['enable'] = 'true';
-                const setHideOnce = invokeOnce(setHide);
-                let [func, utils] = await invoke_plugin('translate', translateServiceName);
-                func(sourceText.trim(), pluginInfo.language[sourceLanguage], pluginInfo.language[newTargetLanguage], {
+            }
+        };
+
+        const cacheKey = buildCacheKey({
+            instanceKey: currentTranslateServiceInstanceKey,
+            config: instanceConfig,
+            from: sourceLanguage,
+            to: newTargetLanguage,
+            detect: detectLanguage,
+            text: sourceText.trim(),
+        });
+
+        if (cacheEnable) {
+            let cached = null;
+            try {
+                cached = await getCachedTranslation(cacheKey, cacheTtlDays);
+            } catch (e) {
+                // A broken cache must never stop a translation.
+                logError(`read translation cache failed: ${e}`);
+            }
+            if (cached !== null) {
+                if (translateID[index] !== id) return;
+                info(`[${currentTranslateServiceInstanceKey}]cache hit`);
+                finishTranslate(cached);
+                return;
+            }
+        }
+
+        setIsLoading(true);
+        setHide(true);
+
+        const onResolve = (v) => {
+            info(`[${currentTranslateServiceInstanceKey}]resolve:` + v);
+            if (translateID[index] !== id) return;
+            // Only plain text is cached; dictionary services resolve with an
+            // object whose shape is service specific.
+            if (cacheEnable && typeof v === 'string' && v.trim() !== '') {
+                setCachedTranslation(cacheKey, v.trim()).catch((e) => logError(`write translation cache failed: ${e}`));
+            }
+            finishTranslate(v);
+        };
+
+        const onReject = (e) => {
+            info(`[${currentTranslateServiceInstanceKey}]reject:` + e);
+            if (translateID[index] !== id) return;
+            setError(e.toString());
+            setIsLoading(false);
+        };
+
+        // Streaming services push partial text through this before resolving.
+        const onPartialResult = (v) => {
+            if (translateID[index] !== id) return;
+            setResult(v);
+            setHideOnce(false);
+        };
+
+        if (isPluginService) {
+            let [func, utils] = await invoke_plugin('translate', translateServiceName);
+            func(sourceText.trim(), languageMap[sourceLanguage], languageMap[newTargetLanguage], {
+                config: instanceConfig,
+                detect: detectLanguage,
+                setResult: onPartialResult,
+                utils,
+            }).then(onResolve, onReject);
+        } else {
+            builtinServices[translateServiceName]
+                .translate(sourceText.trim(), languageMap[sourceLanguage], languageMap[newTargetLanguage], {
                     config: instanceConfig,
                     detect: detectLanguage,
-                    setResult: (v) => {
-                        if (translateID[index] !== id) return;
-                        setResult(v);
-                        setHideOnce(false);
-                    },
-                    utils,
-                }).then(
-                    (v) => {
-                        info(`[${currentTranslateServiceInstanceKey}]resolve:` + v);
-                        if (translateID[index] !== id) return;
-                        setResult(typeof v === 'string' ? v.trim() : v);
-                        setIsLoading(false);
-                        if (v !== '') {
-                            setHideOnce(false);
-                        }
-                        if (!historyDisable) {
-                            addToHistory(
-                                sourceText.trim(),
-                                detectLanguage,
-                                newTargetLanguage,
-                                translateServiceName,
-                                typeof v === 'string' ? v.trim() : v
-                            );
-                        }
-                        if (index === 0 && !clipboardMonitor) {
-                            switch (autoCopy) {
-                                case 'target':
-                                    writeText(v).then(() => {
-                                        if (hideWindow) {
-                                            sendNotification({ title: t('common.write_clipboard'), body: v });
-                                        }
-                                    });
-                                    break;
-                                case 'source_target':
-                                    writeText(sourceText.trim() + '\n\n' + v).then(() => {
-                                        if (hideWindow) {
-                                            sendNotification({
-                                                title: t('common.write_clipboard'),
-                                                body: sourceText.trim() + '\n\n' + v,
-                                            });
-                                        }
-                                    });
-                                    break;
-                                default:
-                                    break;
-                            }
-                        }
-                    },
-                    (e) => {
-                        info(`[${currentTranslateServiceInstanceKey}]reject:` + e);
-                        if (translateID[index] !== id) return;
-                        setError(e.toString());
-                        setIsLoading(false);
-                    }
-                );
-            } else {
-                setError('Language not supported');
-            }
-        } else {
-            const LanguageEnum = builtinServices[translateServiceName].Language;
-            if (sourceLanguage in LanguageEnum && targetLanguage in LanguageEnum) {
-                let newTargetLanguage = targetLanguage;
-                if (sourceLanguage === 'auto' && targetLanguage === detectLanguage) {
-                    newTargetLanguage = translateSecondLanguage;
-                }
-                setIsLoading(true);
-                setHide(true);
-                const instanceConfig = serviceInstanceConfigMap[currentTranslateServiceInstanceKey];
-                const setHideOnce = invokeOnce(setHide);
-                builtinServices[translateServiceName]
-                    .translate(sourceText.trim(), LanguageEnum[sourceLanguage], LanguageEnum[newTargetLanguage], {
-                        config: instanceConfig,
-                        detect: detectLanguage,
-                        setResult: (v) => {
-                            if (translateID[index] !== id) return;
-                            setResult(v);
-                            setHideOnce(false);
-                        },
-                    })
-                    .then(
-                        (v) => {
-                            info(`[${currentTranslateServiceInstanceKey}]resolve:` + v);
-                            if (translateID[index] !== id) return;
-                            setResult(typeof v === 'string' ? v.trim() : v);
-                            setIsLoading(false);
-                            if (v !== '') {
-                                setHideOnce(false);
-                            }
-                            if (!historyDisable) {
-                                addToHistory(
-                                    sourceText.trim(),
-                                    detectLanguage,
-                                    newTargetLanguage,
-                                    translateServiceName,
-                                    typeof v === 'string' ? v.trim() : v
-                                );
-                            }
-                            if (index === 0 && !clipboardMonitor) {
-                                switch (autoCopy) {
-                                    case 'target':
-                                        writeText(v).then(() => {
-                                            if (hideWindow) {
-                                                sendNotification({ title: t('common.write_clipboard'), body: v });
-                                            }
-                                        });
-                                        break;
-                                    case 'source_target':
-                                        writeText(sourceText.trim() + '\n\n' + v).then(() => {
-                                            if (hideWindow) {
-                                                sendNotification({
-                                                    title: t('common.write_clipboard'),
-                                                    body: sourceText.trim() + '\n\n' + v,
-                                                });
-                                            }
-                                        });
-                                        break;
-                                    default:
-                                        break;
-                                }
-                            }
-                        },
-                        (e) => {
-                            info(`[${currentTranslateServiceInstanceKey}]reject:` + e);
-                            if (translateID[index] !== id) return;
-                            setError(e.toString());
-                            setIsLoading(false);
-                        }
-                    );
-            } else {
-                setError('Language not supported');
-            }
+                    setResult: onPartialResult,
+                })
+                .then(onResolve, onReject);
         }
     };
 

@@ -1,0 +1,193 @@
+import { Button, Input, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@nextui-org/react';
+import toast, { Toaster } from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
+import { open } from '@tauri-apps/plugin-shell';
+import React, { useState } from 'react';
+
+import { INSTANCE_NAME_CONFIG_KEY } from '../../../utils/service_instance';
+import { useConfig } from '../../../hooks/useConfig';
+import { useToastStyle } from '../../../hooks';
+import { DEFAULT_MODEL, DEFAULT_REQUEST_PATH, SPEED_OPTIONS, VOICE_OPTIONS } from './index';
+import { Language } from './index';
+import { tts } from './index';
+
+export function Config(props) {
+    const { instanceKey, updateServiceList, onClose } = props;
+    const { t } = useTranslation();
+    const [openaiTtsConfig, setOpenaiTtsConfig] = useConfig(
+        instanceKey,
+        {
+            [INSTANCE_NAME_CONFIG_KEY]: t('services.tts.openai_tts.title'),
+            requestPath: DEFAULT_REQUEST_PATH,
+            apiKey: '',
+            model: DEFAULT_MODEL,
+            voice: 'alloy',
+            speed: 1,
+        },
+        { sync: false }
+    );
+    const [isLoading, setIsLoading] = useState(false);
+
+    const toastStyle = useToastStyle();
+
+    return (
+        openaiTtsConfig !== null && (
+            <>
+                <Toaster />
+                <div className='config-item'>
+                    <Input
+                        label={t('services.instance_name')}
+                        labelPlacement='outside-left'
+                        value={openaiTtsConfig[INSTANCE_NAME_CONFIG_KEY]}
+                        variant='bordered'
+                        classNames={{
+                            base: 'justify-between',
+                            label: 'text-[length:--nextui-font-size-medium]',
+                            mainWrapper: 'max-w-[50%]',
+                        }}
+                        onValueChange={(value) => {
+                            setOpenaiTtsConfig({
+                                ...openaiTtsConfig,
+                                [INSTANCE_NAME_CONFIG_KEY]: value,
+                            });
+                        }}
+                    />
+                </div>
+                <div className={'config-item'}>
+                    <h3 className='my-auto'>{t('services.help')}</h3>
+                    <Button
+                        onPress={() => {
+                            open('https://platform.openai.com/docs/guides/text-to-speech');
+                        }}
+                    >
+                        {t('services.help')}
+                    </Button>
+                </div>
+                <div className='config-item'>
+                    <Input
+                        label={t('services.tts.openai_tts.request_path')}
+                        labelPlacement='outside-left'
+                        value={openaiTtsConfig['requestPath']}
+                        variant='bordered'
+                        classNames={{
+                            base: 'justify-between',
+                            label: 'text-[length:--nextui-font-size-medium]',
+                            mainWrapper: 'max-w-[50%]',
+                        }}
+                        onValueChange={(value) => {
+                            setOpenaiTtsConfig({
+                                ...openaiTtsConfig,
+                                requestPath: value,
+                            });
+                        }}
+                    />
+                </div>
+                <div className='config-item'>
+                    <Input
+                        label={t('services.tts.openai_tts.api_key')}
+                        labelPlacement='outside-left'
+                        type='password'
+                        value={openaiTtsConfig['apiKey']}
+                        variant='bordered'
+                        classNames={{
+                            base: 'justify-between',
+                            label: 'text-[length:--nextui-font-size-medium]',
+                            mainWrapper: 'max-w-[50%]',
+                        }}
+                        onValueChange={(value) => {
+                            setOpenaiTtsConfig({
+                                ...openaiTtsConfig,
+                                apiKey: value,
+                            });
+                        }}
+                    />
+                </div>
+                <div className='config-item'>
+                    <Input
+                        label={t('services.tts.openai_tts.model')}
+                        labelPlacement='outside-left'
+                        value={openaiTtsConfig['model']}
+                        variant='bordered'
+                        classNames={{
+                            base: 'justify-between',
+                            label: 'text-[length:--nextui-font-size-medium]',
+                            mainWrapper: 'max-w-[50%]',
+                        }}
+                        onValueChange={(value) => {
+                            setOpenaiTtsConfig({
+                                ...openaiTtsConfig,
+                                model: value,
+                            });
+                        }}
+                    />
+                </div>
+                <div className='config-item'>
+                    <h3 className='my-auto'>{t('services.tts.openai_tts.voice')}</h3>
+                    <Dropdown>
+                        <DropdownTrigger>
+                            <Button variant='bordered'>{openaiTtsConfig['voice']}</Button>
+                        </DropdownTrigger>
+                        <DropdownMenu
+                            aria-label='openai tts voice'
+                            onAction={(key) => {
+                                setOpenaiTtsConfig({
+                                    ...openaiTtsConfig,
+                                    voice: key,
+                                });
+                            }}
+                        >
+                            {VOICE_OPTIONS.map((voice) => (
+                                <DropdownItem key={voice}>{voice}</DropdownItem>
+                            ))}
+                        </DropdownMenu>
+                    </Dropdown>
+                </div>
+                <div className='config-item'>
+                    <h3 className='my-auto'>{t('services.tts.openai_tts.speed')}</h3>
+                    <Dropdown>
+                        <DropdownTrigger>
+                            <Button variant='bordered'>{`${openaiTtsConfig['speed'] ?? 1}x`}</Button>
+                        </DropdownTrigger>
+                        <DropdownMenu
+                            aria-label='openai tts speed'
+                            onAction={(key) => {
+                                setOpenaiTtsConfig({
+                                    ...openaiTtsConfig,
+                                    speed: Number(key),
+                                });
+                            }}
+                        >
+                            {SPEED_OPTIONS.map((speed) => (
+                                <DropdownItem key={speed}>{`${speed}x`}</DropdownItem>
+                            ))}
+                        </DropdownMenu>
+                    </Dropdown>
+                </div>
+                <div>
+                    <Button
+                        isLoading={isLoading}
+                        fullWidth
+                        color='primary'
+                        onPress={() => {
+                            setIsLoading(true);
+                            tts('hello', Language.en, { config: openaiTtsConfig }).then(
+                                () => {
+                                    setIsLoading(false);
+                                    setOpenaiTtsConfig(openaiTtsConfig, true);
+                                    updateServiceList(instanceKey);
+                                    onClose();
+                                },
+                                (e) => {
+                                    setIsLoading(false);
+                                    toast.error(t('config.service.test_failed') + e.toString(), { style: toastStyle });
+                                }
+                            );
+                        }}
+                    >
+                        {t('common.save')}
+                    </Button>
+                </div>
+            </>
+        )
+    );
+}

@@ -7,11 +7,16 @@ import { Dropdown } from '@nextui-org/react';
 import { Switch } from '@nextui-org/react';
 import { Button } from '@nextui-org/react';
 import { Card } from '@nextui-org/react';
-import React from 'react';
+import toast, { Toaster } from 'react-hot-toast';
+import React, { useEffect, useState } from 'react';
 
+import { clearCache, getCacheCount } from '../../../../utils/db';
 import { languageList } from '../../../../utils/language';
 import { useConfig } from '../../../../hooks/useConfig';
+import { useToastStyle } from '../../../../hooks';
 import { invoke } from '@tauri-apps/api/core';
+
+const CACHE_TTL_OPTIONS = [1, 3, 7, 30, 365];
 
 export default function Translate() {
     const [sourceLanguage, setSourceLanguage] = useConfig('translate_source_language', 'auto');
@@ -32,10 +37,19 @@ export default function Translate() {
     const [hideWindow, setHideWindow] = useConfig('translate_hide_window', false);
     const [closeOnBlur, setCloseOnBlur] = useConfig('translate_close_on_blur', true);
     const [alwaysOnTop, setAlwaysOnTop] = useConfig('translate_always_on_top', false);
+    const [cacheEnable, setCacheEnable] = useConfig('translate_cache_enable', true);
+    const [cacheTtl, setCacheTtl] = useConfig('translate_cache_ttl', 7);
+    const [cacheCount, setCacheCount] = useState(0);
+    const toastStyle = useToastStyle();
     const { t } = useTranslation();
+
+    useEffect(() => {
+        getCacheCount().then(setCacheCount, () => setCacheCount(0));
+    }, []);
 
     return (
         <>
+            <Toaster />
             <Card className='mb-[10px]'>
                 <CardBody>
                     <div className='config-item'>
@@ -166,6 +180,61 @@ export default function Translate() {
                                 }}
                             />
                         )}
+                    </div>
+                    <div className='config-item'>
+                        <h3 className='my-auto mx-0'>{t('config.translate.cache_enable')}</h3>
+                        {cacheEnable !== null && (
+                            <Switch
+                                isSelected={cacheEnable}
+                                onValueChange={(v) => {
+                                    setCacheEnable(v);
+                                }}
+                            />
+                        )}
+                    </div>
+                    <div className={`config-item ${!cacheEnable && 'hidden'}`}>
+                        <h3 className='my-auto mx-0'>{t('config.translate.cache_ttl')}</h3>
+                        {cacheTtl !== null && (
+                            <Dropdown>
+                                <DropdownTrigger>
+                                    <Button variant='bordered'>
+                                        {t('config.translate.cache_ttl_value', { days: cacheTtl })}
+                                    </Button>
+                                </DropdownTrigger>
+                                <DropdownMenu
+                                    aria-label='cache ttl'
+                                    onAction={(key) => {
+                                        setCacheTtl(Number(key));
+                                    }}
+                                >
+                                    {CACHE_TTL_OPTIONS.map((days) => (
+                                        <DropdownItem key={days}>
+                                            {t('config.translate.cache_ttl_value', { days })}
+                                        </DropdownItem>
+                                    ))}
+                                </DropdownMenu>
+                            </Dropdown>
+                        )}
+                    </div>
+                    <div className={`config-item ${!cacheEnable && 'hidden'}`}>
+                        <h3 className='my-auto mx-0'>{t('config.translate.cache_clear')}</h3>
+                        <Button
+                            variant='flat'
+                            color='danger'
+                            onPress={() => {
+                                clearCache().then(
+                                    () => {
+                                        setCacheCount(0);
+                                        toast.success(t('config.translate.cache_cleared'), { style: toastStyle });
+                                    },
+                                    (e) => {
+                                        toast.error(e.toString(), { style: toastStyle });
+                                    }
+                                );
+                            }}
+                        >
+                            {t('config.translate.cache_count', { n: cacheCount })}
+                        </Button>
                     </div>
                     <div className='config-item'>
                         <h3 className='my-auto mx-0'>{t('config.translate.incremental_translate')}</h3>
