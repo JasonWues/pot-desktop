@@ -1,5 +1,13 @@
-.config-item {
-    margin: 10px 0;
-    display: flex;
-    justify-content: space-between;
+/*
+  In `components`, not at the top level. Tailwind 4 puts its utilities in
+  `@layer utilities`, and unlayered CSS outranks every cascade layer, so a top
+  level `display: flex` here beats `.hidden` -- and roughly nine config rows are
+  written as `config-item ${cond && 'hidden'}`, which would never hide again.
+*/
+@layer components {
+    .config-item {
+        margin: 10px 0;
+        display: flex;
+        justify-content: space-between;
+    }
 }

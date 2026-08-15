@@ -20,9 +20,19 @@
   }
 }
 
-* {
-    margin: 0;
-    padding: 0;
+/*
+  This has to sit in `base`. Tailwind 4 emits its utilities inside
+  `@layer utilities`, and unlayered CSS beats every cascade layer no matter how
+  specific the layered rule is -- so as plain top level CSS this reset silently
+  won over every margin and padding utility in the app. Under Tailwind 3, which
+  emitted unlayered utilities, `.mx-\[12px\]` simply outranked `*` on
+  specificity and the same code was fine.
+*/
+@layer base {
+    * {
+        margin: 0;
+        padding: 0;
+    }
 }
 
 html {

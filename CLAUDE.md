@@ -70,6 +70,10 @@ This branch migrated from Tauri 1.8 to Tauri 2 (`d44c7bb`). Two shims deliberate
 
 Other v2 consequences worth knowing: core APIs are now 15 separate plugins (see `Cargo.toml` / `package.json`); every frontend capability must be allow-listed in `src-tauri/capabilities/default.json` (a missing permission fails at runtime, e.g. `data-tauri-drag-region` needs `core:window:allow-start-dragging`); the store returns `undefined` (not `null`) for missing keys.
 
+### Custom CSS must be wrapped in a layer
+
+Tailwind 4 emits its utilities inside `@layer utilities`, and **unlayered CSS beats every cascade layer regardless of specificity**. Any plain rule in `src/style.css` or a component `style.css` therefore silently overrides the utility classes it collides with — this is not a specificity problem and adding classes will not fix it. Put app CSS in `@layer base` (resets) or `@layer components` (component classes), which is where `* { margin: 0 }` and `.config-item` now live. Under Tailwind 3 the same code was fine, because v3 emitted unlayered utilities that simply outranked `*` on specificity.
+
 ### Rust module map (`src-tauri/src/`)
 
 `main.rs` wires plugins, the global `APP: OnceCell<AppHandle>`, and the `invoke_handler` list — a new `#[tauri::command]` must be added there *and* usually needs a capability entry. `cmd.rs` misc commands (screenshot cropping, proxy, plugin install, fonts). `system_ocr.rs` per-OS native OCR (Windows.Media.Ocr / macOS Vision / Linux tesseract binary). `tts.rs` per-OS offline speech (Windows.Media.SpeechSynthesis / macOS `say` / Linux `espeak-ng`), returning base64 WAV because the IPC layer would otherwise serialize the audio as a JSON number array. `lang_detect.rs` offline detection via `lingua`. `backup.rs` WebDAV/Aliyun/local config backup. `updater.rs` + `updater_window`.
