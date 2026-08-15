@@ -74,6 +74,14 @@ Other v2 consequences worth knowing: core APIs are now 15 separate plugins (see 
 
 Tailwind 4 emits its utilities inside `@layer utilities`, and **unlayered CSS beats every cascade layer regardless of specificity**. Any plain rule in `src/style.css` or a component `style.css` therefore silently overrides the utility classes it collides with — this is not a specificity problem and adding classes will not fix it. Put app CSS in `@layer base` (resets) or `@layer components` (component classes), which is where `* { margin: 0 }` and `.config-item` now live. Under Tailwind 3 the same code was fine, because v3 emitted unlayered utilities that simply outranked `*` on specificity.
 
+### Themes
+
+A theme is a HeroUI theme in `tailwind.config.cjs` plus an entry in `src/utils/theme.js` (which keeps the Settings dropdown and the `next-themes` provider in sync — next-themes only strips the classes it was told about, so a name missing from `colorThemes` gets added to `<html>` and never removed) and a `config.general.theme.<name>` string in `en_US.json`/`zh_CN.json`. Because every surface in the app is painted with HeroUI tokens (`bg-content1`, `text-default-500`, `border-default-100`), a colours-only theme needs no component changes at all.
+
+`nocturne` goes further and adds `src/themes/nocturne.css`, which is the **one stylesheet allowed in a layer after `utilities`** (`@layer theme, base, components, utilities, nocturne;`) — it restyles utility classes themselves, which nothing in `components` could do. Two traps it documents in place: `backdrop-filter` establishes a containing block for `position: fixed` descendants, so it must not go on the `bg-background` shells that hold the `data-tauri-drag-region` strips; and lightningcss merges a property with its own prefixed forms, so hand-writing `-webkit-backdrop-filter` makes it emit *only* the legacy property, which Chrome 151/WebView2 no longer supports.
+
+Anything reading a theme colour from JS should pass `hsl(var(--heroui-…))` through as a string rather than branching on the theme name against `semanticColors` — the var resolves against whatever class is on `<html>`, so it stays correct for themes added later.
+
 ### Rust module map (`src-tauri/src/`)
 
 `main.rs` wires plugins, the global `APP: OnceCell<AppHandle>`, and the `invoke_handler` list — a new `#[tauri::command]` must be added there *and* usually needs a capability entry. `cmd.rs` misc commands (screenshot cropping, proxy, plugin install, fonts). `system_ocr.rs` per-OS native OCR (Windows.Media.Ocr / macOS Vision / Linux tesseract binary). `tts.rs` per-OS offline speech (Windows.Media.SpeechSynthesis / macOS `say` / Linux `espeak-ng`), returning base64 WAV because the IPC layer would otherwise serialize the audio as a JSON number array. `lang_detect.rs` offline detection via `lingua`. `backup.rs` WebDAV/Aliyun/local config backup. `updater.rs` + `updater_window`.

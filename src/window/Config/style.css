@@ -8,8 +8,12 @@
   up the LOWEST priority layer -- below `base`, which is where Tailwind's
   preflight `* { margin: 0 }` lives. That silently ate `.config-item`'s margin
   while leaving its display rules intact.
+
+  `nocturne` sits after `utilities` on purpose -- it is the one layer that has to
+  win against them, because it restyles utility classes themselves. See
+  src/themes/nocturne.css.
 */
-@layer theme, base, components, utilities;
+@layer theme, base, components, utilities, nocturne;
 
 /*
   In `components`, not at the top level: Tailwind 4 puts utilities in

@@ -68,6 +68,7 @@
                 "theme": {
                     "light": "浅色",
                     "dark": "深色",
+                    "nocturne": "夜曲",
                     "system": "跟随系统"
                 },
                 "transparent": "透明效果",

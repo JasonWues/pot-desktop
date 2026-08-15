@@ -13,13 +13,29 @@ import { Switch } from '@heroui/react';
 import 'flag-icons/css/flag-icons.min.css';
 import { Input } from '@heroui/react';
 import { Card } from '@heroui/react';
+import { LuSun, LuMoon, LuMonitor, LuSparkles } from 'react-icons/lu';
 import { invoke } from '@tauri-apps/api/core';
 import { useTheme } from 'next-themes';
 
 import { useConfig } from '../../../../hooks/useConfig';
 import { LanguageFlag } from '../../../../utils/language';
+import { themeOptions } from '../../../../utils/theme';
 import { useToastStyle } from '../../../../hooks';
 import { osType } from '../../../../utils/env';
+
+// react-icons ships the Lucide set as `lu`, so the icons cost no extra
+// dependency. Keyed by the same names as `themeOptions`.
+const themeIcon = {
+    system: LuMonitor,
+    light: LuSun,
+    dark: LuMoon,
+    nocturne: LuSparkles,
+};
+
+function ThemeIcon({ name }) {
+    const Icon = themeIcon[name] ?? LuMonitor;
+    return <Icon className='text-[16px]' />;
+}
 
 let timer = null;
 
@@ -293,7 +309,12 @@ export default function General() {
                         {appTheme !== null && (
                             <Dropdown>
                                 <DropdownTrigger>
-                                    <Button variant='bordered'>{t(`config.general.theme.${appTheme}`)}</Button>
+                                    <Button
+                                        variant='bordered'
+                                        startContent={<ThemeIcon name={appTheme} />}
+                                    >
+                                        {t(`config.general.theme.${appTheme}`)}
+                                    </Button>
                                 </DropdownTrigger>
                                 <DropdownMenu
                                     aria-label='app theme'
@@ -319,9 +340,14 @@ export default function General() {
                                         }
                                     }}
                                 >
-                                    <DropdownItem key='system'>{t('config.general.theme.system')}</DropdownItem>
-                                    <DropdownItem key='light'>{t('config.general.theme.light')}</DropdownItem>
-                                    <DropdownItem key='dark'>{t('config.general.theme.dark')}</DropdownItem>
+                                    {themeOptions.map((name) => (
+                                        <DropdownItem
+                                            key={name}
+                                            startContent={<ThemeIcon name={name} />}
+                                        >
+                                            {t(`config.general.theme.${name}`)}
+                                        </DropdownItem>
+                                    ))}
                                 </DropdownMenu>
                             </Dropdown>
                         )}

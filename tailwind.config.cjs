@@ -70,6 +70,81 @@ module.exports = {
                         },
                     },
                 },
+                // Nocturne. Obsidian glass over a drifting aurora, lit by violet
+                // and magenta. Everything here is plain HeroUI theme tokens, so
+                // every existing `bg-content1` / `text-default-500` / `border-
+                // default-100` in the app recolours itself. The parts a token
+                // cannot express -- the aurora, the glass, the glow, the grain --
+                // live in src/themes/nocturne.css.
+                nocturne: {
+                    extend: 'dark',
+                    layout: {
+                        // Tighter than the default 0.25/0.5/0.75rem. Sharp corners
+                        // read as deliberate next to the soft aurora behind them.
+                        radius: { small: '0.125rem', medium: '0.3rem', large: '0.5rem' },
+                        borderWidth: { small: '1px', medium: '1px', large: '2px' },
+                        disabledOpacity: '0.35',
+                        boxShadow: {
+                            small: '0 1px 2px 0 rgb(0 0 0 / 0.5), 0 0 12px -4px rgb(123 97 255 / 0.35)',
+                            medium: '0 4px 16px -4px rgb(0 0 0 / 0.6), 0 0 28px -8px rgb(123 97 255 / 0.45)',
+                            large: '0 12px 40px -8px rgb(0 0 0 / 0.7), 0 0 60px -12px rgb(123 97 255 / 0.55)',
+                        },
+                    },
+                    colors: {
+                        background: '#08080f',
+                        foreground: '#eae8fa',
+                        content1: '#0f0f1c',
+                        content2: '#16162a',
+                        content3: '#1e1e38',
+                        content4: '#282847',
+                        focus: '#7b61ff',
+                        // Like the dark theme, the scale runs darkest -> lightest.
+                        default: {
+                            DEFAULT: '#242440',
+                            50: '#0f0f1c',
+                            100: '#191930',
+                            200: '#242440',
+                            300: '#333355',
+                            400: '#4a4a70',
+                            500: '#8b88b8',
+                            600: '#a6a3cc',
+                            700: '#c0bedd',
+                            800: '#d6d4ec',
+                            900: '#eae8fa',
+                        },
+                        primary: {
+                            DEFAULT: '#7b61ff',
+                            foreground: '#ffffff',
+                            50: '#171034',
+                            100: '#241a55',
+                            200: '#332676',
+                            300: '#453498',
+                            400: '#5b45c4',
+                            500: '#7b61ff',
+                            600: '#9179ff',
+                            700: '#ac98ff',
+                            800: '#c7b9ff',
+                            900: '#e2d9ff',
+                        },
+                        secondary: {
+                            DEFAULT: '#ff3ea5',
+                            foreground: '#0a0a14',
+                            50: '#3a0a24',
+                            100: '#5c0f38',
+                            200: '#80174e',
+                            300: '#a81f66',
+                            400: '#d42b83',
+                            500: '#ff3ea5',
+                            600: '#ff64b7',
+                            700: '#ff8ac9',
+                            800: '#ffb1db',
+                            900: '#ffd8ed',
+                        },
+                        success: { DEFAULT: '#2ce8b4', foreground: '#04140f' },
+                        warning: { DEFAULT: '#ffc247', foreground: '#1a1204' },
+                        danger: { DEFAULT: '#ff4d6d', foreground: '#ffffff' },
+                    },
+                },
             },
         }),
     ],

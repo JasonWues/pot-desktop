@@ -1,6 +1,22 @@
 @import 'tailwindcss';
+@import './themes/nocturne.css';
 
 @config '../tailwind.config.cjs';
+
+/*
+  `darkMode: 'class'` in the config ties the `dark:` variant to `.dark` alone, so
+  every dark: utility -- the app's own handful plus the many that HeroUI's
+  components carry -- would fall back to its light value under Nocturne, which is
+  a dark theme. A CSS-first @custom-variant overrides the config and lets either
+  class trigger it.
+
+  `:is()`, not the `:where()` that Tailwind's own docs suggest. `:where()` scores
+  zero, which would drop every dark: utility in the bundle from 0,2,0 to 0,1,0
+  and hand ties to whichever plain utility happens to be emitted later. `:is(.dark
+  *)` scores 0,1,0, so this reproduces `darkMode: 'class'` exactly and only widens
+  what matches.
+*/
+@custom-variant dark (&:is(.dark *, .nocturne *));
 
 /*
   The default border color has changed to `currentcolor` in Tailwind CSS v4,
@@ -11,13 +27,13 @@
   color utility to any element that depends on these defaults.
 */
 @layer base {
-  *,
-  ::after,
-  ::before,
-  ::backdrop,
-  ::file-selector-button {
-    border-color: var(--color-gray-200, currentcolor);
-  }
+    *,
+    ::after,
+    ::before,
+    ::backdrop,
+    ::file-selector-button {
+        border-color: var(--color-gray-200, currentcolor);
+    }
 }
 
 /*

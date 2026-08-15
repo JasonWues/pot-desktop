@@ -68,6 +68,7 @@
                 "theme": {
                     "light": "Light",
                     "dark": "Dark",
+                    "nocturne": "Nocturne",
                     "system": "System"
                 },
                 "transparent": "Transparent Effect",

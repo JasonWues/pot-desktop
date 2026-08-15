@@ -4,6 +4,7 @@ import { HeroUIProvider } from '@heroui/react';
 import ReactDOM from 'react-dom/client';
 import React from 'react';
 
+import { colorThemes } from './utils/theme';
 import { initStore } from './utils/store';
 import { initEnv } from './utils/env';
 import App from './App';
@@ -42,7 +43,10 @@ async function bootstrap() {
     const root = ReactDOM.createRoot(rootElement);
     root.render(
         <HeroUIProvider>
-            <NextThemesProvider attribute='class'>
+            <NextThemesProvider
+                attribute='class'
+                themes={colorThemes}
+            >
                 <App />
             </NextThemesProvider>
         </HeroUIProvider>
