@@ -26,14 +26,16 @@ export default defineConfig(async () => ({
     build: {
         rollupOptions: {
             input: {
-                index: resolve(__dirname, 'index.html'),
-                daemon: resolve(__dirname, 'daemon.html'),
+                index: resolve(import.meta.dirname, 'index.html'),
+                daemon: resolve(import.meta.dirname, 'daemon.html'),
             },
         },
         // Tauri supports es2021
         target: process.env.TAURI_PLATFORM == 'windows' ? 'chrome105' : 'safari11',
-        // don't minify for debug builds
-        minify: !process.env.TAURI_DEBUG ? 'esbuild' : false,
+        // don't minify for debug builds. `true` is the Oxc minifier, Vite 8's
+        // default; the old 'esbuild' value is deprecated and would need esbuild
+        // installed as a separate dependency.
+        minify: !process.env.TAURI_DEBUG,
         // produce sourcemaps for debug builds
         sourcemap: !!process.env.TAURI_DEBUG,
     },
