@@ -192,7 +192,7 @@ export default function Translate() {
                             />
                         )}
                     </div>
-                    <div className={`config-item ${!cacheEnable && 'hidden'}`}>
+                    <div className={`config-item ${!cacheEnable ? 'hidden' : ''}`}>
                         <h3 className='my-auto mx-0'>{t('config.translate.cache_ttl')}</h3>
                         {cacheTtl !== null && (
                             <Dropdown>
@@ -216,7 +216,7 @@ export default function Translate() {
                             </Dropdown>
                         )}
                     </div>
-                    <div className={`config-item ${!cacheEnable && 'hidden'}`}>
+                    <div className={`config-item ${!cacheEnable ? 'hidden' : ''}`}>
                         <h3 className='my-auto mx-0'>{t('config.translate.cache_clear')}</h3>
                         <Button
                             variant='flat'

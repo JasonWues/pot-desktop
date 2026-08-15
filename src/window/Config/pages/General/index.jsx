@@ -468,7 +468,7 @@ export default function General() {
                             </Dropdown>
                         )}
                     </div>
-                    <div className={`config-item ${osType !== 'Windows_NT' && 'hidden'}`}>
+                    <div className={`config-item ${osType !== 'Windows_NT' ? 'hidden' : ''}`}>
                         <h3 className='my-auto'>{t('config.general.tray_click_event')}</h3>
                         {trayClickEvent !== null && (
                             <Dropdown>
@@ -494,7 +494,7 @@ export default function General() {
                             </Dropdown>
                         )}
                     </div>
-                    <div className={`config-item ${osType === 'Darwin' && 'hidden'}`}>
+                    <div className={`config-item ${osType === 'Darwin' ? 'hidden' : ''}`}>
                         <h3>{t('config.general.transparent')}</h3>
                         {transparent !== null && (
                             <Switch

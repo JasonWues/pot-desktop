@@ -368,7 +368,7 @@ export default function SourceArea(props) {
 
 
     return (
-        <div className={hideSource && windowType !== '[INPUT_TRANSLATE]' && 'hidden'}>
+        <div className={hideSource && windowType !== '[INPUT_TRANSLATE]' ? 'hidden' : ''}>
             <Card
                 shadow='none'
                 className='bg-content1 rounded-[10px] mt-px pb-0'

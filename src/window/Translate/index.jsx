@@ -234,9 +234,7 @@ export default function Translate() {
     return (
         pluginList && (
             <div
-                className={`bg-background h-screen w-screen ${
-                    osType === 'Linux' && 'rounded-[10px] border-1 border-default-100'
-                }`}
+                className={`bg-background h-screen w-screen ${osType === 'Linux' ? 'rounded-[10px] border-1 border-default-100' : ''}`}
             >
                 <div
                     className='fixed top-[5px] left-[5px] right-[5px] h-[30px]'
@@ -269,7 +267,7 @@ export default function Translate() {
                         size='sm'
                         variant='flat'
                         disableAnimation
-                        className={`my-auto ${osType === 'Darwin' && 'hidden'} bg-transparent`}
+                        className={`my-auto ${osType === 'Darwin' ? 'hidden' : ''} bg-transparent`}
                         onPress={() => {
                             void appWindow.close();
                         }}
@@ -287,7 +285,7 @@ export default function Translate() {
                                 />
                             )}
                         </div>
-                        <div className={`${hideLanguage && 'hidden'}`}>
+                        <div className={`${hideLanguage ? 'hidden' : ''}`}>
                             <LanguageArea />
                             <Spacer y={2} />
                         </div>
@@ -332,9 +330,9 @@ export default function Translate() {
                                                             </div>
                                                         )}
                                                     </Draggable>
-                                                ) : (
-                                                    <></>
-                                                );
+                                                ) : // `null`, not an empty fragment: a fragment is a
+                                                // child of this list and React wants a key for it.
+                                                null;
                                             })}
                                     </div>
                                 )}

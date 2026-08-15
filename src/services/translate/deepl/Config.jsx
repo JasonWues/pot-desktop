@@ -71,7 +71,7 @@ export function Config(props) {
                         }}
                     />
                 </div>
-                <div className={`config-item ${deeplConfig.type === 'free' && 'hidden'}`}>
+                <div className={`config-item ${deeplConfig.type === 'free' ? 'hidden' : ''}`}>
                     <h3 className='my-auto'>{t('services.help')}</h3>
                     <Button
                         onPress={() => {
@@ -107,7 +107,7 @@ export function Config(props) {
                         </DropdownMenu>
                     </Dropdown>
                 </div>
-                <div className={`config-item ${deeplConfig.type !== 'api' && 'hidden'}`}>
+                <div className={`config-item ${deeplConfig.type !== 'api' ? 'hidden' : ''}`}>
                     <Input
                         label={t('services.translate.deepl.auth_key')}
                         labelPlacement='outside-left'
@@ -127,7 +127,7 @@ export function Config(props) {
                         }}
                     />
                 </div>
-                <div className={`config-item ${deeplConfig.type !== 'deeplx' && 'hidden'}`}>
+                <div className={`config-item ${deeplConfig.type !== 'deeplx' ? 'hidden' : ''}`}>
                     <Input
                         label={t('services.translate.deepl.custom_url')}
                         labelPlacement='outside-left'

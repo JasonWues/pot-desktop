@@ -137,7 +137,7 @@ export default function Hotkey() {
                                 <Button
                                     size='sm'
                                     variant='flat'
-                                    className={`${selectionTranslate === '' && 'hidden'}`}
+                                    className={`${selectionTranslate === '' ? 'hidden' : ''}`}
                                     onPress={() => {
                                         registerHandler('hotkey_selection_translate', selectionTranslate);
                                     }}
@@ -168,7 +168,7 @@ export default function Hotkey() {
                                 <Button
                                     size='sm'
                                     variant='flat'
-                                    className={`${inputTranslate === '' && 'hidden'}`}
+                                    className={`${inputTranslate === '' ? 'hidden' : ''}`}
                                     onPress={() => {
                                         registerHandler('hotkey_input_translate', inputTranslate);
                                     }}
@@ -199,7 +199,7 @@ export default function Hotkey() {
                                 <Button
                                     size='sm'
                                     variant='flat'
-                                    className={`${ocrRecognize === '' && 'hidden'}`}
+                                    className={`${ocrRecognize === '' ? 'hidden' : ''}`}
                                     onPress={() => {
                                         registerHandler('hotkey_ocr_recognize', ocrRecognize);
                                     }}
@@ -230,7 +230,7 @@ export default function Hotkey() {
                                 <Button
                                     size='sm'
                                     variant='flat'
-                                    className={`${ocrTranslate === '' && 'hidden'}`}
+                                    className={`${ocrTranslate === '' ? 'hidden' : ''}`}
                                     onPress={() => {
                                         registerHandler('hotkey_ocr_translate', ocrTranslate);
                                     }}

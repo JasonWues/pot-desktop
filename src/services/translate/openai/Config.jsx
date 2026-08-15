@@ -225,7 +225,7 @@ export function Config(props) {
                         </div>
                     </CardBody>
                 </Card>
-                <div className={`config-item ${openaiConfig.service === 'azure' && 'hidden'}`}>
+                <div className={`config-item ${openaiConfig.service === 'azure' ? 'hidden' : ''}`}>
                     <Input
                         label={t('services.translate.openai.model')}
                         labelPlacement='outside-left'

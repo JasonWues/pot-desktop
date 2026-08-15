@@ -108,9 +108,7 @@ export default function Recognize() {
         pluginList &&
         serviceInstanceConfigMap !== null && (
             <div
-                className={`bg-background h-screen ${
-                    osType === 'Linux' && 'rounded-[10px] border-1 border-default-100'
-                }`}
+                className={`bg-background h-screen ${osType === 'Linux' ? 'rounded-[10px] border-1 border-default-100' : ''}`}
             >
                 <div
                     data-tauri-drag-region='true'

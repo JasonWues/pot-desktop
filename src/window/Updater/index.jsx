@@ -46,9 +46,7 @@ export default function Updater() {
 
     return (
         <div
-            className={`${transparent ? 'bg-background/90' : 'bg-background'} h-screen ${
-                osType === 'Linux' && 'rounded-[10px] border-1 border-default-100'
-            }`}
+            className={`${transparent ? 'bg-background/90' : 'bg-background'} h-screen ${osType === 'Linux' ? 'rounded-[10px] border-1 border-default-100' : ''}`}
         >
             <Toaster />
             <div className='p-[5px] h-[35px] w-full select-none cursor-default'>

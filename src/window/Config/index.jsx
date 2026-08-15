@@ -31,9 +31,7 @@ export default function Config() {
                 shadow='none'
                 className={`${
                     transparent ? 'bg-background/90' : 'bg-content1'
-                } float-left w-[230px] h-screen rounded-none ${
-                    osType === 'Linux' && 'rounded-l-[10px] border-1'
-                } border-r-1 border-default-100 select-none cursor-default`}
+                } float-left w-[230px] h-screen rounded-none ${osType === 'Linux' ? 'rounded-l-[10px] border-1' : ''} border-r-1 border-default-100 select-none cursor-default`}
             >
                 <div className='h-[35px] p-[5px]'>
                     <div
@@ -54,9 +52,7 @@ export default function Config() {
                 <SideBar />
             </Card>
             <div
-                className={`bg-background ml-[230px] h-screen select-none cursor-default ${
-                    osType === 'Linux' && 'rounded-r-[10px] border-1 border-l-0 border-default-100'
-                }`}
+                className={`bg-background ml-[230px] h-screen select-none cursor-default ${osType === 'Linux' ? 'rounded-r-[10px] border-1 border-l-0 border-default-100' : ''}`}
             >
                 <div
                     data-tauri-drag-region='true'

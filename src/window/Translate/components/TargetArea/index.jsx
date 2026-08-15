@@ -468,7 +468,7 @@ export default function TargetArea(props) {
             >
                 <div>
                     {/* result content */}
-                    <CardBody className={`p-[12px] pb-0 ${hide && 'h-0 p-0'}`}>
+                    <CardBody className={`p-[12px] pb-0 ${hide ? 'h-0 p-0' : ''}`}>
                         {typeof result === 'string' ? (
                             <textarea
                                 ref={textAreaRef}
@@ -602,7 +602,7 @@ export default function TargetArea(props) {
                         )}
                     </CardBody>
                     <CardFooter
-                        className={`bg-content1 rounded-none rounded-b-[10px] flex px-[12px] p-[5px] ${hide && 'hidden'}`}
+                        className={`bg-content1 rounded-none rounded-b-[10px] flex px-[12px] p-[5px] ${hide ? 'hidden' : ''}`}
                     >
                         <ButtonGroup>
                             {/* speak button */}
@@ -763,7 +763,7 @@ export default function TargetArea(props) {
                                     isIconOnly
                                     variant='light'
                                     size='sm'
-                                    className={`${error === '' && 'hidden'}`}
+                                    className={`${error === '' ? 'hidden' : ''}`}
                                     onPress={() => {
                                         setError('');
                                         setResult('');
