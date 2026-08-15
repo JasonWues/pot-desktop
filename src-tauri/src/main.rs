@@ -23,10 +23,10 @@ use config::*;
 use hotkey::*;
 use lang_detect::*;
 use log::{info, warn};
-use once_cell::sync::OnceCell;
 use screenshot::screenshot;
 use server::*;
 use std::sync::Mutex;
+use std::sync::OnceLock;
 use system_ocr::*;
 use tauri::Manager;
 use tauri_plugin_log::{Target, TargetKind};
@@ -38,7 +38,7 @@ use window::config_window;
 use window::updater_window;
 
 // Global AppHandle
-pub static APP: OnceCell<tauri::AppHandle> = OnceCell::new();
+pub static APP: OnceLock<tauri::AppHandle> = OnceLock::new();
 
 // Text to be translated
 pub struct StringWrapper(pub Mutex<String>);
@@ -126,7 +126,10 @@ fn main() {
             }
             match get("proxy_enable") {
                 Some(v) => {
-                    if v.as_bool().unwrap() && get("proxy_host").map_or(false, |host| !host.as_str().unwrap().is_empty()) {
+                    if v.as_bool().unwrap()
+                        && get("proxy_host")
+                            .map_or(false, |host| !host.as_str().unwrap().is_empty())
+                    {
                         let _ = set_proxy();
                     }
                 }
@@ -181,7 +184,15 @@ fn main() {
         .expect("error while running tauri application")
         // 窗口关闭不退出
         .run(|_app_handle, event| {
-            if let tauri::RunEvent::ExitRequested { api, .. } = event {
+            // Only the last window closing is prevented. Tauri 2 also routes
+            // `AppHandle::exit`/`restart` through `ExitRequested`, unlike v1 where
+            // they exited directly, so preventing those too left the tray's Quit
+            // and Restart items doing nothing. `code` tells the two apart: `None`
+            // is user interaction, `Some` is a programmatic exit.
+            if let tauri::RunEvent::ExitRequested {
+                code: None, api, ..
+            } = event
+            {
                 api.prevent_exit();
             }
         });

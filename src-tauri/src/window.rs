@@ -33,6 +33,17 @@ fn get_daemon_window() -> WebviewWindow {
     }
 }
 
+// Mouse physical position, relative to the top-left corner of the desktop.
+pub fn get_mouse_position() -> tauri::PhysicalPosition<i32> {
+    match APP.get().unwrap().cursor_position() {
+        Ok(position) => tauri::PhysicalPosition::new(position.x as i32, position.y as i32),
+        Err(e) => {
+            warn!("Mouse position not found ({}), using (0, 0) as default", e);
+            tauri::PhysicalPosition::new(0, 0)
+        }
+    }
+}
+
 // Get monitor where the mouse is currently located
 fn get_current_monitor(x: i32, y: i32) -> Monitor {
     info!("Mouse position: {}, {}", x, y);
@@ -58,15 +69,7 @@ fn get_current_monitor(x: i32, y: i32) -> Monitor {
 
 // Creating a window on the mouse monitor
 fn build_window(label: &str, title: &str) -> (WebviewWindow, bool) {
-    use mouse_position::mouse_position::{Mouse, Position};
-
-    let mouse_position = match Mouse::get_mouse_position() {
-        Mouse::Position { x, y } => Position { x, y },
-        Mouse::Error => {
-            warn!("Mouse position not found, using (0, 0) as default");
-            Position { x: 0, y: 0 }
-        }
-    };
+    let mouse_position = get_mouse_position();
     let current_monitor = get_current_monitor(mouse_position.x, mouse_position.y);
     // `position()` on the builder is logical, the monitor reports physical, so the
     // two have to be reconciled or the window lands off-screen on a scaled setup.
@@ -146,15 +149,7 @@ fn log_window_geometry(window: &WebviewWindow) {
 }
 
 fn translate_window() -> WebviewWindow {
-    use mouse_position::mouse_position::{Mouse, Position};
-    // Mouse physical position
-    let mut mouse_position = match Mouse::get_mouse_position() {
-        Mouse::Position { x, y } => Position { x, y },
-        Mouse::Error => {
-            warn!("Mouse position not found, using (0, 0) as default");
-            Position { x: 0, y: 0 }
-        }
-    };
+    let mut mouse_position = get_mouse_position();
     let (window, exists) = build_window("translate", "Translate");
     if exists {
         return window;
@@ -380,6 +375,9 @@ pub fn ocr_recognize() {
     }
     #[cfg(not(target_os = "macos"))]
     {
+        // Capture first: it then runs while the overlay's webview starts up,
+        // instead of after it. See `screenshot::start_capture`.
+        crate::screenshot::start_capture();
         let window = screenshot_window();
         let window_ = window.clone();
         window.listen("success", move |event| {
@@ -414,6 +412,7 @@ pub fn ocr_translate() {
     }
     #[cfg(not(target_os = "macos"))]
     {
+        crate::screenshot::start_capture();
         let window = screenshot_window();
         let window_ = window.clone();
         window.listen("success", move |event| {

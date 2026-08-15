@@ -296,7 +296,9 @@ export default function TargetArea(props) {
 
     // refresh tts config
     useEffect(() => {
-        if (ttsServiceList && getServiceSouceType(ttsServiceList[0]) === ServiceSourceType.PLUGIN) {
+        // `[]` is truthy, so the length check is what keeps `[0]` from being undefined
+        // when every tts service has been removed.
+        if (ttsServiceList?.length && getServiceSouceType(ttsServiceList[0]) === ServiceSourceType.PLUGIN) {
             readTextFile(`plugins/tts/${getServiceName(ttsServiceList[0])}/info.json`, {
                 baseDir: BaseDirectory.AppConfig,
             }).then((infoStr) => {

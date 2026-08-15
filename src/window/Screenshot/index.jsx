@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { appCacheDir, join } from '@tauri-apps/api/path';
-import { currentMonitor } from '@tauri-apps/api/window';
 import { convertFileSrc } from '@tauri-apps/api/core';
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 import { emit } from '@tauri-apps/api/event';
@@ -21,13 +20,12 @@ export default function Screenshot() {
     const imgRef = useRef();
 
     useEffect(() => {
-        currentMonitor().then((monitor) => {
-            const position = monitor.position;
-            invoke('screenshot', { x: position.x, y: position.y }).then(() => {
-                appCacheDir().then((appCacheDirPath) => {
-                    join(appCacheDirPath, 'pot_screenshot.png').then((filePath) => {
-                        setImgurl(convertFileSrc(filePath));
-                    });
+        // The capture was started in Rust when the hotkey fired, so this only waits
+        // for it to finish — no need to tell the backend which monitor to grab.
+        invoke('screenshot').then(() => {
+            appCacheDir().then((appCacheDirPath) => {
+                join(appCacheDirPath, 'pot_screenshot.png').then((filePath) => {
+                    setImgurl(convertFileSrc(filePath));
                 });
             });
         });
