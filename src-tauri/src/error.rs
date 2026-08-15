@@ -8,8 +8,6 @@ pub enum Error {
     #[error(transparent)]
     Dav(#[from] reqwest_dav::Error),
     #[error(transparent)]
-    DavRe(#[from] reqwest_dav::re_exports::reqwest::Error),
-    #[error(transparent)]
     Serde(#[from] serde_json::Error),
     #[error(transparent)]
     Zip(#[from] zip::result::ZipError),
@@ -25,6 +23,8 @@ pub enum Error {
     Image(#[from] image::ImageError),
     #[error(transparent)]
     Selection(#[from] font_kit::error::SelectionError),
+    // Also covers `reqwest_dav::re_exports::reqwest::Error`: since reqwest_dav 0.1.15
+    // that re-export is this same reqwest, so a second variant would conflict.
     #[error(transparent)]
     Reqwest(#[from] reqwest::Error),
 }
