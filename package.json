@@ -8,6 +8,7 @@
         "build": "vite build",
         "preview": "vite preview",
         "tauri": "tauri",
+        "dev:mcp": "tauri dev --config src-tauri/tauri.dev.conf.json",
         "updater": "node updater/updater.mjs",
         "updater:fixRuntime": "node updater/updater-for-fix-runtime.mjs"
     },

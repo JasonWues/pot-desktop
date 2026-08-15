@@ -61,6 +61,7 @@
         {
             "identifier": "http:default",
             "allow": [{ "url": "http://*" }, { "url": "https://*" }]
-        }
+        },
+        "mcp-bridge:default"
     ]
 }

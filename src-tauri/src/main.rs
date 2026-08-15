@@ -44,7 +44,20 @@ pub static APP: OnceLock<tauri::AppHandle> = OnceLock::new();
 pub struct StringWrapper(pub Mutex<String>);
 
 fn main() {
-    tauri::Builder::default()
+    let builder = tauri::Builder::default();
+
+    // Debug builds expose an MCP bridge, which lets an AI assistant screenshot the
+    // webviews, read the DOM and watch IPC -- the things that otherwise can only be
+    // reached by asking the user to reproduce a bug by hand. `localhost_only` is not
+    // the plugin's default: it otherwise binds 0.0.0.0, which would let anyone on
+    // the network drive these windows. `cfg(debug_assertions)` keeps it out of
+    // release builds entirely.
+    #[cfg(debug_assertions)]
+    let builder = builder.plugin(tauri_plugin_mcp_bridge::init_with_config(
+        tauri_plugin_mcp_bridge::Config::localhost_only(),
+    ));
+
+    builder
         .plugin(tauri_plugin_single_instance::init(|app, _argv, cwd| {
             let _ = app
                 .notification()
