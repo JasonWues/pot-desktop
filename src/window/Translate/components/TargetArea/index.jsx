@@ -16,7 +16,12 @@ import { BaseDirectory, readTextFile } from '@tauri-apps/plugin-fs';
 import { sendNotification } from '@tauri-apps/plugin-notification';
 import React, { useEffect, useState, useRef } from 'react';
 import { writeText } from '@tauri-apps/plugin-clipboard-manager';
-import PulseLoader from 'react-spinners/PulseLoader';
+// Imported from the package root, not `react-spinners/PulseLoader`. That
+// subpath is CJS, and react-spinners 0.17 put a `"use client"` directive ahead
+// of its `__esModule` marker, which defeats the interop detection: the default
+// import came through as the raw `{ default }` namespace object, so rendering
+// it threw "Element type is invalid ... but got: object".
+import { PulseLoader } from 'react-spinners';
 import { TbTransformFilled } from 'react-icons/tb';
 import { HiOutlineVolumeUp } from 'react-icons/hi';
 import { semanticColors } from '@heroui/theme';
