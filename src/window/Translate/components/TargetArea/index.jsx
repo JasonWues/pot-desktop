@@ -465,7 +465,7 @@ export default function TargetArea(props) {
                         {typeof result === 'string' ? (
                             <textarea
                                 ref={textAreaRef}
-                                className={`text-[${appFontSize}px] h-0 resize-none bg-transparent select-text outline-none`}
+                                className={`text-[${appFontSize}px] h-0 resize-none bg-transparent select-text outline-hidden`}
                                 readOnly
                                 value={result}
                             />

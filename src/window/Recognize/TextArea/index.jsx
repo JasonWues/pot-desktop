@@ -155,7 +155,7 @@ export default function TextArea(props) {
                         {text && (
                             <textarea
                                 value={text}
-                                className='bg-content1 h-full m-[12px] mb-0 resize-none focus:outline-none'
+                                className='bg-content1 h-full m-[12px] mb-0 resize-none focus:outline-hidden'
                                 onChange={(e) => {
                                     setText(e.target.value);
                                 }}
@@ -165,7 +165,7 @@ export default function TextArea(props) {
                             <textarea
                                 value={error}
                                 readOnly
-                                className='bg-content1 h-full m-[12px] mb-0 resize-none focus:outline-none text-red-500'
+                                className='bg-content1 h-full m-[12px] mb-0 resize-none focus:outline-hidden text-red-500'
                                 onChange={(e) => {
                                     setText(e.target.value);
                                 }}
