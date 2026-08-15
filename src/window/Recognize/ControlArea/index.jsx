@@ -1,4 +1,4 @@
-import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Button } from '@nextui-org/react';
+import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Button } from '@heroui/react';
 import { atom, useAtom, useSetAtom, useAtomValue } from 'jotai';
 import { fetch, Body } from '../../../utils/http';
 import { useTranslation } from 'react-i18next';

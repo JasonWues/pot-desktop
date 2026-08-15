@@ -4,7 +4,7 @@ import { convertFileSrc } from '@tauri-apps/api/core';
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 import React, { useState, useEffect } from 'react';
 import { listen } from '@tauri-apps/api/event';
-import { Button } from '@nextui-org/react';
+import { Button } from '@heroui/react';
 import { BsPinFill } from 'react-icons/bs';
 import { atom, useAtom } from 'jotai';
 

@@ -1,4 +1,4 @@
-import { Button, Input, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@nextui-org/react';
+import { Button, Input, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@heroui/react';
 import React, { useEffect, useState } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -67,7 +67,7 @@ export function Config(props) {
                         variant='bordered'
                         classNames={{
                             base: 'justify-between',
-                            label: 'text-[length:--nextui-font-size-medium]',
+                            label: 'text-[length:--heroui-font-size-medium]',
                             mainWrapper: 'max-w-[50%]',
                         }}
                         onValueChange={(value) => {

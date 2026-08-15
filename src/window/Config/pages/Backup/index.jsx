@@ -1,17 +1,17 @@
 import { readTextFile, BaseDirectory } from '@tauri-apps/plugin-fs';
-import { DropdownTrigger } from '@nextui-org/react';
-import { useDisclosure } from '@nextui-org/react';
+import { DropdownTrigger } from '@heroui/react';
+import { useDisclosure } from '@heroui/react';
 import toast, { Toaster } from 'react-hot-toast';
-import { DropdownMenu } from '@nextui-org/react';
-import { DropdownItem } from '@nextui-org/react';
+import { DropdownMenu } from '@heroui/react';
+import { DropdownItem } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
-import { CardBody } from '@nextui-org/react';
-import { Dropdown } from '@nextui-org/react';
+import { CardBody } from '@heroui/react';
+import { Dropdown } from '@heroui/react';
 import { warn } from '@tauri-apps/plugin-log';
-import { Button } from '@nextui-org/react';
-import { Input } from '@nextui-org/react';
-import { Card } from '@nextui-org/react';
-import { Avatar, Tooltip } from '@nextui-org/react';
+import { Button } from '@heroui/react';
+import { Input } from '@heroui/react';
+import { Card } from '@heroui/react';
+import { Avatar, Tooltip } from '@heroui/react';
 import React, { useEffect, useState } from 'react';
 
 import { useConfig, useToastStyle } from '../../../../hooks';

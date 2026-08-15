@@ -1,4 +1,4 @@
-import { Button, Card, CardBody, CardFooter, ButtonGroup, Chip, Tooltip, Spacer } from '@nextui-org/react';
+import { Button, Card, CardBody, CardFooter, ButtonGroup, Chip, Tooltip, Spacer } from '@heroui/react';
 import { BaseDirectory, readTextFile } from '@tauri-apps/plugin-fs';
 import React, { useEffect, useRef, useState } from 'react';
 import { writeText } from '@tauri-apps/plugin-clipboard-manager';

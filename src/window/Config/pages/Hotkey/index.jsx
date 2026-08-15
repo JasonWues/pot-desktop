@@ -1,10 +1,10 @@
 import { unregister, isRegistered } from '@tauri-apps/plugin-global-shortcut';
 import toast, { Toaster } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { CardBody } from '@nextui-org/react';
-import { Button } from '@nextui-org/react';
-import { Input } from '@nextui-org/react';
-import { Card } from '@nextui-org/react';
+import { CardBody } from '@heroui/react';
+import { Button } from '@heroui/react';
+import { Input } from '@heroui/react';
+import { Card } from '@heroui/react';
 import React from 'react';
 
 import { useConfig } from '../../../../hooks/useConfig';

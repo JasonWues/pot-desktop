@@ -1,4 +1,4 @@
-import { Card, CardBody, CardFooter, Button, Skeleton, ButtonGroup, Tooltip } from '@nextui-org/react';
+import { Card, CardBody, CardFooter, Button, Skeleton, ButtonGroup, Tooltip } from '@heroui/react';
 import { sendNotification } from '@tauri-apps/plugin-notification';
 import { writeText } from '@tauri-apps/plugin-clipboard-manager';
 import { atom, useAtom, useAtomValue } from 'jotai';

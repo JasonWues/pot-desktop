@@ -1,4 +1,4 @@
-import { Input, Button, Switch, Textarea, Card, CardBody, Link, Tooltip, Progress } from '@nextui-org/react';
+import { Input, Button, Switch, Textarea, Card, CardBody, Link, Tooltip, Progress } from '@heroui/react';
 import { INSTANCE_NAME_CONFIG_KEY } from '../../../utils/service_instance';
 import { MdDeleteOutline } from 'react-icons/md';
 import toast, { Toaster } from 'react-hot-toast';
@@ -109,7 +109,7 @@ export function Config(props) {
                         variant='bordered'
                         classNames={{
                             base: 'justify-between',
-                            label: 'text-[length:--nextui-font-size-medium]',
+                            label: 'text-[length:--heroui-font-size-medium]',
                             mainWrapper: 'max-w-[50%]',
                         }}
                         onValueChange={(value) => {
@@ -175,7 +175,7 @@ export function Config(props) {
                         variant='bordered'
                         classNames={{
                             base: 'justify-between',
-                            label: 'text-[length:--nextui-font-size-medium]',
+                            label: 'text-[length:--heroui-font-size-medium]',
                             mainWrapper: 'max-w-[50%]',
                         }}
                         onValueChange={(value) => {
@@ -194,7 +194,7 @@ export function Config(props) {
                         variant='bordered'
                         classNames={{
                             base: 'justify-between',
-                            label: 'text-[length:--nextui-font-size-medium]',
+                            label: 'text-[length:--heroui-font-size-medium]',
                             mainWrapper: 'max-w-[50%]',
                         }}
                         onValueChange={(value) => {

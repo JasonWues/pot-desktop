@@ -1,11 +1,11 @@
 import { INSTANCE_NAME_CONFIG_KEY } from '../../../utils/service_instance';
-import { DropdownTrigger } from '@nextui-org/react';
-import { Input, Button } from '@nextui-org/react';
-import { DropdownMenu } from '@nextui-org/react';
-import { DropdownItem } from '@nextui-org/react';
+import { DropdownTrigger } from '@heroui/react';
+import { Input, Button } from '@heroui/react';
+import { DropdownMenu } from '@heroui/react';
+import { DropdownItem } from '@heroui/react';
 import toast, { Toaster } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { Dropdown } from '@nextui-org/react';
+import { Dropdown } from '@heroui/react';
 import { open } from '@tauri-apps/plugin-shell';
 import React, { useState } from 'react';
 
@@ -60,7 +60,7 @@ export function Config(props) {
                         variant='bordered'
                         classNames={{
                             base: 'justify-between',
-                            label: 'text-[length:--nextui-font-size-medium]',
+                            label: 'text-[length:--heroui-font-size-medium]',
                             mainWrapper: 'max-w-[50%]',
                         }}
                         onValueChange={(value) => {
@@ -116,7 +116,7 @@ export function Config(props) {
                         variant='bordered'
                         classNames={{
                             base: 'justify-between',
-                            label: 'text-[length:--nextui-font-size-medium]',
+                            label: 'text-[length:--heroui-font-size-medium]',
                             mainWrapper: 'max-w-[50%]',
                         }}
                         onValueChange={(value) => {
@@ -135,7 +135,7 @@ export function Config(props) {
                         variant='bordered'
                         classNames={{
                             base: 'justify-between',
-                            label: 'text-[length:--nextui-font-size-medium]',
+                            label: 'text-[length:--heroui-font-size-medium]',
                             mainWrapper: 'max-w-[50%]',
                         }}
                         onValueChange={(value) => {

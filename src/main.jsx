@@ -1,6 +1,6 @@
 import { ThemeProvider as NextThemesProvider } from 'next-themes';
 import { attachConsole, error as logError } from '@tauri-apps/plugin-log';
-import { NextUIProvider } from '@nextui-org/react';
+import { HeroUIProvider } from '@heroui/react';
 import ReactDOM from 'react-dom/client';
 import React from 'react';
 
@@ -41,11 +41,11 @@ async function bootstrap() {
     const rootElement = document.getElementById('root');
     const root = ReactDOM.createRoot(rootElement);
     root.render(
-        <NextUIProvider>
+        <HeroUIProvider>
             <NextThemesProvider attribute='class'>
                 <App />
             </NextThemesProvider>
-        </NextUIProvider>
+        </HeroUIProvider>
     );
 }
 

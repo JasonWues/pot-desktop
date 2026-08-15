@@ -1,5 +1,9 @@
 # pnpm >= 10 requires an explicit decision for dependency build scripts.
-# Both are kept disabled, which is the behaviour the project already had.
+# All are kept disabled: esbuild and tesseract.js because that is the behaviour
+# the project already had, and @heroui/shared-utils because its postinstall is
+# `node -e "try{require('./scripts/postinstall.js')}catch(e){}"`, which swallows
+# whatever it does and is not needed for the package to work.
 allowBuilds:
+  '@heroui/shared-utils': false
   esbuild: false
   tesseract.js: false

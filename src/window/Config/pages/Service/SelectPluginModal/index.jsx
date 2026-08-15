@@ -1,4 +1,4 @@
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button } from '@nextui-org/react';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button } from '@heroui/react';
 import { remove, BaseDirectory } from '@tauri-apps/plugin-fs';
 import { open as openInBrowser } from '@tauri-apps/plugin-shell';
 import toast, { Toaster } from 'react-hot-toast';

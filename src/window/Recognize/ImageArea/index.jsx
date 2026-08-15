@@ -1,4 +1,4 @@
-import { Card, CardBody, CardFooter, Button, Tooltip } from '@nextui-org/react';
+import { Card, CardBody, CardFooter, Button, Tooltip } from '@heroui/react';
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 import React, { useEffect, useRef } from 'react';
 import { listen } from '@tauri-apps/api/event';

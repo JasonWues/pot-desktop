@@ -1,7 +1,7 @@
 import { useLocation, useRoutes } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
-import { Card, Divider } from '@nextui-org/react';
+import { Card, Divider } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 
 import WindowControl from '../../components/WindowControl';

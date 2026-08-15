@@ -1,12 +1,12 @@
-import { DropdownTrigger } from '@nextui-org/react';
-import { DropdownMenu } from '@nextui-org/react';
-import { DropdownItem } from '@nextui-org/react';
+import { DropdownTrigger } from '@heroui/react';
+import { DropdownMenu } from '@heroui/react';
+import { DropdownItem } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
-import { CardBody } from '@nextui-org/react';
-import { Dropdown } from '@nextui-org/react';
-import { Switch } from '@nextui-org/react';
-import { Button } from '@nextui-org/react';
-import { Card } from '@nextui-org/react';
+import { CardBody } from '@heroui/react';
+import { Dropdown } from '@heroui/react';
+import { Switch } from '@heroui/react';
+import { Button } from '@heroui/react';
+import { Card } from '@heroui/react';
 import React from 'react';
 
 import { languageList } from '../../../../utils/language';

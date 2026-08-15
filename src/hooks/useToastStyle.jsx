@@ -1,4 +1,4 @@
-import { semanticColors } from '@nextui-org/theme';
+import { semanticColors } from '@heroui/theme';
 import { useTheme } from 'next-themes';
 
 export const useToastStyle = () => {

@@ -1,4 +1,4 @@
-import { Divider, Button, Popover, PopoverTrigger, PopoverContent, Tooltip } from '@nextui-org/react';
+import { Divider, Button, Popover, PopoverTrigger, PopoverContent, Tooltip } from '@heroui/react';
 import { appLogDir, appConfigDir } from '@tauri-apps/api/path';
 import { useTranslation } from 'react-i18next';
 import { open } from '@tauri-apps/plugin-shell';

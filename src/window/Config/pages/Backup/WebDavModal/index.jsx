@@ -1,4 +1,4 @@
-import { Modal, ModalContent, ModalHeader, ModalBody, Button, Skeleton } from '@nextui-org/react';
+import { Modal, ModalContent, ModalHeader, ModalBody, Button, Skeleton } from '@heroui/react';
 import React, { useEffect, useState } from 'react';
 import { MdDeleteOutline } from 'react-icons/md';
 import toast, { Toaster } from 'react-hot-toast';

@@ -8,7 +8,7 @@ import { MdKeyboardAlt } from 'react-icons/md';
 import { MdExtension } from 'react-icons/md';
 import { AiFillCloud } from 'react-icons/ai';
 import { FaHistory } from 'react-icons/fa';
-import { Button } from '@nextui-org/react';
+import { Button } from '@heroui/react';
 import React from 'react';
 
 export default function SideBar() {

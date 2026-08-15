@@ -1,5 +1,5 @@
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
-import { Card, Spacer, Button, useDisclosure } from '@nextui-org/react';
+import { Card, Spacer, Button, useDisclosure } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 

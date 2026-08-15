@@ -1,9 +1,9 @@
 import { INSTANCE_NAME_CONFIG_KEY } from '../../../../../utils/service_instance';
-import { Button, Input } from '@nextui-org/react';
-import { DropdownTrigger } from '@nextui-org/react';
-import { DropdownMenu } from '@nextui-org/react';
-import { DropdownItem } from '@nextui-org/react';
-import { Dropdown } from '@nextui-org/react';
+import { Button, Input } from '@heroui/react';
+import { DropdownTrigger } from '@heroui/react';
+import { DropdownMenu } from '@heroui/react';
+import { DropdownItem } from '@heroui/react';
+import { Dropdown } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 import { open } from '@tauri-apps/plugin-shell';
 import React from 'react';
@@ -36,7 +36,7 @@ export function PluginConfig(props) {
                         variant='bordered'
                         classNames={{
                             base: 'justify-between',
-                            label: 'text-[length:--nextui-font-size-medium]',
+                            label: 'text-[length:--heroui-font-size-medium]',
                             mainWrapper: 'max-w-[50%]',
                         }}
                         onValueChange={(value) => {

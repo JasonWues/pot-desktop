@@ -1,4 +1,4 @@
-import { Card, Button, CardFooter, Dropdown, DropdownMenu, DropdownTrigger, DropdownItem } from '@nextui-org/react';
+import { Card, Button, CardFooter, Dropdown, DropdownMenu, DropdownTrigger, DropdownItem } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 import { BiTransferAlt } from 'react-icons/bi';
 import React, { useEffect } from 'react';

@@ -1,5 +1,5 @@
 import { RxDragHandleHorizontal } from 'react-icons/rx';
-import { Spacer, Button } from '@nextui-org/react';
+import { Spacer, Button } from '@heroui/react';
 import { MdDeleteOutline } from 'react-icons/md';
 import { useTranslation } from 'react-i18next';
 import { BiSolidEdit } from 'react-icons/bi';

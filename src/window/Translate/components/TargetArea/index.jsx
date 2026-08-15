@@ -10,7 +10,7 @@ import {
     DropdownMenu,
     DropdownTrigger,
     Tooltip,
-} from '@nextui-org/react';
+} from '@heroui/react';
 import { BiCollapseVertical, BiExpandVertical } from 'react-icons/bi';
 import { BaseDirectory, readTextFile } from '@tauri-apps/plugin-fs';
 import { sendNotification } from '@tauri-apps/plugin-notification';
@@ -19,7 +19,7 @@ import { writeText } from '@tauri-apps/plugin-clipboard-manager';
 import PulseLoader from 'react-spinners/PulseLoader';
 import { TbTransformFilled } from 'react-icons/tb';
 import { HiOutlineVolumeUp } from 'react-icons/hi';
-import { semanticColors } from '@nextui-org/theme';
+import { semanticColors } from '@heroui/theme';
 import toast, { Toaster } from 'react-hot-toast';
 import { MdContentCopy } from 'react-icons/md';
 import { useTranslation } from 'react-i18next';

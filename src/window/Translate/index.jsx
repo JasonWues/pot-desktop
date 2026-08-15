@@ -4,7 +4,7 @@ import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 import { currentMonitor } from '@tauri-apps/api/window';
 import { appConfigDir, join } from '@tauri-apps/api/path';
 import { convertFileSrc } from '@tauri-apps/api/core';
-import { Spacer, Button } from '@nextui-org/react';
+import { Spacer, Button } from '@heroui/react';
 import { AiFillCloseCircle } from 'react-icons/ai';
 import React, { useState, useEffect } from 'react';
 import { listen } from '@tauri-apps/api/event';

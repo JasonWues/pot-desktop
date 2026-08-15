@@ -1,4 +1,4 @@
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Spacer } from '@nextui-org/react';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Spacer } from '@heroui/react';
 
 import { useTranslation } from 'react-i18next';
 import React from 'react';

@@ -1,4 +1,4 @@
-import { Code, Card, CardBody, Button, Progress, Skeleton } from '@nextui-org/react';
+import { Code, Card, CardBody, Button, Progress, Skeleton } from '@heroui/react';
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 import React, { useEffect, useState } from 'react';
 import { relaunch } from '@tauri-apps/plugin-process';
