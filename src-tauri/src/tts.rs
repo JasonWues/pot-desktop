@@ -87,7 +87,7 @@ pub fn system_tts(
     let stream = synth
         .SynthesizeTextToStreamAsync(&HSTRING::from(text))
         .map_err(|e| e.to_string())?
-        .get()
+        .join()
         .map_err(|e| e.to_string())?;
 
     let size = stream.Size().map_err(|e| e.to_string())? as u32;
@@ -96,7 +96,7 @@ pub fn system_tts(
     reader
         .LoadAsync(size)
         .map_err(|e| e.to_string())?
-        .get()
+        .join()
         .map_err(|e| e.to_string())?;
     let mut buf = vec![0u8; size as usize];
     reader.ReadBytes(&mut buf).map_err(|e| e.to_string())?;

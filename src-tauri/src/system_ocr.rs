@@ -15,20 +15,26 @@ pub fn system_ocr(app_handle: tauri::AppHandle, lang: &str) -> Result<String, St
 
     let path = app_cache_dir_path.to_string_lossy().replace("\\\\?\\", "");
 
+    // `IAsyncOperation::get` became `join` when windows-rs moved async into the
+    // separate windows-future crate.
     let file = StorageFile::GetFileFromPathAsync(&HSTRING::from(path))
         .unwrap()
-        .get()
+        .join()
         .unwrap();
 
     let bitmap = BitmapDecoder::CreateWithIdAsync(
         BitmapDecoder::PngDecoderId().unwrap(),
-        &file.OpenAsync(FileAccessMode::Read).unwrap().get().unwrap(),
+        &file
+            .OpenAsync(FileAccessMode::Read)
+            .unwrap()
+            .join()
+            .unwrap(),
     )
     .unwrap()
-    .get()
+    .join()
     .unwrap();
 
-    let bitmap = bitmap.GetSoftwareBitmapAsync().unwrap().get().unwrap();
+    let bitmap = bitmap.GetSoftwareBitmapAsync().unwrap().join().unwrap();
 
     let engine = match lang {
         "auto" => OcrEngine::TryCreateFromUserProfileLanguages(),
@@ -45,7 +51,7 @@ pub fn system_ocr(app_handle: tauri::AppHandle, lang: &str) -> Result<String, St
         Ok(v) => Ok(v
             .RecognizeAsync(&bitmap)
             .unwrap()
-            .get()
+            .join()
             .unwrap()
             .Text()
             .unwrap()
