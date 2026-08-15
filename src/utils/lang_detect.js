@@ -1,7 +1,6 @@
 import { fetch, Body } from './http';
 import { invoke } from '@tauri-apps/api/core';
 import { store } from './store';
-import { v4 as uuidv4 } from 'uuid';
 
 // https://fanyi-api.baidu.com/product/113
 async function baidu_detect(text) {
@@ -27,7 +26,7 @@ async function baidu_detect(text) {
         nob: 'nb_no',
         nno: 'nn_no',
         per: 'fa',
-        ukr: 'uk'
+        ukr: 'uk',
     };
     let res = await fetch('https://fanyi.baidu.com/langdetect', {
         method: 'POST',
@@ -49,7 +48,6 @@ async function baidu_detect(text) {
 // 腾讯只支持这么多语言
 // https://cloud.tencent.com/document/product/551/15619
 async function tencent_detect(text) {
-
     const lang_map = {
         zh: 'zh_cn',
         en: 'en',
@@ -111,7 +109,7 @@ async function google_detect(text) {
         km: 'km',
         fa: 'fa',
         no: 'nb_no',
-        uk: 'uk'
+        uk: 'uk',
     };
     let res = await fetch(
         `https://translate.google.com/translate_a/single?dt=at&dt=bd&dt=ex&dt=ld&dt=md&dt=qca&dt=rw&dt=rm&dt=ss&dt=t`,
@@ -168,7 +166,7 @@ async function niutrans_detect(text) {
         nb: 'nb_no',
         nn: 'nn_no',
         fa: 'fa',
-        uk: 'uk'
+        uk: 'uk',
     };
     let res = await fetch('https://test.niutrans.com/NiuTransServer/language', {
         method: 'GET',
@@ -209,13 +207,13 @@ async function yandex_detect(text) {
         hi: 'hi',
         no: 'nb_no',
         fa: 'fa',
-        uk: 'uk'
+        uk: 'uk',
     };
 
     let res = await fetch('https://translate.yandex.net/api/v1/tr.json/detect', {
         method: 'GET',
         query: {
-            id: uuidv4().replaceAll('-', '') + '-0-0',
+            id: crypto.randomUUID().replaceAll('-', '') + '-0-0',
             srv: 'android',
             text: text,
         },
@@ -255,7 +253,7 @@ async function bing_detect(text) {
         km: 'km',
         nb: 'nb_no',
         fa: 'fa',
-        uk: 'uk'
+        uk: 'uk',
     };
     const token_url = 'https://edge.microsoft.com/translate/auth';
 

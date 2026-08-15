@@ -10,7 +10,6 @@ import { Dropdown } from '@heroui/react';
 import { info } from '@tauri-apps/plugin-log';
 import { Button } from '@heroui/react';
 import { Switch } from '@heroui/react';
-import 'flag-icons/css/flag-icons.min.css';
 import { Input } from '@heroui/react';
 import { Card } from '@heroui/react';
 import { LuSun, LuMoon, LuMonitor, LuSparkles } from 'react-icons/lu';
@@ -19,6 +18,7 @@ import { useTheme } from 'next-themes';
 
 import { useConfig } from '../../../../hooks/useConfig';
 import { LanguageFlag } from '../../../../utils/language';
+import Flag from '../../../../components/Flag';
 import { themeOptions } from '../../../../utils/theme';
 import { useToastStyle } from '../../../../hooks';
 import { osType } from '../../../../utils/env';
@@ -172,7 +172,7 @@ export default function General() {
                                 <DropdownTrigger>
                                     <Button
                                         variant='bordered'
-                                        startContent={<span className={`fi fi-${LanguageFlag[appLanguage]}`} />}
+                                        startContent={<Flag code={LanguageFlag[appLanguage]} />}
                                     >
                                         {languageName[appLanguage]}
                                     </Button>
@@ -188,115 +188,115 @@ export default function General() {
                                 >
                                     <DropdownItem
                                         key='zh_cn'
-                                        startContent={<span className={`fi fi-${LanguageFlag.zh_cn}`} />}
+                                        startContent={<Flag code={LanguageFlag.zh_cn} />}
                                     >
                                         简体中文
                                     </DropdownItem>
                                     <DropdownItem
                                         key='zh_tw'
-                                        startContent={<span className={`fi fi-${LanguageFlag.zh_cn}`} />}
+                                        startContent={<Flag code={LanguageFlag.zh_cn} />}
                                     >
                                         繁體中文
                                     </DropdownItem>
                                     <DropdownItem
                                         key='en'
-                                        startContent={<span className={`fi fi-${LanguageFlag.en}`} />}
+                                        startContent={<Flag code={LanguageFlag.en} />}
                                     >
                                         English
                                     </DropdownItem>
                                     <DropdownItem
                                         key='ja'
-                                        startContent={<span className={`fi fi-${LanguageFlag.ja}`} />}
+                                        startContent={<Flag code={LanguageFlag.ja} />}
                                     >
                                         日本語
                                     </DropdownItem>
                                     <DropdownItem
                                         key='ko'
-                                        startContent={<span className={`fi fi-${LanguageFlag.ko}`} />}
+                                        startContent={<Flag code={LanguageFlag.ko} />}
                                     >
                                         한국어
                                     </DropdownItem>
                                     <DropdownItem
                                         key='fr'
-                                        startContent={<span className={`fi fi-${LanguageFlag.fr}`} />}
+                                        startContent={<Flag code={LanguageFlag.fr} />}
                                     >
                                         Français
                                     </DropdownItem>
                                     <DropdownItem
                                         key='de'
-                                        startContent={<span className={`fi fi-${LanguageFlag.de}`} />}
+                                        startContent={<Flag code={LanguageFlag.de} />}
                                     >
                                         Deutsch
                                     </DropdownItem>
                                     <DropdownItem
                                         key='es'
-                                        startContent={<span className={`fi fi-${LanguageFlag.es}`} />}
+                                        startContent={<Flag code={LanguageFlag.es} />}
                                     >
                                         Español
                                     </DropdownItem>
                                     <DropdownItem
                                         key='ru'
-                                        startContent={<span className={`fi fi-${LanguageFlag.ru}`} />}
+                                        startContent={<Flag code={LanguageFlag.ru} />}
                                     >
                                         Русский
                                     </DropdownItem>
                                     <DropdownItem
                                         key='it'
-                                        startContent={<span className={`fi fi-${LanguageFlag.it}`} />}
+                                        startContent={<Flag code={LanguageFlag.it} />}
                                     >
                                         Italiano
                                     </DropdownItem>
                                     <DropdownItem
                                         key='tr'
-                                        startContent={<span className={`fi fi-${LanguageFlag.tr}`} />}
+                                        startContent={<Flag code={LanguageFlag.tr} />}
                                     >
                                         Türkçe
                                     </DropdownItem>
                                     <DropdownItem
                                         key='pt_pt'
-                                        startContent={<span className={`fi fi-${LanguageFlag.pt_pt}`} />}
+                                        startContent={<Flag code={LanguageFlag.pt_pt} />}
                                     >
                                         Português
                                     </DropdownItem>
                                     <DropdownItem
                                         key='pt_br'
-                                        startContent={<span className={`fi fi-${LanguageFlag.pt_br}`} />}
+                                        startContent={<Flag code={LanguageFlag.pt_br} />}
                                     >
                                         Português (Brasil)
                                     </DropdownItem>
                                     <DropdownItem
                                         key='nb_no'
-                                        startContent={<span className={`fi fi-${LanguageFlag.nb_no}`} />}
+                                        startContent={<Flag code={LanguageFlag.nb_no} />}
                                     >
                                         Norsk Bokmål
                                     </DropdownItem>
                                     <DropdownItem
                                         key='nn_no'
-                                        startContent={<span className={`fi fi-${LanguageFlag.nn_no}`} />}
+                                        startContent={<Flag code={LanguageFlag.nn_no} />}
                                     >
                                         Norsk Nynorsk
                                     </DropdownItem>
                                     <DropdownItem
                                         key='fa'
-                                        startContent={<span className={`fi fi-${LanguageFlag.fa}`} />}
+                                        startContent={<Flag code={LanguageFlag.fa} />}
                                     >
                                         فارسی
                                     </DropdownItem>
                                     <DropdownItem
                                         key='uk'
-                                        startContent={<span className={`fi fi-${LanguageFlag.uk}`} />}
+                                        startContent={<Flag code={LanguageFlag.uk} />}
                                     >
                                         Українська
                                     </DropdownItem>
                                     <DropdownItem
                                         key='ar'
-                                        startContent={<span className={`fi fi-${LanguageFlag.ar}`} />}
+                                        startContent={<Flag code={LanguageFlag.ar} />}
                                     >
                                         العربية
                                     </DropdownItem>
                                     <DropdownItem
                                         key='he'
-                                        startContent={<span className={`fi fi-${LanguageFlag.he}`} />}
+                                        startContent={<Flag code={LanguageFlag.he} />}
                                     >
                                         עִבְרִית
                                     </DropdownItem>

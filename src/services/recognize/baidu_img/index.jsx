@@ -1,7 +1,10 @@
 import { readFile, BaseDirectory } from '@tauri-apps/plugin-fs';
 import { fetch, Body } from '../../../utils/http';
 import { nanoid } from 'nanoid';
-import md5 from 'md5';
+// `lib-typedarrays` is what teaches `WordArray.create` to take the image bytes.
+import CryptoJS from 'crypto-js/core';
+import 'crypto-js/lib-typedarrays';
+import md5 from 'crypto-js/md5';
 
 export async function recognize(base64, language, options = {}) {
     const { config } = options;
@@ -16,8 +19,8 @@ export async function recognize(base64, language, options = {}) {
     }
 
     let file = await readFile('pot_screenshot_cut.png', { baseDir: BaseDirectory.AppCache });
-    const str = appid + md5(file) + salt + 'APICUIDmac' + secret;
-    const sign = md5(str);
+    const str = appid + md5(CryptoJS.lib.WordArray.create(file)).toString() + salt + 'APICUIDmac' + secret;
+    const sign = md5(str).toString();
 
     let res = await fetch(url, {
         method: 'POST',

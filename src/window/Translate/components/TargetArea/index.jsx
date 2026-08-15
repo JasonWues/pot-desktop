@@ -30,8 +30,7 @@ import { useTranslation } from 'react-i18next';
 import { GiCycle } from 'react-icons/gi';
 import { useAtomValue } from 'jotai';
 import { nanoid } from 'nanoid';
-import { useSpring, animated } from '@react-spring/web';
-import useMeasure from 'react-use-measure';
+import { motion } from 'framer-motion';
 
 import * as builtinCollectionServices from '../../../../services/collection';
 import { sourceLanguageAtom, targetLanguageAtom } from '../LanguageArea';
@@ -337,12 +336,6 @@ export default function TargetArea(props) {
         }
     };
 
-    const [boundRef, bounds] = useMeasure({ scroll: true });
-    const springs = useSpring({
-        from: { height: 0 },
-        to: { height: hide ? 0 : bounds.height },
-    });
-
     return (
         <Card
             shadow='none'
@@ -466,8 +459,14 @@ export default function TargetArea(props) {
                     </Button>
                 </div>
             </CardHeader>
-            <animated.div style={{ ...springs }}>
-                <div ref={boundRef}>
+            {/* `height: auto` is measured by framer-motion itself, which is why this
+                needs neither react-spring nor a measuring hook. */}
+            <motion.div
+                initial={{ height: 0 }}
+                animate={{ height: hide ? 0 : 'auto' }}
+                style={{ overflow: 'hidden' }}
+            >
+                <div>
                     {/* result content */}
                     <CardBody className={`p-[12px] pb-0 ${hide && 'h-0 p-0'}`}>
                         {typeof result === 'string' ? (
@@ -848,7 +847,7 @@ export default function TargetArea(props) {
                         </ButtonGroup>
                     </CardFooter>
                 </div>
-            </animated.div>
+            </motion.div>
         </Card>
     );
 }

@@ -1,5 +1,4 @@
 import { fetch, Body } from '../../../utils/http';
-import { v4 as uuidv4 } from 'uuid';
 
 export async function translate(text, from, to) {
     const url = 'https://translate.yandex.net/api/v1/tr.json/translate';
@@ -9,7 +8,7 @@ export async function translate(text, from, to) {
             'Content-Type': 'application/x-www-form-urlencoded',
         },
         query: {
-            id: uuidv4().replaceAll('-', '') + '-0-0',
+            id: crypto.randomUUID().replaceAll('-', '') + '-0-0',
             srv: 'android',
         },
         body: Body.form({
