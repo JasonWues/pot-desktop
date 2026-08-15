@@ -13,6 +13,12 @@ export default defineConfig(async () => ({
     server: {
         port: 1420,
         strictPort: true,
+        watch: {
+            // cargo writes and locks files under src-tauri/target while it builds.
+            // Watching them makes chokidar's fs.watch throw EBUSY on the linked
+            // pot.exe, and that error event terminates the whole dev server.
+            ignored: ['**/src-tauri/**'],
+        },
     },
     // to make use of `TAURI_DEBUG` and other env variables
     // https://tauri.studio/v1/api/config#buildconfig.beforedevcommand
