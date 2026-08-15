@@ -442,6 +442,13 @@
                     "appid": "App ID",
                     "secret": "Secret"
                 },
+                "openai_ocr": {
+                    "title": "OpenAI",
+                    "request_path": "Request Path",
+                    "api_key": "Api Key",
+                    "model": "Model",
+                    "prompt_description": "By customizing the Prompt, you can customize the behavior of the model. $language will be replaced with the selected language."
+                },
                 "qrcode": {
                     "title": "QR Code"
                 }

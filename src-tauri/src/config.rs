@@ -67,6 +67,7 @@ pub fn check_service_available() -> Result<(), Error> {
         "iflytek_ocr",
         "iflytek_intsig_ocr",
         "iflytek_latex_ocr",
+        "openai_ocr",
         "qrcode",
         "simple_latex_ocr",
         "system",

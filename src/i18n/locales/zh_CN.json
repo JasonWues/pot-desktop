@@ -442,6 +442,13 @@
                     "appid": "App ID",
                     "secret": "Secret"
                 },
+                "openai_ocr": {
+                    "title": "OpenAI",
+                    "request_path": "请求地址",
+                    "api_key": "Api Key",
+                    "model": "模型",
+                    "prompt_description": "通过自定义 Prompt 自定义模型行为, $language 将会被替换为所选择的语言。"
+                },
                 "qrcode": {
                     "title": "二维码识别"
                 }
