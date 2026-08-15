@@ -24,12 +24,10 @@ import { writeText } from '@tauri-apps/plugin-clipboard-manager';
 import { PulseLoader } from 'react-spinners';
 import { TbTransformFilled } from 'react-icons/tb';
 import { HiOutlineVolumeUp } from 'react-icons/hi';
-import { semanticColors } from '@heroui/theme';
 import toast, { Toaster } from 'react-hot-toast';
 import { MdContentCopy } from 'react-icons/md';
 import { useTranslation } from 'react-i18next';
 import { GiCycle } from 'react-icons/gi';
-import { useTheme } from 'next-themes';
 import { useAtomValue } from 'jotai';
 import { nanoid } from 'nanoid';
 import { useSpring, animated } from '@react-spring/web';
@@ -91,7 +89,6 @@ export default function TargetArea(props) {
     const textAreaRef = useRef();
     const toastStyle = useToastStyle();
     const speak = useVoice();
-    const theme = useTheme();
 
     useEffect(() => {
         if (error) {
@@ -435,9 +432,13 @@ export default function TargetArea(props) {
                             })}
                         </DropdownMenu>
                     </Dropdown>
+                    {/* The colour is a var reference, resolved against whatever theme class
+                        is on <html>. The old branch compared the whole `useTheme()` object
+                        against 'dark', so it was never true and the spinner always took the
+                        light palette's grey. */}
                     <PulseLoader
                         loading={isLoading}
-                        color={theme === 'dark' ? semanticColors.dark.default[500] : semanticColors.light.default[500]}
+                        color='hsl(var(--heroui-default-500))'
                         size={8}
                         cssOverride={{
                             display: 'inline-block',
