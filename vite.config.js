@@ -1,10 +1,13 @@
+import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
 
 // https://vitejs.dev/config/
 export default defineConfig(async () => ({
-    plugins: [react()],
+    // Tailwind runs as a Vite plugin rather than through postcss.config.js, so
+    // the project needs neither postcss nor @tailwindcss/postcss.
+    plugins: [tailwindcss(), react()],
 
     // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
     // prevent vite from obscuring rust errors
