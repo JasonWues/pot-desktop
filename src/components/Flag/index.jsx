@@ -20,7 +20,7 @@ import jp from 'flag-icons/flags/4x3/jp.svg';
 import kh from 'flag-icons/flags/4x3/kh.svg';
 import kr from 'flag-icons/flags/4x3/kr.svg';
 import mn from 'flag-icons/flags/4x3/mn.svg';
-import ms from 'flag-icons/flags/4x3/ms.svg';
+import my from 'flag-icons/flags/4x3/my.svg';
 import nl from 'flag-icons/flags/4x3/nl.svg';
 import no from 'flag-icons/flags/4x3/no.svg';
 import pl from 'flag-icons/flags/4x3/pl.svg';
@@ -50,7 +50,7 @@ const flags = {
     kh,
     kr,
     mn,
-    ms,
+    my,
     nl,
     no,
     pl,

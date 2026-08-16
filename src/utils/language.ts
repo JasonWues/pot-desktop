@@ -52,7 +52,8 @@ export enum LanguageFlag {
     vi = 'vn',
     id = 'id',
     th = 'th',
-    ms = 'ms',
+    // `ms` is Malay; the flag code is Malaysia's `my`. `ms` is Montserrat.
+    ms = 'my',
     ar = 'ae',
     hi = 'in',
     km = 'kh',
