@@ -82,13 +82,20 @@ export async function translate(text, from, to, options) {
             const reader = res.body.getReader();
             try {
                 let temp = '';
+                // One decoder for the whole stream, in streaming mode: a chunk
+                // boundary can fall inside a multi byte character, and decoding
+                // each chunk on its own turns that character into U+FFFD -- in
+                // the accumulated result, not just in the partial shown while it
+                // arrives. Which makes it a translation app that mangles the
+                // occasional CJK glyph.
+                const decoder = new TextDecoder();
                 while (true) {
                     const { done, value } = await reader.read();
                     if (done) {
                         setResult(target.trim());
                         return target.trim();
                     }
-                    const str = new TextDecoder().decode(value);
+                    const str = decoder.decode(value, { stream: true });
                     let datas = str.split('data:');
                     for (let data of datas) {
                         if (data.trim() !== '' && data.trim() !== '[DONE]') {
