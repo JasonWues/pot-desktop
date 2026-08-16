@@ -9,6 +9,18 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+# Only the settings that cost nothing to build. `strip` is a flag handed to the
+# linker, so it does not change compile time at all.
+#
+# `lto` and `codegen-units = 1` are deliberately NOT set: they are the two that
+# buy size with build time, and after the language models left there is only
+# about 30MB of code for them to work on, so the trade is not worth it here.
+# `panic = "abort"` is also left alone -- windows are created hidden and shown
+# once the webview mounts, so aborting on a stray panic would strand an
+# invisible window instead of surfacing an error.
+[profile.release]
+strip = true
+
 [build-dependencies]
 tauri-build = { version = "2", features = [] }
 
@@ -41,7 +53,6 @@ tiny_http = "0.12.0"
 xcap = "0.9"
 base64 = "0.23"
 arboard = "3.4"
-lingua = { version = "1.6.2", default-features = false, features = ["chinese", "japanese", "english", "korean", "french", "spanish", "german", "russian", "italian", "portuguese", "turkish", "arabic", "vietnamese", "thai", "indonesian", "malay", "hindi", "mongolian", "persian", "nynorsk", "bokmal", "ukrainian"] }
 reqwest = { version = "0.12", features = ["json"] }
 reqwest_dav = "0.1.15"
 zip = "2.2.0"
@@ -49,6 +60,7 @@ walkdir = "2.5"
 thiserror = "2.0"
 font-kit = "0.14.2"
 image = "0.25.4"
+whatlang = "0.18.0"
 
 [target.'cfg(target_os = "macos")'.dependencies]
 macos-accessibility-client = "0.0.1"
