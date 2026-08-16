@@ -25,7 +25,11 @@ export async function translate(text, from, to, options = {}) {
         };
     });
 
-    const response = await ollama.chat({ model, messages: promptList, stream: stream });
+    // Reasoning models otherwise spend their budget deliberating about a
+    // translation and, depending on the server version, emit that reasoning as
+    // part of the message content -- so it lands in the result as if it were the
+    // translation. Nothing here wants it. (upstream pot-app/pot-desktop#1178)
+    const response = await ollama.chat({ model, messages: promptList, think: false, stream: stream });
 
     if (stream) {
         let target = '';

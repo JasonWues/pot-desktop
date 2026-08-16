@@ -31,6 +31,13 @@ export const detectLanguageAtom = atom('');
 let unlisten = null;
 let timer = null;
 
+// `keydown` for the key that commits an IME candidate is dispatched before
+// `compositionend`, so the ref is still true at that point -- but the browser's
+// own flag is the authoritative signal, and this checks it first.
+function isComposing(event) {
+    return event.nativeEvent?.isComposing || event.keyCode === 229;
+}
+
 export default function SourceArea(props) {
     const { pluginList, serviceInstanceConfigMap } = props;
     const [appFontSize] = useConfig('app_font_size', 16);
@@ -49,6 +56,10 @@ export default function SourceArea(props) {
     const toastStyle = useToastStyle();
     const { t } = useTranslation();
     const textAreaRef = useRef();
+    // True between compositionstart and compositionend, i.e. while an IME has a
+    // word in progress. A ref rather than state because it is read inside a
+    // timeout and must not schedule a render of its own.
+    const isComposingRef = useRef(false);
     const speak = useVoice();
 
     const handleNewText = async (text) => {
@@ -168,7 +179,10 @@ export default function SourceArea(props) {
     };
 
     const keyDown = (event) => {
-        if (event.key === 'Enter' && !event.shiftKey) {
+        // Enter also picks the highlighted candidate out of an IME's list, and
+        // that keystroke arrives here first. Without this, choosing a Chinese
+        // candidate translates whatever half-typed text is in the box.
+        if (event.key === 'Enter' && !event.shiftKey && !isComposing(event)) {
             event.preventDefault();
             detect_language(sourceText).then(() => {
                 syncSourceText();
@@ -266,14 +280,22 @@ export default function SourceArea(props) {
     const changeSourceText = async (text) => {
         setDetectLanguage('');
         await setSourceText(text);
-        if (dynamicTranslate) {
+        // An IME rewrites the textarea on every keystroke while a word is being
+        // composed, so with dynamic translate on, typing pinyin fires a
+        // translation of the unfinished syllables. `compositionend` runs one
+        // straight away, so nothing is lost by waiting.
+        if (dynamicTranslate && !isComposingRef.current) {
             if (sourceTextChangeTimer) {
                 clearTimeout(sourceTextChangeTimer);
             }
             sourceTextChangeTimer = setTimeout(() => {
-                detect_language(text).then(() => {
-                    syncSourceText();
-                });
+                // The timer outlives the keystroke that armed it, so composition
+                // may have started in the meantime.
+                if (!isComposingRef.current) {
+                    detect_language(text).then(() => {
+                        syncSourceText();
+                    });
+                }
             }, 1000);
         }
     }
@@ -384,6 +406,19 @@ export default function SourceArea(props) {
                         onChange={(e) => {
                             const v = e.target.value;
                             changeSourceText(v);
+                        }}
+                        onCompositionStart={() => {
+                            isComposingRef.current = true;
+                        }}
+                        onCompositionEnd={(e) => {
+                            isComposingRef.current = false;
+                            // The word is finished, so translate it now rather
+                            // than making the user wait out the debounce.
+                            if (dynamicTranslate) {
+                                detect_language(e.target.value).then(() => {
+                                    syncSourceText();
+                                });
+                            }
                         }}
                     />
                 </CardBody>
