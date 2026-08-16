@@ -5,6 +5,7 @@ import { open } from '@tauri-apps/plugin-shell';
 import React, { useState } from 'react';
 
 import { INSTANCE_NAME_CONFIG_KEY } from '../../../utils/service_instance';
+import InstanceNameInput from '../../../components/InstanceNameInput';
 import { useConfig } from '../../../hooks/useConfig';
 import { useToastStyle } from '../../../hooks';
 import { DEFAULT_MODEL, DEFAULT_REQUEST_PATH, SPEED_OPTIONS, VOICE_OPTIONS } from './index';
@@ -34,25 +35,10 @@ export function Config(props) {
         openaiTtsConfig !== null && (
             <>
                 <Toaster />
-                <div className='config-item'>
-                    <Input
-                        label={t('services.instance_name')}
-                        labelPlacement='outside-left'
-                        value={openaiTtsConfig[INSTANCE_NAME_CONFIG_KEY]}
-                        variant='bordered'
-                        classNames={{
-                            base: 'justify-between',
-                            label: 'text-(length:--heroui-font-size-medium)',
-                            mainWrapper: 'max-w-[50%]',
-                        }}
-                        onValueChange={(value) => {
-                            setOpenaiTtsConfig({
-                                ...openaiTtsConfig,
-                                [INSTANCE_NAME_CONFIG_KEY]: value,
-                            });
-                        }}
-                    />
-                </div>
+                <InstanceNameInput
+                    config={openaiTtsConfig}
+                    onChange={setOpenaiTtsConfig}
+                />
                 <div className={'config-item'}>
                     <h3 className='my-auto'>{t('services.help')}</h3>
                     <Button

@@ -1,4 +1,5 @@
 import { INSTANCE_NAME_CONFIG_KEY } from '../../../utils/service_instance';
+import InstanceNameInput from '../../../components/InstanceNameInput';
 import { Input, Button } from '@heroui/react';
 import toast, { Toaster } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -50,25 +51,10 @@ export function Config(props) {
                 }}
             >
                 <Toaster />
-                <div className='config-item'>
-                    <Input
-                        label={t('services.instance_name')}
-                        labelPlacement='outside-left'
-                        value={config[INSTANCE_NAME_CONFIG_KEY]}
-                        variant='bordered'
-                        classNames={{
-                            base: 'justify-between',
-                            label: 'text-(length:--heroui-font-size-medium)',
-                            mainWrapper: 'max-w-[50%]',
-                        }}
-                        onValueChange={(value) => {
-                            setConfig({
-                                ...config,
-                                [INSTANCE_NAME_CONFIG_KEY]: value,
-                            });
-                        }}
-                    />
-                </div>
+                <InstanceNameInput
+                    config={config}
+                    onChange={setConfig}
+                />
                 <div className={'config-item'}>
                     <h3 className='my-auto'>{t('services.help')}</h3>
                     <Button

@@ -1,4 +1,5 @@
 import { INSTANCE_NAME_CONFIG_KEY } from '../../../utils/service_instance';
+import InstanceNameInput from '../../../components/InstanceNameInput';
 import { Button, Input } from '@heroui/react';
 import toast, { Toaster } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -46,25 +47,10 @@ export function Config(props) {
                         );
                     }}
                 >
-                    <div className='config-item'>
-                        <Input
-                            label={t('services.instance_name')}
-                            labelPlacement='outside-left'
-                            value={ankiConfig[INSTANCE_NAME_CONFIG_KEY]}
-                            variant='bordered'
-                            classNames={{
-                                base: 'justify-between',
-                                label: 'text-(length:--heroui-font-size-medium)',
-                                mainWrapper: 'max-w-[50%]',
-                            }}
-                            onValueChange={(value) => {
-                                setAnkiConfig({
-                                    ...ankiConfig,
-                                    [INSTANCE_NAME_CONFIG_KEY]: value,
-                                });
-                            }}
-                        />
-                    </div>
+                    <InstanceNameInput
+                        config={ankiConfig}
+                        onChange={setAnkiConfig}
+                    />
                     <div className={'config-item'}>
                         <h3 className='my-auto'>{t('services.help')}</h3>
                         <Button

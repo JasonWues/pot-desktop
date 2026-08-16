@@ -1,4 +1,5 @@
 import { INSTANCE_NAME_CONFIG_KEY } from '../../../utils/service_instance';
+import InstanceNameInput from '../../../components/InstanceNameInput';
 import { DropdownTrigger } from '@heroui/react';
 import { Input, Button } from '@heroui/react';
 import { DropdownMenu } from '@heroui/react';
@@ -52,25 +53,10 @@ export function Config(props) {
                 }}
             >
                 <Toaster />
-                <div className='config-item'>
-                    <Input
-                        label={t('services.instance_name')}
-                        labelPlacement='outside-left'
-                        value={deeplConfig[INSTANCE_NAME_CONFIG_KEY]}
-                        variant='bordered'
-                        classNames={{
-                            base: 'justify-between',
-                            label: 'text-(length:--heroui-font-size-medium)',
-                            mainWrapper: 'max-w-[50%]',
-                        }}
-                        onValueChange={(value) => {
-                            setDeeplConfig({
-                                ...deeplConfig,
-                                [INSTANCE_NAME_CONFIG_KEY]: value,
-                            });
-                        }}
-                    />
-                </div>
+                <InstanceNameInput
+                    config={deeplConfig}
+                    onChange={setDeeplConfig}
+                />
                 <div className={`config-item ${deeplConfig.type === 'free' ? 'hidden' : ''}`}>
                     <h3 className='my-auto'>{t('services.help')}</h3>
                     <Button

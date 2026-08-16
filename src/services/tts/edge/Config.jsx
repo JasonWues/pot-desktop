@@ -1,9 +1,10 @@
-import { Button, Input, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@heroui/react';
+import { Button, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@heroui/react';
 import React, { useEffect, useState } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 
 import { INSTANCE_NAME_CONFIG_KEY } from '../../../utils/service_instance';
+import InstanceNameInput from '../../../components/InstanceNameInput';
 import { useConfig } from '../../../hooks/useConfig';
 import { useToastStyle } from '../../../hooks';
 import { getVoiceList, matchVoice } from './index';
@@ -83,22 +84,10 @@ export function Config(props) {
         edgeConfig !== null && (
             <>
                 <Toaster />
-                <div className='config-item'>
-                    <Input
-                        label={t('services.instance_name')}
-                        labelPlacement='outside-left'
-                        value={edgeConfig[INSTANCE_NAME_CONFIG_KEY]}
-                        variant='bordered'
-                        classNames={{
-                            base: 'justify-between',
-                            label: 'text-(length:--heroui-font-size-medium)',
-                            mainWrapper: 'max-w-[50%]',
-                        }}
-                        onValueChange={(value) => {
-                            setEdgeConfig({ ...edgeConfig, [INSTANCE_NAME_CONFIG_KEY]: value });
-                        }}
-                    />
-                </div>
+                <InstanceNameInput
+                    config={edgeConfig}
+                    onChange={setEdgeConfig}
+                />
 
                 {offsetDropdown(t('services.tts.edge_tts.rate'), 'rate', RATE_OPTIONS, '%')}
                 {offsetDropdown(t('services.tts.edge_tts.pitch'), 'pitch', PITCH_OPTIONS, 'Hz')}

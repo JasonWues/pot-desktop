@@ -1,5 +1,6 @@
 import { Input, Button, Switch, Textarea, Card, CardBody, Link, Tooltip, Progress } from '@heroui/react';
 import { INSTANCE_NAME_CONFIG_KEY } from '../../../utils/service_instance';
+import InstanceNameInput from '../../../components/InstanceNameInput';
 import { MdDeleteOutline } from 'react-icons/md';
 import toast, { Toaster } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -101,25 +102,10 @@ export function Config(props) {
                 }}
             >
                 <Toaster />
-                <div className='config-item'>
-                    <Input
-                        label={t('services.instance_name')}
-                        labelPlacement='outside-left'
-                        value={serviceConfig[INSTANCE_NAME_CONFIG_KEY]}
-                        variant='bordered'
-                        classNames={{
-                            base: 'justify-between',
-                            label: 'text-(length:--heroui-font-size-medium)',
-                            mainWrapper: 'max-w-[50%]',
-                        }}
-                        onValueChange={(value) => {
-                            setServiceConfig({
-                                ...serviceConfig,
-                                [INSTANCE_NAME_CONFIG_KEY]: value,
-                            });
-                        }}
-                    />
-                </div>
+                <InstanceNameInput
+                    config={serviceConfig}
+                    onChange={setServiceConfig}
+                />
                 {installedModels === null && (
                     <Card
                         isBlurred

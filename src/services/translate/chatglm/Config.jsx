@@ -1,4 +1,5 @@
 import { INSTANCE_NAME_CONFIG_KEY } from '../../../utils/service_instance';
+import InstanceNameInput from '../../../components/InstanceNameInput';
 import { Input, Button, Textarea } from '@heroui/react';
 import { DropdownTrigger } from '@heroui/react';
 import { MdDeleteOutline } from 'react-icons/md';
@@ -66,25 +67,10 @@ export function Config(props) {
                 }}
             >
                 <Toaster />
-                <div className='config-item'>
-                    <Input
-                        label={t('services.instance_name')}
-                        labelPlacement='outside-left'
-                        value={serviceConfig[INSTANCE_NAME_CONFIG_KEY]}
-                        variant='bordered'
-                        classNames={{
-                            base: 'justify-between',
-                            label: 'text-(length:--heroui-font-size-medium)',
-                            mainWrapper: 'max-w-[50%]',
-                        }}
-                        onValueChange={(value) => {
-                            setServiceConfig({
-                                ...serviceConfig,
-                                [INSTANCE_NAME_CONFIG_KEY]: value,
-                            });
-                        }}
-                    />
-                </div>
+                <InstanceNameInput
+                    config={serviceConfig}
+                    onChange={setServiceConfig}
+                />
                 <div className='config-item'>
                     <h3 className='my-auto'>{t('services.help')}</h3>
                     <Button
