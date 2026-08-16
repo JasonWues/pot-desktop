@@ -29,7 +29,6 @@ export const sourceTextAtom = atom('');
 export const detectLanguageAtom = atom('');
 
 let unlisten = null;
-let timer = null;
 
 // `keydown` for the key that commits an IME candidate is dispatched before
 // `compositionend`, so the ref is still true at that point -- but the browser's
@@ -60,6 +59,11 @@ export default function SourceArea(props) {
     // word in progress. A ref rather than state because it is read inside a
     // timeout and must not schedule a render of its own.
     const isComposingRef = useRef(false);
+    // The pending dynamic-translate timer. A ref rather than a plain `let` in the
+    // component body: typing re-renders, which reinitialised that variable to
+    // null, so `clearTimeout` never had anything to clear and every keystroke
+    // armed a translation of its own instead of one after the pause.
+    const sourceTextChangeTimerRef = useRef(null);
     const speak = useVoice();
 
     const handleNewText = async (text) => {
@@ -276,7 +280,6 @@ export default function SourceArea(props) {
         setDetectLanguage(await detect(text));
     };
 
-    let sourceTextChangeTimer = null;
     const changeSourceText = async (text) => {
         setDetectLanguage('');
         await setSourceText(text);
@@ -285,10 +288,10 @@ export default function SourceArea(props) {
         // translation of the unfinished syllables. `compositionend` runs one
         // straight away, so nothing is lost by waiting.
         if (dynamicTranslate && !isComposingRef.current) {
-            if (sourceTextChangeTimer) {
-                clearTimeout(sourceTextChangeTimer);
+            if (sourceTextChangeTimerRef.current) {
+                clearTimeout(sourceTextChangeTimerRef.current);
             }
-            sourceTextChangeTimer = setTimeout(() => {
+            sourceTextChangeTimerRef.current = setTimeout(() => {
                 // The timer outlives the keystroke that armed it, so composition
                 // may have started in the meantime.
                 if (!isComposingRef.current) {
@@ -413,7 +416,14 @@ export default function SourceArea(props) {
                         onCompositionEnd={(e) => {
                             isComposingRef.current = false;
                             // The word is finished, so translate it now rather
-                            // than making the user wait out the debounce.
+                            // than making the user wait out the debounce -- and
+                            // drop any timer armed before composition started, so
+                            // it cannot land afterwards and detect the language
+                            // from the text as it was then.
+                            if (sourceTextChangeTimerRef.current) {
+                                clearTimeout(sourceTextChangeTimerRef.current);
+                                sourceTextChangeTimerRef.current = null;
+                            }
                             if (dynamicTranslate) {
                                 detect_language(e.target.value).then(() => {
                                     syncSourceText();
