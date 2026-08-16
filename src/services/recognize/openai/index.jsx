@@ -13,10 +13,13 @@ export async function recognize(base64, language, options = {}) {
         requestPath = `https://${requestPath}`;
     }
     const apiUrl = new URL(requestPath);
-    // in openai like api, /v1 is not required
+    // in openai like api, /v1 is not required. The version segment is only added
+    // when the configured path does not already carry one, so that the
+    // `https://host/v1` form most providers document does not become
+    // `https://host/v1/v1/chat/completions`.
     if (!apiUrl.pathname.endsWith('/chat/completions')) {
-        apiUrl.pathname += apiUrl.pathname.endsWith('/') ? '' : '/';
-        apiUrl.pathname += 'v1/chat/completions';
+        const base = apiUrl.pathname.replace(/\/+$/, '');
+        apiUrl.pathname = /\/v\d+$/.test(base) ? `${base}/chat/completions` : `${base}/v1/chat/completions`;
     }
 
     // 兼容旧版

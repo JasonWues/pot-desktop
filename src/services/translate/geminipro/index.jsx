@@ -1,3 +1,9 @@
+// See the note in ../openai/index.jsx: the streaming branch needs the body as a
+// stream, which the v1 shim cannot give it, and a webview `window.fetch` is a
+// real browser request subject to CORS. Google does send permissive CORS headers
+// today, so this one was not broken -- but it only worked at Google's discretion,
+// and the plugin's fetch is issued from Rust where the question does not arise.
+import { fetch as streamingFetch } from '@tauri-apps/plugin-http';
 import { fetch, Body } from '../../../utils/http';
 import { Language } from './info';
 
@@ -59,7 +65,7 @@ export async function translate(text, from, to, options = {}) {
     };
 
     if (stream) {
-        const res = await window.fetch(requestPath, {
+        const res = await streamingFetch(requestPath, {
             method: 'POST',
             headers: headers,
             body: JSON.stringify(body),
@@ -98,7 +104,8 @@ export async function translate(text, from, to, options = {}) {
                 reader.releaseLock();
             }
         } else {
-            throw `Http Request Error\nHttp Status: ${res.status}\n${JSON.stringify(res.data)}`;
+            // A standard `Response` has no `.data`; the body has to be read.
+            throw `Http Request Error\nHttp Status: ${res.status}\n${await res.text()}`;
         }
     } else {
         let res = await fetch(requestPath, {

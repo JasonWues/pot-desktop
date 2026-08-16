@@ -1,3 +1,11 @@
+// The streaming branch needs the response body as a stream, which the v1 shim
+// cannot give it (the shim reads the body to build `res.data`). It uses the
+// plugin's own fetch instead of `window.fetch`, because a webview fetch is a
+// real browser request and so subject to CORS: providers that do not send
+// `Access-Control-Allow-Origin` -- ollama.com among them -- fail it outright
+// with `TypeError: Failed to fetch`. The plugin's request is made from Rust,
+// where CORS does not apply, and its body is still chunked.
+import { fetch as streamingFetch } from '@tauri-apps/plugin-http';
 import { fetch, Body } from '../../../utils/http';
 import { Language } from './info';
 import { defaultRequestArguments } from './Config';
@@ -14,9 +22,12 @@ export async function translate(text, from, to, options) {
 
     // in openai like api, /v1 is not required
     if (service === 'openai' && !apiUrl.pathname.endsWith('/chat/completions')) {
-        // not openai like, populate completion endpoint
-        apiUrl.pathname += apiUrl.pathname.endsWith('/') ? '' : '/';
-        apiUrl.pathname += 'v1/chat/completions';
+        // not openai like, populate completion endpoint. The version segment is
+        // only added when the configured path does not already carry one --
+        // `https://host/v1` used to turn into `https://host/v1/v1/...`, which is
+        // the shape most providers document, so it was easy to hit.
+        const base = apiUrl.pathname.replace(/\/+$/, '');
+        apiUrl.pathname = /\/v\d+$/.test(base) ? `${base}/chat/completions` : `${base}/v1/chat/completions`;
     }
 
     // 兼容旧版
@@ -61,7 +72,7 @@ export async function translate(text, from, to, options) {
         body['model'] = model;
     }
     if (stream) {
-        const res = await window.fetch(apiUrl.href, {
+        const res = await streamingFetch(apiUrl.href, {
             method: 'POST',
             headers: headers,
             body: JSON.stringify(body),
@@ -115,7 +126,8 @@ export async function translate(text, from, to, options) {
                 reader.releaseLock();
             }
         } else {
-            throw `Http Request Error\nHttp Status: ${res.status}\n${JSON.stringify(res.data)}`;
+            // A standard `Response` has no `.data`; the body has to be read.
+            throw `Http Request Error\nHttp Status: ${res.status}\n${await res.text()}`;
         }
     } else {
         let res = await fetch(apiUrl.href, {
