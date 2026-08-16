@@ -52,12 +52,13 @@ export default function General() {
     const [transparent, setTransparent] = useConfig('transparent', true);
     const [devMode, setDevMode] = useConfig('dev_mode', false);
     const [trayClickEvent, setTrayClickEvent] = useConfig('tray_click_event', 'config');
-    const [proxyEnable, setProxyEnable] = useConfig('proxy_enable', false);
+    const [proxyMode, setProxyMode] = useConfig('proxy_mode', 'system');
     const [proxyHost, setProxyHost] = useConfig('proxy_host', '');
     const [proxyPort, setProxyPort] = useConfig('proxy_port', '');
     const [proxyUsername, setProxyUsername] = useConfig('proxy_username', '');
     const [proxyPassword, setProxyPassword] = useConfig('proxy_password', '');
     const [noProxy, setNoProxy] = useConfig('no_proxy', 'localhost,127.0.0.1');
+    const [systemProxy, setSystemProxy] = useState(null);
     const { t, i18n } = useTranslation();
     const { setTheme } = useTheme();
     const toastStyle = useToastStyle();
@@ -92,6 +93,16 @@ export default function General() {
             setFontList(v);
         });
     }, []);
+
+    // Only worth reading while the system is the thing being followed; in the other
+    // two modes what the OS thinks is not what the requests will do.
+    useEffect(() => {
+        if (proxyMode !== 'system') {
+            setSystemProxy(null);
+            return;
+        }
+        invoke('get_system_proxy').then(setSystemProxy);
+    }, [proxyMode]);
 
     return (
         <>
@@ -522,33 +533,49 @@ export default function General() {
                 <CardBody>
                     <div className='config-item'>
                         <h3>{t('config.general.proxy.title')}</h3>
-                        {proxyEnable !== null && (
-                            <Switch
-                                isSelected={proxyEnable}
-                                onValueChange={async (v) => {
-                                    if (v) {
-                                        if (proxyHost === '' || proxyPort === '') {
-                                            setProxyEnable(false);
+                        {proxyMode !== null && (
+                            <Dropdown>
+                                <DropdownTrigger>
+                                    <Button variant='bordered'>{t(`config.general.proxy.mode.${proxyMode}`)}</Button>
+                                </DropdownTrigger>
+                                <DropdownMenu
+                                    aria-label='proxy mode'
+                                    onAction={async (key) => {
+                                        if (key === 'manual' && (proxyHost === '' || proxyPort === '')) {
                                             toast.error(t('config.general.proxy_error'), {
                                                 duration: 3000,
                                                 style: toastStyle,
                                             });
                                             return;
-                                        } else {
-                                            setProxyEnable(v);
                                         }
-                                    } else {
-                                        setProxyEnable(v);
-                                    }
-                                    toast.success(t('config.general.proxy_change'), {
-                                        duration: 1000,
-                                        style: toastStyle,
-                                    });
-                                }}
-                            />
+                                        setProxyMode(key);
+                                        toast.success(t('config.general.proxy_change'), {
+                                            duration: 1000,
+                                            style: toastStyle,
+                                        });
+                                    }}
+                                >
+                                    <DropdownItem key='system'>{t('config.general.proxy.mode.system')}</DropdownItem>
+                                    <DropdownItem key='manual'>{t('config.general.proxy.mode.manual')}</DropdownItem>
+                                    <DropdownItem key='off'>{t('config.general.proxy.mode.off')}</DropdownItem>
+                                </DropdownMenu>
+                            </Dropdown>
                         )}
                     </div>
-                    <div className='config-item'>
+                    {proxyMode === 'system' && systemProxy !== null && (
+                        <div className='config-item'>
+                            <span className='text-[12px] text-default-500 whitespace-pre-line'>
+                                {systemProxy.pac_url
+                                    ? t('config.general.proxy.detected_pac', { url: systemProxy.pac_url })
+                                    : systemProxy.http || systemProxy.https
+                                      ? t('config.general.proxy.detected', {
+                                            value: systemProxy.https ?? systemProxy.http,
+                                        })
+                                      : t('config.general.proxy.detected_none')}
+                            </span>
+                        </div>
+                    )}
+                    <div className={`config-item ${proxyMode === 'manual' ? '' : 'hidden'}`}>
                         {proxyHost !== null && (
                             <Input
                                 type='url'
@@ -583,12 +610,11 @@ export default function General() {
                             />
                         )}
                     </div>
-                    <div className='config-item'>
+                    <div className={`config-item ${proxyMode === 'manual' ? '' : 'hidden'}`}>
                         {proxyUsername !== null && (
                             <Input
                                 type='text'
                                 variant='bordered'
-                                isDisabled
                                 label={t('config.general.proxy.username')}
                                 value={proxyUsername}
                                 onValueChange={(v) => {
@@ -601,7 +627,6 @@ export default function General() {
                             <Input
                                 type='password'
                                 variant='bordered'
-                                isDisabled
                                 label={t('config.general.proxy.password')}
                                 value={proxyPassword}
                                 onValueChange={(v) => {
@@ -611,7 +636,7 @@ export default function General() {
                             />
                         )}
                     </div>
-                    <div className='config-item'>
+                    <div className={`config-item ${proxyMode === 'manual' ? '' : 'hidden'}`}>
                         {noProxy !== null && (
                             <Input
                                 variant='bordered'

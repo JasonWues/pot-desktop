@@ -55,14 +55,14 @@
                 "app_font": "Font",
                 "app_fallback_font": "Fallback Font",
                 "font_size": {
-                    "title": "Font Size",
                     "10": "Extra Small (10px)",
                     "12": "Very Small (12px)",
                     "14": "Small (14px)",
                     "16": "Standard (16px)",
                     "18": "Large (18px)",
                     "20": "Very Large (20px)",
-                    "24": "Extra Large (24px)"
+                    "24": "Extra Large (24px)",
+                    "title": "Font Size"
                 },
                 "default_font": "Default",
                 "theme": {
@@ -79,7 +79,15 @@
                     "port": "Port",
                     "username": "Username",
                     "password": "Password",
-                    "no_proxy": "No Proxy"
+                    "no_proxy": "No Proxy",
+                    "mode": {
+                        "system": "Follow system",
+                        "manual": "Manual",
+                        "off": "No proxy"
+                    },
+                    "detected": "Detected system proxy: {{value}}",
+                    "detected_none": "No system proxy configured",
+                    "detected_pac": "The system uses an auto-configuration script ({{url}}), which cannot be followed. Choose Manual to set the proxy directly."
                 },
                 "proxy_change": "The proxy has been changed, Restart the application for the changes to take effect",
                 "proxy_error": "Please fill in the host and port",
@@ -115,14 +123,14 @@
                 "delete_newline": "Delete Newline",
                 "remember_language": "Remember Target Language",
                 "font_size": {
-                    "title": "Font Size",
                     "10": "Very Very Small (10px)",
                     "12": "Very Small (12px)",
                     "14": "Small (14px)",
                     "16": "Standard (16px)",
                     "18": "Large (18px)",
                     "20": "Very Large (20px)",
-                    "24": "Very Very Large (24px)"
+                    "24": "Very Very Large (24px)",
+                    "title": "Font Size"
                 },
                 "window_position": "Window Position",
                 "mouse": "Follow the Mouse",

@@ -8,6 +8,7 @@ mod config;
 mod error;
 mod hotkey;
 mod lang_detect;
+mod proxy;
 mod screenshot;
 mod server;
 mod system_ocr;
@@ -23,6 +24,7 @@ use config::*;
 use hotkey::*;
 use lang_detect::*;
 use log::{info, warn};
+use proxy::{apply_proxy, get_system_proxy};
 use screenshot::screenshot;
 use server::*;
 use std::sync::Mutex;
@@ -44,6 +46,10 @@ pub static APP: OnceLock<tauri::AppHandle> = OnceLock::new();
 pub struct StringWrapper(pub Mutex<String>);
 
 fn main() {
+    // Before anything can overwrite them: on Linux the inherited proxy variables
+    // are the system setting, and "follow the system" restores exactly these.
+    proxy::capture_inherited_env();
+
     let builder = tauri::Builder::default();
 
     // Debug builds expose an MCP bridge, which lets an AI assistant screenshot the
@@ -105,6 +111,11 @@ fn main() {
             // Init Config
             info!("Init Config Store");
             init_config(app);
+            // Before any window exists: `useConfig` seeds a missing key with its
+            // default, so a webview that reaches `proxy_mode` first would write
+            // "system" and the migration below would then decline to run, quietly
+            // dropping a manual proxy.
+            proxy::migrate_config();
             // Check First Run
             if is_first_run() {
                 // Open Config Window
@@ -137,16 +148,8 @@ fn main() {
                         .show();
                 }
             }
-            match get("proxy_enable") {
-                Some(v) => {
-                    if v.as_bool().unwrap()
-                        && get("proxy_host")
-                            .map_or(false, |host| !host.as_str().unwrap().is_empty())
-                    {
-                        let _ = set_proxy();
-                    }
-                }
-                None => {}
+            if let Err(e) = apply_proxy() {
+                warn!("Failed to apply the proxy setting: {e}");
             }
             // Check Update
             check_update(app.handle().clone());
@@ -177,8 +180,7 @@ fn main() {
             system_ocr,
             system_tts,
             system_tts_voices,
-            set_proxy,
-            unset_proxy,
+            get_system_proxy,
             run_binary,
             open_devtools,
             register_shortcut_by_frontend,

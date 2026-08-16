@@ -5124,6 +5124,7 @@ dependencies = [
  "image",
  "log",
  "macos-accessibility-client",
+ "percent-encoding",
  "reqwest 0.12.28",
  "reqwest_dav",
  "selection",
@@ -5152,6 +5153,7 @@ dependencies = [
  "walkdir",
  "whatlang",
  "windows 0.62.2",
+ "windows-registry",
  "xcap",
  "zip 2.4.2",
 ]

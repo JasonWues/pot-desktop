@@ -55,14 +55,14 @@
                 "app_font": "字体",
                 "app_fallback_font": "后备字体",
                 "font_size": {
-                    "title": "字体大小",
                     "10": "极小 (10px)",
                     "12": "特小 (12px)",
                     "14": "小 (14px)",
                     "16": "标准 (16px)",
                     "18": "大 (18px)",
                     "20": "特大 (20px)",
-                    "24": "超大 (24px)"
+                    "24": "超大 (24px)",
+                    "title": "字体大小"
                 },
                 "default_font": "默认",
                 "theme": {
@@ -79,7 +79,15 @@
                     "port": "代理端口",
                     "username": "用户名",
                     "password": "密码",
-                    "no_proxy": "不使用代理的地址或IP"
+                    "no_proxy": "不使用代理的地址或IP",
+                    "mode": {
+                        "system": "跟随系统",
+                        "manual": "手动设置",
+                        "off": "不使用代理"
+                    },
+                    "detected": "检测到系统代理：{{value}}",
+                    "detected_none": "系统未设置代理",
+                    "detected_pac": "系统使用自动配置脚本（{{url}}），无法读取。请改用手动设置直接填写代理。"
                 },
                 "proxy_change": "代理已经改变，重启应用生效",
                 "proxy_error": "请填写代理地址和端口",
@@ -115,14 +123,14 @@
                 "delete_newline": "自动删除换行",
                 "remember_language": "记住目标语言",
                 "font_size": {
-                    "title": "字体大小",
                     "10": "极小 (10px)",
                     "12": "特小 (12px)",
                     "14": "小 (14px)",
                     "16": "标准 (16px)",
                     "18": "大 (18px)",
                     "20": "特大 (20px)",
-                    "24": "超大 (24px)"
+                    "24": "超大 (24px)",
+                    "title": "字体大小"
                 },
                 "window_position": "窗口位置",
                 "mouse": "跟随鼠标",
