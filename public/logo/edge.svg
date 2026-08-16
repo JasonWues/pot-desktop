@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+  <defs>
+    <linearGradient id="edge-tts-g" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#35C1F1"/>
+      <stop offset="1" stop-color="#0F5FCE"/>
+    </linearGradient>
+  </defs>
+  <!-- A neutral speech-wave mark rather than the Edge logo, which is a trademark. -->
+  <path d="M4 10.5v3" stroke="url(#edge-tts-g)" stroke-width="2" stroke-linecap="round" fill="none"/>
+  <path d="M8 7.5v9" stroke="url(#edge-tts-g)" stroke-width="2" stroke-linecap="round" fill="none"/>
+  <path d="M12 4.5v15" stroke="url(#edge-tts-g)" stroke-width="2" stroke-linecap="round" fill="none"/>
+  <path d="M16 7.5v9" stroke="url(#edge-tts-g)" stroke-width="2" stroke-linecap="round" fill="none"/>
+  <path d="M20 10.5v3" stroke="url(#edge-tts-g)" stroke-width="2" stroke-linecap="round" fill="none"/>
+</svg>

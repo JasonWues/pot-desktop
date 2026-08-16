@@ -480,6 +480,15 @@
                     "model": "模型",
                     "voice": "音色",
                     "speed": "语速"
+                },
+                "edge_tts": {
+                    "title": "Edge 语音",
+                    "rate": "语速",
+                    "pitch": "音调",
+                    "volume": "音量",
+                    "language": "语言",
+                    "voice": "音色",
+                    "auto_voice": "自动"
                 }
             },
             "collection": {
@@ -502,7 +511,14 @@
             "copy": "复制",
             "retry": "重试",
             "delete_newline": "删除换行",
-            "translate_back": "翻译回原文"
+            "translate_back": "翻译回原文",
+            "ai_preset": {
+                "translate": "翻译",
+                "polish": "润色",
+                "summarize": "总结",
+                "grammar": "语法纠错",
+                "explain_code": "解释代码"
+            }
         },
         "recognize": {
             "recognize": "重新识别",
@@ -510,7 +526,11 @@
             "copy_img": "复制图片",
             "copy_text": "复制",
             "delete_newline": "删除换行",
-            "delete_space": "删除空格"
+            "delete_space": "删除空格",
+            "in_place_translate": "图片翻译",
+            "in_place_restore": "显示原图",
+            "in_place_recognizing": "识别中…",
+            "in_place_translating": "翻译中 {{done}}/{{total}}"
         }
     }
 }

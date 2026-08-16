@@ -33,10 +33,11 @@ import { nanoid } from 'nanoid';
 import { motion } from 'framer-motion';
 
 import * as builtinCollectionServices from '../../../../services/collection';
-import { sourceLanguageAtom, targetLanguageAtom } from '../LanguageArea';
+import { sourceLanguageAtom, targetLanguageAtom, aiPresetAtom } from '../LanguageArea';
 import { useConfig, useToastStyle, useVoice } from '../../../../hooks';
 import { sourceTextAtom, detectLanguageAtom } from '../SourceArea';
 import { invoke_plugin } from '../../../../utils/invoke_plugin';
+import { applyPreset, DEFAULT_PRESET } from '../../../../utils/ai_presets';
 import * as builtinServices from '../../../../services/translate';
 import * as builtinTtsServices from '../../../../services/tts';
 import { addToHistory, buildCacheKey, getCachedTranslation, setCachedTranslation } from '../../../../utils/db';
@@ -78,6 +79,7 @@ export default function TargetArea(props) {
     const sourceText = useAtomValue(sourceTextAtom);
     const sourceLanguage = useAtomValue(sourceLanguageAtom);
     const targetLanguage = useAtomValue(targetLanguageAtom);
+    const aiPreset = useAtomValue(aiPresetAtom);
     const [autoCopy] = useConfig('translate_auto_copy', 'disable');
     const [hideWindow] = useConfig('translate_hide_window', false);
     const [clipboardMonitor] = useConfig('clipboard_monitor', false);
@@ -124,6 +126,7 @@ export default function TargetArea(props) {
         hideWindow,
         currentTranslateServiceInstanceKey,
         clipboardMonitor,
+        aiPreset,
     ]);
 
     function invokeOnce(fn) {
@@ -145,12 +148,17 @@ export default function TargetArea(props) {
 
         const translateServiceName = getServiceName(currentTranslateServiceInstanceKey);
         const isPluginService = whetherPluginService(currentTranslateServiceInstanceKey);
-        const instanceConfig = serviceInstanceConfigMap[currentTranslateServiceInstanceKey];
-        if (isPluginService && instanceConfig) {
+        const savedConfig = serviceInstanceConfigMap[currentTranslateServiceInstanceKey];
+        if (isPluginService && savedConfig) {
             // The plugin protocol expects this flag on the config. Setting it
             // before the cache key is derived keeps the key stable across calls.
-            instanceConfig['enable'] = 'true';
+            savedConfig['enable'] = 'true';
         }
+        // A non-default preset swaps the prompt for this request only. It returns
+        // a copy, so the saved config is untouched and -- because the cache key is
+        // derived from the config that is actually used -- a polished result
+        // cannot come back from the cache as a translation.
+        const instanceConfig = applyPreset(savedConfig, translateServiceName, aiPreset);
 
         // Plugins declare their languages in info.json, built-in services in a
         // Language enum; both are keyed by pot's own language codes.
@@ -163,9 +171,14 @@ export default function TargetArea(props) {
         }
 
         // Translating into the language the text is already written in is not
-        // useful, so fall back to the configured second language.
+        // useful, so fall back to the configured second language. That reasoning
+        // only holds for translation: a summary of Chinese text into Chinese is
+        // exactly what was asked for, and swapping to the second language there
+        // would silently answer in the wrong one.
         const newTargetLanguage =
-            sourceLanguage === 'auto' && targetLanguage === detectLanguage ? translateSecondLanguage : targetLanguage;
+            aiPreset === DEFAULT_PRESET && sourceLanguage === 'auto' && targetLanguage === detectLanguage
+                ? translateSecondLanguage
+                : targetLanguage;
 
         const setHideOnce = invokeOnce(setHide);
 

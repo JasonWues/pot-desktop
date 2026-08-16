@@ -480,6 +480,15 @@
                     "model": "Model",
                     "voice": "Voice",
                     "speed": "Speed"
+                },
+                "edge_tts": {
+                    "title": "Edge TTS",
+                    "rate": "Rate",
+                    "pitch": "Pitch",
+                    "volume": "Volume",
+                    "language": "Language",
+                    "voice": "Voice",
+                    "auto_voice": "Auto"
                 }
             },
             "collection": {
@@ -502,7 +511,14 @@
             "copy": "Copy",
             "retry": "Try again",
             "delete_newline": "Delete Newline",
-            "translate_back": "Translation back to the original"
+            "translate_back": "Translation back to the original",
+            "ai_preset": {
+                "translate": "Translate",
+                "polish": "Polish",
+                "summarize": "Summarize",
+                "grammar": "Fix grammar",
+                "explain_code": "Explain code"
+            }
         },
         "recognize": {
             "recognize": "Recognize",
@@ -510,7 +526,11 @@
             "copy_img": "Copy Image",
             "copy_text": "Copy",
             "delete_newline": "Delete Newline",
-            "delete_space": "Delete Space"
+            "delete_space": "Delete Space",
+            "in_place_translate": "Translate image",
+            "in_place_restore": "Show original",
+            "in_place_recognizing": "Recognizing…",
+            "in_place_translating": "Translating {{done}}/{{total}}"
         }
     }
 }

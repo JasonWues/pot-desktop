@@ -5,11 +5,17 @@ import React, { useEffect } from 'react';
 import { atom, useAtom, useAtomValue } from 'jotai';
 
 import { languageList } from '../../../../utils/language';
+import { AI_PRESETS, DEFAULT_PRESET } from '../../../../utils/ai_presets';
+import { LuWand } from 'react-icons/lu';
 import { detectLanguageAtom } from '../SourceArea';
 import { useConfig } from '../../../../hooks';
 
 export const sourceLanguageAtom = atom();
 export const targetLanguageAtom = atom();
+// Which prompt preset the LLM-backed services should run. Not persisted: it is a
+// per-session mode, and silently reopening the window in 'summarize' would be a
+// surprise.
+export const aiPresetAtom = atom(DEFAULT_PRESET);
 
 export default function LanguageArea() {
     const [rememberLanguage] = useConfig('translate_remember_language', false);
@@ -20,6 +26,7 @@ export default function LanguageArea() {
     const [sourceLanguage, setSourceLanguage] = useAtom(sourceLanguageAtom);
     const [targetLanguage, setTargetLanguage] = useAtom(targetLanguageAtom);
     const detectLanguage = useAtomValue(detectLanguageAtom);
+    const [aiPreset, setAiPreset] = useAtom(aiPresetAtom);
     const { t } = useTranslation();
 
     useEffect(() => {
@@ -45,6 +52,36 @@ export default function LanguageArea() {
         >
             <CardFooter className='bg-content2 flex justify-between p-0 rounded-[10px]'>
                 <div className='flex'>
+                    {/* The preset only reaches the LLM-backed services; the rest
+                        ignore it, so it sits with the languages rather than in
+                        any one service's header. */}
+                    <Dropdown>
+                        <DropdownTrigger>
+                            <Button
+                                isIconOnly={aiPreset === DEFAULT_PRESET}
+                                radius='sm'
+                                variant='light'
+                                className={aiPreset === DEFAULT_PRESET ? '' : 'text-primary'}
+                                startContent={aiPreset === DEFAULT_PRESET ? null : <LuWand className='text-[16px]' />}
+                            >
+                                {aiPreset === DEFAULT_PRESET ? (
+                                    <LuWand className='text-[16px] text-default-400' />
+                                ) : (
+                                    t(`translate.ai_preset.${aiPreset}`)
+                                )}
+                            </Button>
+                        </DropdownTrigger>
+                        <DropdownMenu
+                            aria-label='AI preset'
+                            onAction={(key) => {
+                                setAiPreset(key);
+                            }}
+                        >
+                            {AI_PRESETS.map((preset) => (
+                                <DropdownItem key={preset.id}>{t(`translate.ai_preset.${preset.id}`)}</DropdownItem>
+                            ))}
+                        </DropdownMenu>
+                    </Dropdown>
                     <Dropdown>
                         <DropdownTrigger>
                             <Button

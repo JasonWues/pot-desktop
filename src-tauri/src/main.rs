@@ -5,9 +5,11 @@ mod backup;
 mod clipboard;
 mod cmd;
 mod config;
+mod edge_tts;
 mod error;
 mod hotkey;
 mod lang_detect;
+mod ocr_layout;
 mod proxy;
 mod screenshot;
 mod server;
@@ -21,8 +23,10 @@ use backup::*;
 use clipboard::*;
 use cmd::*;
 use config::*;
+use edge_tts::{edge_tts, edge_tts_voices};
 use hotkey::*;
 use lang_detect::*;
+use ocr_layout::system_ocr_layout;
 use log::{info, warn};
 use proxy::{apply_proxy, get_system_proxy};
 use screenshot::screenshot;
@@ -178,9 +182,12 @@ fn main() {
             get_base64,
             copy_img,
             system_ocr,
+            system_ocr_layout,
             system_tts,
             system_tts_voices,
             get_system_proxy,
+            edge_tts,
+            edge_tts_voices,
             run_binary,
             open_devtools,
             register_shortcut_by_frontend,
