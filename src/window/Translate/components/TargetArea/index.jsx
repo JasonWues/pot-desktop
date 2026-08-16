@@ -9,6 +9,7 @@ import {
     DropdownItem,
     DropdownMenu,
     DropdownTrigger,
+    Spinner,
     Tooltip,
 } from '@heroui/react';
 import { BiCollapseVertical, BiExpandVertical } from 'react-icons/bi';
@@ -16,12 +17,6 @@ import { BaseDirectory, readTextFile } from '@tauri-apps/plugin-fs';
 import { sendNotification } from '@tauri-apps/plugin-notification';
 import React, { useEffect, useState, useRef } from 'react';
 import { writeText } from '@tauri-apps/plugin-clipboard-manager';
-// Imported from the package root, not `react-spinners/PulseLoader`. That
-// subpath is CJS, and react-spinners 0.17 put a `"use client"` directive ahead
-// of its `__esModule` marker, which defeats the interop detection: the default
-// import came through as the raw `{ default }` namespace object, so rendering
-// it threw "Element type is invalid ... but got: object".
-import { PulseLoader } from 'react-spinners';
 import { TbTransformFilled } from 'react-icons/tb';
 import { HiOutlineVolumeUp } from 'react-icons/hi';
 import toast, { Toaster } from 'react-hot-toast';
@@ -440,20 +435,25 @@ export default function TargetArea(props) {
                             })}
                         </DropdownMenu>
                     </Dropdown>
-                    {/* The colour is a var reference, resolved against whatever theme class
-                        is on <html>. The old branch compared the whole `useTheme()` object
-                        against 'dark', so it was never true and the spinner always took the
-                        light palette's grey. */}
-                    <PulseLoader
-                        loading={isLoading}
-                        color='hsl(var(--heroui-default-500))'
-                        size={8}
-                        cssOverride={{
-                            display: 'inline-block',
-                            margin: 'auto',
-                            marginLeft: '20px',
-                        }}
-                    />
+                    {/* `size` is deliberately not set. For the dots variant it sizes a fixed
+                        square wrapper -- 40px at `lg` -- and this header is 30px tall, so the
+                        wrapper is sized to the dots instead. That also lays them out as a row
+                        rather than spreading them across that square.
+
+                        `default-500` rather than `color='default'`, which is a lighter shade:
+                        500 is what this spinner has always used, and a utility class resolves
+                        against whatever theme class is on <html> exactly as the var reference
+                        it replaces did. */}
+                    {isLoading && (
+                        <Spinner
+                            variant='dots'
+                            classNames={{
+                                base: 'my-auto ml-[20px]',
+                                wrapper: 'w-auto h-2 gap-1',
+                                dots: 'size-2 bg-default-500',
+                            }}
+                        />
+                    )}
                 </div>
                 {/* content collapse */}
                 <div className='flex'>
