@@ -50,7 +50,12 @@ serde_json = "1.0"
 dirs = "6.0.0"
 log = "0.4"
 tiny_http = "0.12.0"
-xcap = "0.9"
+# `wgc` swaps the capture backend from GDI's BitBlt to Windows.Graphics.Capture.
+# BitBlt is an SDR-only API with no colour space handling, so on an HDR desktop --
+# which DWM composes in scRGB FP16, where values above SDR white are legal -- it
+# blows the highlights out. WGC is the path Snipping Tool uses. It is also GPU
+# side, so it should not be slower than the BitBlt it replaces.
+xcap = { version = "0.9", features = ["wgc"] }
 base64 = "0.23"
 arboard = "3.4"
 reqwest = { version = "0.12", features = ["json"] }
