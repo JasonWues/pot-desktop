@@ -1,6 +1,42 @@
 import { Language } from './info';
-import * as jose from 'jose';
 import { info } from '@tauri-apps/plugin-log';
+
+const textEncoder = new TextEncoder();
+
+function base64url(bytes) {
+    let binary = '';
+    for (const byte of bytes) {
+        binary += String.fromCharCode(byte);
+    }
+    return btoa(binary).replaceAll('+', '-').replaceAll('/', '_').replaceAll('=', '');
+}
+
+// ChatGLM authenticates with a JWT signed by the second half of the API key.
+// Written out rather than taken from a JOSE library: this is the only JWT the
+// app ever signs, and all of it is two base64url segments and one HMAC.
+//
+// The header is emitted exactly as passed. `sign_type` is ChatGLM's own field,
+// and there is deliberately no `typ` -- which is also what the `SignJWT` this
+// replaces produced, since jose serializes the protected header untouched
+// rather than filling anything in.
+//
+// `crypto.subtle` rather than a hashing dependency: it needs a secure context,
+// which the app is already relying on for `crypto.randomUUID` in the yandex
+// service and in lang_detect.
+async function signHs256(header, payload, secret) {
+    const key = await crypto.subtle.importKey(
+        'raw',
+        textEncoder.encode(secret),
+        { name: 'HMAC', hash: 'SHA-256' },
+        false,
+        ['sign']
+    );
+    const headerPart = base64url(textEncoder.encode(JSON.stringify(header)));
+    const payloadPart = base64url(textEncoder.encode(JSON.stringify(payload)));
+    const signingInput = `${headerPart}.${payloadPart}`;
+    const signature = await crypto.subtle.sign('HMAC', key, textEncoder.encode(signingInput));
+    return `${signingInput}.${base64url(new Uint8Array(signature))}`;
+}
 
 export async function translate(text, from, to, options = {}) {
     const { config, setResult, detect } = options;
@@ -29,9 +65,7 @@ export async function translate(text, from, to, options = {}) {
         exp: timestamp + 1000 * 60,
         timestamp: timestamp,
     };
-    secret = new TextEncoder().encode(secret);
-    let jwt = new jose.SignJWT(payload).setProtectedHeader({ alg: 'HS256', sign_type: 'SIGN' });
-    let token = await jwt.sign(secret);
+    let token = await signHs256({ alg: 'HS256', sign_type: 'SIGN' }, payload, secret);
 
     const headers = {
         'Content-Type': 'application/json',

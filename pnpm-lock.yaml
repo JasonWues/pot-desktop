@@ -74,9 +74,6 @@ importers:
       i18next:
         specifier: ^26.3.6
         version: 26.3.6(typescript@5.6.3)
-      jose:
-        specifier: ^6.2.8
-        version: 6.2.8
       jotai:
         specifier: ^2.10.1
         version: 2.20.2(@babel/core@7.26.0)(@babel/template@7.29.7)(@types/react@18.3.12)(react@19.2.8)
@@ -2226,9 +2223,6 @@ packages:
   jiti@2.7.0:
     resolution: {integrity: sha512-AC/7JofJvZGrrneWNaEnJeOLUx+JlGt7tNa0wZiRPT4MY1wmfKjt2+6O2p2uz2+skll8OZZmJMNqeke7kKbNgQ==}
     hasBin: true
-
-  jose@6.2.8:
-    resolution: {integrity: sha512-Bsdjwm3Qsd/P0jR+BHDe3LytDfY7WBq2HmCCLIwuVRHMuEC9ae7/R474GIUdF1NgCyZjzVo/A9DOiOBtXq8ZoQ==}
 
   jotai@2.20.2:
     resolution: {integrity: sha512-aHB4CNb9qRcyf0mwSB6EO5bCGAjx8cTwFgOFCE2leOnTzqACbnSWG8XoWB3LxCT1Qoj03I1OWAHszDmN4uHb/w==}
@@ -5914,8 +5908,6 @@ snapshots:
   is-url@1.2.4: {}
 
   jiti@2.7.0: {}
-
-  jose@6.2.8: {}
 
   jotai@2.20.2(@babel/core@7.26.0)(@babel/template@7.29.7)(@types/react@18.3.12)(react@19.2.8):
     optionalDependencies:
