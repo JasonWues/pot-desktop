@@ -51,6 +51,21 @@
     }
 }
 
+/*
+  v2's `isLoading` swapped the label for a spinner. Its v3 successor `isPending`
+  draws nothing at all -- `@apply status-pending` resolves to `pointer-events:
+  none` and that is the whole of it -- so the ~40 "test connection" and "save"
+  buttons across the service configs went dead silent while their request ran.
+  A spinner needs the render-prop form of `children` at each call site; this is
+  the one-rule version that at least makes the wait visible everywhere.
+*/
+@layer components {
+    .button[data-pending='true'] {
+        opacity: 0.6;
+        cursor: wait;
+    }
+}
+
 html {
     border-radius: 10px !important;
     background: transparent !important;

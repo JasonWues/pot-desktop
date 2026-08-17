@@ -18,8 +18,10 @@
   of `outline`/`ghost` -- always at full opacity. v2 only ever used that colour
   through `bg-default/40`, so taking its hex literally (#999999, or the #aaaaaa
   of `default-200`) painted every one of those a mid grey slab. It has to be a
-  near-surface neutral instead; #dddddd is v2's `content2`, one step off the
-  #eeeeee cards, which is what `flat` actually looked like once composited.
+  near-surface neutral instead. #cccccc is what v2's `bg-default/40` actually
+  composited to over an #eeeeee card (0.4 x #999999 + 0.6 x #eeeeee), and it is
+  the only value that also stays visible on the #dddddd service rows -- #dddddd
+  itself is `--surface-secondary`, so a tertiary button there vanished entirely.
   The dark and nocturne themes did not have this problem: their `default` scale
   runs darkest -> lightest, so the same index already landed near the surface.
 */
@@ -44,10 +46,10 @@
         --overlay: #eeeeee;
         --overlay-foreground: #181818;
 
-        --default: #dddddd;
+        --default: #cccccc;
         --default-foreground: #181818;
-        --default-hover: #cccccc;
-        --default-soft: #e6e6e6;
+        --default-hover: #bbbbbb;
+        --default-soft: #dddddd;
         --default-soft-foreground: #181818;
 
         --muted: #686868;

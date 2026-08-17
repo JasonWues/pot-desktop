@@ -71,9 +71,22 @@ export default function Service() {
     }, []);
     return (
         pluginList !== null && (
-            <Tabs className='flex flex-col max-h-[calc(100%-40px)] overflow-y-auto'>
+            /*
+              v2 put `className` on the tab-list wrapper, so `justify-center
+              max-h-[calc(100%-40px)] overflow-y-auto` here only ever constrained
+              the strip of tab labels. v3 puts it on the root, which also wraps
+              every panel -- the clamp then cut the panel short and gave the page
+              a second scrollbar outside the list's own, with the two "add
+              service" buttons stranded past the fold. The panel content already
+              carries `h-[calc(100vh-120px)] overflow-y-auto`, which is the one
+              scroller this page should have.
+            */
+            <Tabs className='flex h-full flex-col'>
                 <Tabs.ListContainer>
-                    <Tabs.List aria-label={t('config.service.label')}>
+                    <Tabs.List
+                        className='justify-center'
+                        aria-label={t('config.service.label')}
+                    >
                         <Tabs.Tab id='translate'>
                             {t(`config.service.translate`)}
                             <Tabs.Indicator />

@@ -118,8 +118,11 @@ export default function Hotkey() {
                     <h3 className='my-auto'>{t('config.hotkey.selection_translate')}</h3>
                     {/* InputGroup, not Input with children: v3's Input renders a real
                         <input>, which is a void element and cannot hold the OK button.
-                        `label` is not a v3 Input prop either, and the row's own <h3>
-                        already names the field, so it becomes the aria-label.
+                        `label` is not a v3 Input prop either. It carried the only
+                        hint an unset hotkey field ever showed, so it splits in
+                        two: aria-label for the accessible name, placeholder for
+                        the text -- without the latter the two unbound rows are
+                        blank white boxes that say nothing.
                         `readOnly` because the value is driven by onKeyDown, and React
                         warns on a `value` with no `onChange`. The same shape repeats
                         for the three hotkey fields below. */}
@@ -128,6 +131,7 @@ export default function Hotkey() {
                             <InputGroup.Input
                                 type='hotkey'
                                 aria-label={t('config.hotkey.set_hotkey')}
+                                placeholder={t('config.hotkey.set_hotkey')}
                                 value={selectionTranslate}
                                 readOnly
                                 onKeyDown={(e) => {
@@ -141,7 +145,7 @@ export default function Hotkey() {
                             <InputGroup.Suffix>
                                 <Button
                                     size='sm'
-                                    variant='tertiary'
+                                    variant='primary'
                                     className={`${selectionTranslate === '' ? 'hidden' : ''}`}
                                     onPress={() => {
                                         registerHandler('hotkey_selection_translate', selectionTranslate);
@@ -160,6 +164,7 @@ export default function Hotkey() {
                             <InputGroup.Input
                                 type='hotkey'
                                 aria-label={t('config.hotkey.set_hotkey')}
+                                placeholder={t('config.hotkey.set_hotkey')}
                                 value={inputTranslate}
                                 readOnly
                                 onKeyDown={(e) => {
@@ -173,7 +178,7 @@ export default function Hotkey() {
                             <InputGroup.Suffix>
                                 <Button
                                     size='sm'
-                                    variant='tertiary'
+                                    variant='primary'
                                     className={`${inputTranslate === '' ? 'hidden' : ''}`}
                                     onPress={() => {
                                         registerHandler('hotkey_input_translate', inputTranslate);
@@ -192,6 +197,7 @@ export default function Hotkey() {
                             <InputGroup.Input
                                 type='hotkey'
                                 aria-label={t('config.hotkey.set_hotkey')}
+                                placeholder={t('config.hotkey.set_hotkey')}
                                 value={ocrRecognize}
                                 readOnly
                                 onKeyDown={(e) => {
@@ -205,7 +211,7 @@ export default function Hotkey() {
                             <InputGroup.Suffix>
                                 <Button
                                     size='sm'
-                                    variant='tertiary'
+                                    variant='primary'
                                     className={`${ocrRecognize === '' ? 'hidden' : ''}`}
                                     onPress={() => {
                                         registerHandler('hotkey_ocr_recognize', ocrRecognize);
@@ -224,6 +230,7 @@ export default function Hotkey() {
                             <InputGroup.Input
                                 type='hotkey'
                                 aria-label={t('config.hotkey.set_hotkey')}
+                                placeholder={t('config.hotkey.set_hotkey')}
                                 value={ocrTranslate}
                                 readOnly
                                 onKeyDown={(e) => {
@@ -237,7 +244,7 @@ export default function Hotkey() {
                             <InputGroup.Suffix>
                                 <Button
                                     size='sm'
-                                    variant='tertiary'
+                                    variant='primary'
                                     className={`${ocrTranslate === '' ? 'hidden' : ''}`}
                                     onPress={() => {
                                         registerHandler('hotkey_ocr_translate', ocrTranslate);

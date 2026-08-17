@@ -382,7 +382,6 @@ export default function History() {
                 >
                     <Table.ScrollContainer>
                         <Table.Content
-                            hideHeader
                             selectionMode='single'
                             selectionBehavior='toggle'
                             aria-label='History Table'
@@ -391,7 +390,12 @@ export default function History() {
                                 onOpen();
                             }}
                         >
-                            <Table.Header>
+                            {/* v2's `hideHeader` on Table is gone, and an unknown prop is
+                                not an error -- it just did nothing, leaving a 20px band of
+                                empty column dividers above the first row. The columns still
+                                have to exist for the collection, so the header row is hidden
+                                instead of dropped. */}
+                            <Table.Header className='hidden'>
                                 <Table.Column id='service' />
                                 <Table.Column id='text' />
                                 <Table.Column id='source' />
