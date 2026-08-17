@@ -43,6 +43,32 @@ import {
 const PAGE_SIZE = 20;
 const ALL = '__all__';
 
+const ELLIPSIS = Symbol('ellipsis');
+
+// The page numbers to actually draw. v3's Pagination has no notion of collapsing
+// a long run, so this is what v2's `isCompact` did on its own: first and last
+// always, a window either side of the current page, and an ellipsis for each gap.
+function pageWindow(current, totalPages) {
+    if (!Number.isFinite(totalPages) || totalPages < 1) {
+        return [1];
+    }
+    if (totalPages <= 7) {
+        return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+    const pages = new Set([1, totalPages, current, current - 1, current + 1]);
+    const shown = [...pages].filter((p) => p >= 1 && p <= totalPages).sort((a, b) => a - b);
+    const out = [];
+    let previous = 0;
+    for (const p of shown) {
+        if (p - previous > 1) {
+            out.push(ELLIPSIS);
+        }
+        out.push(p);
+        previous = p;
+    }
+    return out;
+}
+
 // `text`/`result` come straight from the user, so every field is quoted and
 // embedded quotes are doubled. The BOM makes Excel read it as UTF-8.
 function toCsv(rows) {
@@ -439,13 +465,48 @@ export default function History() {
                     </Table.ScrollContainer>
                 </Table>
                 <div className='mt-[8px] flex justify-around'>
-                    <Pagination
-                        showControls
-                        isCompact
-                        total={Math.ceil(total / PAGE_SIZE)}
-                        page={page}
-                        onChange={setPage}
-                    />
+                    {/* v3's Pagination renders no pages of its own: `total`, `page`
+                        and `onChange` are gone and every link is written out. With
+                        none, it produced an empty <nav> with `total` and `page`
+                        leaked onto it as DOM attributes.
+
+                        `pageWindow` is what v2's `isCompact` did for free -- keep
+                        the run short and stand in an ellipsis -- since a history
+                        of any size would otherwise print every page number. */}
+                    <Pagination>
+                        <Pagination.Content>
+                            <Pagination.Item>
+                                <Pagination.Previous
+                                    isDisabled={page <= 1}
+                                    onPress={() => setPage(page - 1)}
+                                >
+                                    <Pagination.PreviousIcon />
+                                </Pagination.Previous>
+                            </Pagination.Item>
+                            {pageWindow(page, Math.ceil(total / PAGE_SIZE)).map((entry, index) => (
+                                <Pagination.Item key={entry === ELLIPSIS ? `gap-${index}` : entry}>
+                                    {entry === ELLIPSIS ? (
+                                        <Pagination.Ellipsis />
+                                    ) : (
+                                        <Pagination.Link
+                                            isActive={entry === page}
+                                            onPress={() => setPage(entry)}
+                                        >
+                                            {entry}
+                                        </Pagination.Link>
+                                    )}
+                                </Pagination.Item>
+                            ))}
+                            <Pagination.Item>
+                                <Pagination.Next
+                                    isDisabled={page >= Math.ceil(total / PAGE_SIZE)}
+                                    onPress={() => setPage(page + 1)}
+                                >
+                                    <Pagination.NextIcon />
+                                </Pagination.Next>
+                            </Pagination.Item>
+                        </Pagination.Content>
+                    </Pagination>
                     <ButtonGroup className='my-auto'>
                         <Button
                             size='sm'
