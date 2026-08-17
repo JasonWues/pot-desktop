@@ -50,6 +50,7 @@ export default function SelectPluginModal(props) {
                                                 key={x}
                                             >
                                                 <Button
+                                                    variant='tertiary'
                                                     fullWidth
                                                     className='mr-[8px]'
                                                     onPress={() => {

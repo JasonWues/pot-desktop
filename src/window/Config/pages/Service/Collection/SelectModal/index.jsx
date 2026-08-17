@@ -25,6 +25,7 @@ export default function SelectModal(props) {
                                         return (
                                             <div key={x}>
                                                 <Button
+                                                    variant='tertiary'
                                                     fullWidth
                                                     onPress={() => {
                                                         setCurrentConfigKey(createServiceInstanceKey(x));
