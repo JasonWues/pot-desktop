@@ -73,24 +73,28 @@ pub fn get_base64(app_handle: tauri::AppHandle) -> String {
 }
 
 #[tauri::command]
-pub fn copy_img(app_handle: tauri::AppHandle, width: usize, height: usize) -> Result<(), Error> {
-    use arboard::{Clipboard, ImageData};
+pub fn copy_img(app_handle: tauri::AppHandle) -> Result<(), Error> {
     use dirs::cache_dir;
     use image::ImageReader;
-    use std::borrow::Cow;
+    use tauri_plugin_clipboard_manager::ClipboardExt;
 
     let mut app_cache_dir_path = cache_dir().expect("Get Cache Dir Failed");
     app_cache_dir_path.push(&app_handle.config().identifier);
     app_cache_dir_path.push("pot_screenshot_cut.png");
     let data = ImageReader::open(app_cache_dir_path)?.decode()?;
 
-    let img = ImageData {
-        width,
-        height,
-        bytes: Cow::from(data.as_bytes()),
-    };
-    let result = Clipboard::new()?.set_image(img)?;
-    Ok(result)
+    // `to_rgba8`, where this used to hand over `as_bytes` unconverted. The
+    // clipboard wants four channels per pixel; a PNG that decoded to anything
+    // narrower -- greyscale, or RGB with no alpha -- was being read as if it
+    // were RGBA, so the rows walked out of step and the paste came out as
+    // noise. Screenshots are RGBA in practice, which is why it went unnoticed.
+    let rgba = data.to_rgba8();
+    // Dimensions from the decoded image rather than from the caller. They were
+    // passed in from the `<img>`'s natural size, and the clipboard trusts them
+    // to describe the buffer -- so any disagreement was read out of bounds.
+    let image = tauri::image::Image::new(rgba.as_raw(), rgba.width(), rgba.height());
+    app_handle.clipboard().write_image(&image)?;
+    Ok(())
 }
 
 // `set_proxy` / `unset_proxy` moved to `proxy.rs`, which grew the mode handling

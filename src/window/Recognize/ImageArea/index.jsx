@@ -107,10 +107,7 @@ export default function ImageArea() {
                         size='sm'
                         variant='light'
                         onPress={async () => {
-                            await invoke('copy_img', {
-                                width: imgRef.current.naturalWidth,
-                                height: imgRef.current.naturalHeight,
-                            });
+                            await invoke('copy_img');
                         }}
                     >
                         <MdContentCopy className='text-[16px]' />
