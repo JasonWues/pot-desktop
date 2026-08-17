@@ -58,9 +58,8 @@ export default function LanguageArea() {
                     <Dropdown>
                         <Button
                             isIconOnly={aiPreset === DEFAULT_PRESET}
-                            radius='sm'
                             variant='tertiary'
-                            className={aiPreset === DEFAULT_PRESET ? '' : 'text-accent'}
+                            className={`rounded-md ${aiPreset === DEFAULT_PRESET ? '' : 'text-accent'}`}
                         >
                             {aiPreset === DEFAULT_PRESET ? null : <LuWand className='text-[16px]' />}
                             {aiPreset === DEFAULT_PRESET ? (
@@ -89,7 +88,7 @@ export default function LanguageArea() {
                     </Dropdown>
                     <Dropdown>
                         <Button
-                            radius='sm'
+                            className='rounded-md'
                             variant='tertiary'
                         >
                             {t(`languages.${sourceLanguage}`)}
@@ -156,7 +155,7 @@ export default function LanguageArea() {
                 <div className='flex'>
                     <Dropdown>
                         <Button
-                            radius='sm'
+                            className='rounded-md'
                             variant='tertiary'
                         >
                             {t(`languages.${targetLanguage}`)}

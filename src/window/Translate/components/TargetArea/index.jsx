@@ -429,23 +429,19 @@ export default function TargetArea(props) {
                             </Dropdown.Menu>
                         </Dropdown.Popover>
                     </Dropdown>
-                    {/* `size` is deliberately not set. For the dots variant it sizes a fixed
-                        square wrapper -- 40px at `lg` -- and this header is 30px tall, so the
-                        wrapper is sized to the dots instead. That also lays them out as a row
-                        rather than spreading them across that square.
+                    {/* v3's Spinner is one spinning SVG: no `variant`, no slots, no
+                        `classNames`. The dots and every class in that object were being
+                        dropped, leaving a bare 24px circle in a 30px header, so this is
+                        the plain form -- `sm` is 16px, and the colour is inherited.
 
-                        `default-500` rather than `color='default'`, which is a lighter shade:
-                        500 is what this spinner has always used, and a utility class resolves
-                        against whatever theme class is on <html> exactly as the var reference
-                        it replaces did. */}
-                    {isPending && (
+                        `isPending` here was a rename too far. The v2 -> v3 pass renamed
+                        Button's `isLoading` prop, and caught this `loading={isLoading}`
+                        on the way past; the state is still called `isLoading`, so the
+                        reference threw and took the whole TargetArea down with it. */}
+                    {isLoading && (
                         <Spinner
-                            variant='dots'
-                            classNames={{
-                                base: 'my-auto ml-[20px]',
-                                wrapper: 'w-auto h-2 gap-1',
-                                dots: 'size-2 bg-muted',
-                            }}
+                            size='sm'
+                            className='my-auto ml-[20px] text-muted'
                         />
                     )}
                 </div>
