@@ -5,10 +5,6 @@ import {
     ModalFooter,
     Table,
     TableHeader,
-    TableColumn,
-    TableBody,
-    TableRow,
-    TableCell,
     Dropdown,
     TextArea,
     Button,
@@ -16,6 +12,7 @@ import {
     Input,
     Pagination,
     Label,
+    SearchField,
 } from '@heroui/react';
 import { readDir, BaseDirectory, readTextFile, exists } from '@tauri-apps/plugin-fs';
 import { appConfigDir, join } from '@tauri-apps/api/path';
@@ -341,93 +338,105 @@ export default function History() {
                         </Dropdown.Popover>
                     </Dropdown>
                 </div>
+                {/* v3's Table is three components, not one: the root styles the
+                    container, ScrollContainer owns the scrolling, and Content is
+                    the actual table -- which is where aria-label, selectionMode and
+                    onRowAction now live. Getting this wrong does not fail the
+                    build: the flat TableHeader/TableRow/TableCell names still
+                    exist, and are literally the same objects, so the v2
+                    arrangement compiled and then threw "cannot be rendered outside
+                    a collection" the moment this page opened.
+
+                    Columns and rows are keyed by `id` rather than React's `key`,
+                    the same distinction the dropdown items have. */}
                 <Table
-                    fullWidth
-                    hideHeader
-                    selectionMode='single'
-                    selectionBehavior='toggle'
-                    aria-label='History Table'
-                    classNames={{
-                        base: `${
-                            osType === 'Linux' ? 'h-[calc(100vh-180px)]' : 'h-[calc(100vh-150px)]'
-                        } overflow-y-auto`,
-                        td: 'px-0',
-                    }}
-                    onRowAction={(id) => {
-                        getSelectedData(id);
-                        onOpen();
-                    }}
+                    className={`${
+                        osType === 'Linux' ? 'h-[calc(100vh-180px)]' : 'h-[calc(100vh-150px)]'
+                    } overflow-y-auto`}
                 >
-                    <TableHeader>
-                        <TableColumn key='service' />
-                        <TableColumn key='text' />
-                        <TableColumn key='source' />
-                        <TableColumn key='target' />
-                        <TableColumn key='result' />
-                        <TableColumn key='timestamp' />
-                    </TableHeader>
-                    <TableBody
-                        emptyContent={'No History to display.'}
-                        items={items}
-                    >
-                        {(item) =>
-                            whetherAvailableService(item.service, {
-                                [ServiceSourceType.BUILDIN]: builtinServices,
-                                [ServiceSourceType.PLUGIN]: pluginList[ServiceType.TRANSLATE],
-                            }) && (
-                                <TableRow key={item.id}>
-                                    <TableCell>
-                                        {getServiceSouceType(item.service) === ServiceSourceType.PLUGIN ? (
-                                            <img
-                                                src={pluginList['translate'][getServiceName(item.service)].icon}
-                                                className='h-[18px] w-[18px] my-auto mr-[8px]'
-                                                draggable={false}
-                                            />
-                                        ) : (
-                                            <img
-                                                src={`${builtinServices[getServiceName(item.service)].info.icon}`}
-                                                className='h-[18px] w-[18px] my-auto mr-[8px]'
-                                                draggable={false}
-                                            />
-                                        )}
-                                    </TableCell>
-                                    <TableCell>
-                                        <p
-                                            className={`whitespace-nowrap ${
-                                                osType === 'Linux'
-                                                    ? 'w-[calc((100vw-287px-26px-60px-140px-30px)*0.5)]'
-                                                    : 'w-[calc((100vw-287px-26px-60px-140px)*0.5)]'
-                                            } text-ellipsis overflow-hidden`}
-                                        >
-                                            {item.text}
-                                        </p>
-                                    </TableCell>
-                                    <TableCell>
-                                        <span className={`w-[30px] fi fi-${LanguageFlag[item.source]}`} />
-                                    </TableCell>
-                                    <TableCell>
-                                        <span className={`w-[30px] fi fi-${LanguageFlag[item.target]}`} />
-                                    </TableCell>
-                                    <TableCell>
-                                        <p
-                                            className={`whitespace-nowrap ${
-                                                osType === 'Linux'
-                                                    ? 'w-[calc((100vw-287px-26px-60px-140px-30px)*0.5)]'
-                                                    : 'w-[calc((100vw-287px-26px-60px-140px)*0.5)]'
-                                            } text-ellipsis overflow-hidden`}
-                                        >
-                                            {item.result}
-                                        </p>
-                                    </TableCell>
-                                    <TableCell>
-                                        <p className='text-center whitespace-nowrap w-[140px]'>
-                                            {formatDate(new Date(item.timestamp))}
-                                        </p>
-                                    </TableCell>
-                                </TableRow>
-                            )
-                        }
-                    </TableBody>
+                    <Table.ScrollContainer>
+                        <Table.Content
+                            hideHeader
+                            selectionMode='single'
+                            selectionBehavior='toggle'
+                            aria-label='History Table'
+                            onRowAction={(id) => {
+                                getSelectedData(id);
+                                onOpen();
+                            }}
+                        >
+                            <Table.Header>
+                                <Table.Column id='service' />
+                                <Table.Column id='text' />
+                                <Table.Column id='source' />
+                                <Table.Column id='target' />
+                                <Table.Column id='result' />
+                                <Table.Column id='timestamp' />
+                            </Table.Header>
+                            <Table.Body
+                                renderEmptyState={() => 'No History to display.'}
+                                items={items}
+                            >
+                                {(item) =>
+                                    whetherAvailableService(item.service, {
+                                        [ServiceSourceType.BUILDIN]: builtinServices,
+                                        [ServiceSourceType.PLUGIN]: pluginList[ServiceType.TRANSLATE],
+                                    }) && (
+                                        <Table.Row id={item.id}>
+                                            <Table.Cell className='px-0'>
+                                                {getServiceSouceType(item.service) === ServiceSourceType.PLUGIN ? (
+                                                    <img
+                                                        src={pluginList['translate'][getServiceName(item.service)].icon}
+                                                        className='h-[18px] w-[18px] my-auto mr-[8px]'
+                                                        draggable={false}
+                                                    />
+                                                ) : (
+                                                    <img
+                                                        src={`${builtinServices[getServiceName(item.service)].info.icon}`}
+                                                        className='h-[18px] w-[18px] my-auto mr-[8px]'
+                                                        draggable={false}
+                                                    />
+                                                )}
+                                            </Table.Cell>
+                                            <Table.Cell className='px-0'>
+                                                <p
+                                                    className={`whitespace-nowrap ${
+                                                        osType === 'Linux'
+                                                            ? 'w-[calc((100vw-287px-26px-60px-140px-30px)*0.5)]'
+                                                            : 'w-[calc((100vw-287px-26px-60px-140px)*0.5)]'
+                                                    } text-ellipsis overflow-hidden`}
+                                                >
+                                                    {item.text}
+                                                </p>
+                                            </Table.Cell>
+                                            <Table.Cell className='px-0'>
+                                                <span className={`w-[30px] fi fi-${LanguageFlag[item.source]}`} />
+                                            </Table.Cell>
+                                            <Table.Cell className='px-0'>
+                                                <span className={`w-[30px] fi fi-${LanguageFlag[item.target]}`} />
+                                            </Table.Cell>
+                                            <Table.Cell className='px-0'>
+                                                <p
+                                                    className={`whitespace-nowrap ${
+                                                        osType === 'Linux'
+                                                            ? 'w-[calc((100vw-287px-26px-60px-140px-30px)*0.5)]'
+                                                            : 'w-[calc((100vw-287px-26px-60px-140px)*0.5)]'
+                                                    } text-ellipsis overflow-hidden`}
+                                                >
+                                                    {item.result}
+                                                </p>
+                                            </Table.Cell>
+                                            <Table.Cell className='px-0'>
+                                                <p className='text-center whitespace-nowrap w-[140px]'>
+                                                    {formatDate(new Date(item.timestamp))}
+                                                </p>
+                                            </Table.Cell>
+                                        </Table.Row>
+                                    )
+                                }
+                            </Table.Body>
+                        </Table.Content>
+                    </Table.ScrollContainer>
                 </Table>
                 <div className='mt-[8px] flex justify-around'>
                     <Pagination
