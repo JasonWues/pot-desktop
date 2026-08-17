@@ -73,7 +73,18 @@
         align-items: center;
     }
 
+    /*
+      v2's ModalBody was `flex flex-col gap-3` and every modal leaned on it for
+      spacing. v3's is a plain block with no gap, so the five service pickers --
+      which are a bare `<div><Button/></div>` per row -- came out as a stack of
+      touching pills. The config modals do not notice either way: their body has
+      a single <form> child and the rows inside space themselves with
+      `.config-item`'s own margin.
+    */
     .modal__body {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
         color: var(--foreground);
     }
 }
