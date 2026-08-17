@@ -72,7 +72,7 @@ export default function ServiceItem(props) {
                     <Button
                         isIconOnly
                         size='sm'
-                        variant='light'
+                        variant='tertiary'
                         onPress={() => {
                             setCurrentConfigKey(serviceInstanceKey);
                             onConfigOpen();
@@ -84,8 +84,7 @@ export default function ServiceItem(props) {
                     <Button
                         isIconOnly
                         size='sm'
-                        variant='light'
-                        color='danger'
+                        variant='danger-soft'
                         onPress={() => {
                             deleteServiceInstance(serviceInstanceKey);
                         }}

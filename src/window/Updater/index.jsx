@@ -145,10 +145,9 @@ export default function Updater() {
 
             <div className='grid gap-4 grid-cols-2 h-[50px] my-[10px] mx-[80px]'>
                 <Button
-                    variant='flat'
-                    isLoading={downloaded !== 0}
+                    variant='tertiary'
+                    isPending={downloaded !== 0}
                     isDisabled={downloaded !== 0}
-                    color='primary'
                     onPress={() => {
                         if (pendingUpdate === null) {
                             toast.error(t('updater.latest'), { style: toastStyle });
@@ -189,8 +188,7 @@ export default function Updater() {
                         : t('updater.update')}
                 </Button>
                 <Button
-                    variant='flat'
-                    color='danger'
+                    variant='danger-soft'
                     onPress={() => {
                         appWindow.close();
                     }}

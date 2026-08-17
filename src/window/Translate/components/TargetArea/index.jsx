@@ -361,7 +361,7 @@ export default function TargetArea(props) {
                     <Dropdown>
                         <Button
                             size='sm'
-                            variant='solid'
+                            variant='primary'
                             className='bg-transparent'
                         >
                             {whetherPluginService(currentTranslateServiceInstanceKey) ? (
@@ -438,7 +438,7 @@ export default function TargetArea(props) {
                         500 is what this spinner has always used, and a utility class resolves
                         against whatever theme class is on <html> exactly as the var reference
                         it replaces did. */}
-                    {isLoading && (
+                    {isPending && (
                         <Spinner
                             variant='dots'
                             classNames={{
@@ -454,7 +454,7 @@ export default function TargetArea(props) {
                     <Button
                         size='sm'
                         isIconOnly
-                        variant='light'
+                        variant='tertiary'
                         className='h-[20px] w-[20px]'
                         onPress={() => setHide(!hide)}
                     >
@@ -613,7 +613,7 @@ export default function TargetArea(props) {
                                 <Tooltip.Trigger>
                                     <Button
                                         isIconOnly
-                                        variant='light'
+                                        variant='tertiary'
                                         size='sm'
                                         isDisabled={typeof result !== 'string' || result === ''}
                                         onPress={() => {
@@ -632,7 +632,7 @@ export default function TargetArea(props) {
                                 <Tooltip.Trigger>
                                     <Button
                                         isIconOnly
-                                        variant='light'
+                                        variant='tertiary'
                                         size='sm'
                                         isDisabled={typeof result !== 'string' || result === ''}
                                         onPress={() => {
@@ -649,7 +649,7 @@ export default function TargetArea(props) {
                                 <Tooltip.Trigger>
                                     <Button
                                         isIconOnly
-                                        variant='light'
+                                        variant='tertiary'
                                         size='sm'
                                         isDisabled={typeof result !== 'string' || result === ''}
                                         onPress={async () => {
@@ -774,7 +774,7 @@ export default function TargetArea(props) {
                                 <Tooltip.Trigger>
                                     <Button
                                         isIconOnly
-                                        variant='light'
+                                        variant='tertiary'
                                         size='sm'
                                         className={`${error === '' ? 'hidden' : ''}`}
                                         onPress={() => {
@@ -795,7 +795,7 @@ export default function TargetArea(props) {
                                         <Button
                                             key={collectionServiceInstanceName}
                                             isIconOnly
-                                            variant='light'
+                                            variant='tertiary'
                                             size='sm'
                                             onPress={async () => {
                                                 if (

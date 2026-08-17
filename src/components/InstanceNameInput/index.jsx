@@ -25,7 +25,7 @@ export default function InstanceNameInput({ config, onChange }) {
             >
                 <Label className='text-base my-auto'>{t('services.instance_name')}</Label>
                 <Input
-                    variant='bordered'
+                    variant='secondary'
                     className='max-w-[50%]'
                 />
             </TextField>

@@ -302,7 +302,7 @@ export default function History() {
                     <Dropdown>
                         <Button
                             size='sm'
-                            variant='bordered'
+                            variant='secondary'
                             className='my-auto'
                         >
                             {serviceFilter === ALL ? t('config.history.all_services') : serviceLabel(serviceFilter)}
@@ -333,7 +333,7 @@ export default function History() {
                     <Dropdown>
                         <Button
                             size='sm'
-                            variant='bordered'
+                            variant='secondary'
                             className='my-auto'
                         >
                             {targetFilter === ALL
@@ -579,7 +579,7 @@ export default function History() {
                                             <ModalFooter className='flex justify-between'>
                                                 <ButtonGroup>
                                                     <Button
-                                                        color='primary'
+                                                        variant='primary'
                                                         onPress={async () => {
                                                             await updateData();
                                                             close();
@@ -589,8 +589,7 @@ export default function History() {
                                                     </Button>
                                                     <Button
                                                         isIconOnly
-                                                        color='danger'
-                                                        variant='flat'
+                                                        variant='danger-soft'
                                                         aria-label={t('config.history.delete')}
                                                         onPress={async () => {
                                                             await deleteItem(selectedItem.id);
@@ -607,7 +606,7 @@ export default function History() {
                                                                 <Button
                                                                     key={instanceKey}
                                                                     isIconOnly
-                                                                    variant='light'
+                                                                    variant='tertiary'
                                                                     onPress={async () => {
                                                                         if (
                                                                             getServiceSouceType(instanceKey) ===

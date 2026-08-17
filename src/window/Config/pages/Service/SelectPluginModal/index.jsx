@@ -34,7 +34,7 @@ export default function SelectPluginModal(props) {
                                     {Object.keys(pluginList).length === 0 && (
                                         <Button
                                             fullWidth
-                                            variant='flat'
+                                            variant='tertiary'
                                             onPress={() => {
                                                 openInBrowser('http://pot-app.com/plugin.html');
                                             }}
@@ -65,8 +65,7 @@ export default function SelectPluginModal(props) {
                                                 </Button>
                                                 <Button
                                                     isIconOnly
-                                                    color='danger'
-                                                    variant='flat'
+                                                    variant='danger-soft'
                                                     onPress={() => {
                                                         remove(`plugins/${pluginType}/${x}`, {
                                                             baseDir: BaseDirectory.AppConfig,
@@ -93,9 +92,8 @@ export default function SelectPluginModal(props) {
                                     <div>
                                         <Button
                                             fullWidth
-                                            isLoading={installing}
-                                            color='secondary'
-                                            variant='flat'
+                                            isPending={installing}
+                                            variant='tertiary'
                                             onPress={async () => {
                                                 setInstalling(true);
                                                 const selected = await open({
@@ -135,8 +133,7 @@ export default function SelectPluginModal(props) {
                                 </ModalBody>
                                 <ModalFooter>
                                     <Button
-                                        color='danger'
-                                        variant='light'
+                                        variant='danger-soft'
                                         onPress={close}
                                     >
                                         {t('common.cancel')}

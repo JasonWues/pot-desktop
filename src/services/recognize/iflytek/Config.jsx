@@ -80,7 +80,7 @@ export function Config(props) {
                     >
                         <Label className='text-base my-auto'>{t('services.recognize.iflytek_ocr.appid')}</Label>
                         <Input
-                            variant='bordered'
+                            variant='secondary'
                             className='max-w-[50%]'
                         />
                     </TextField>
@@ -98,7 +98,7 @@ export function Config(props) {
                     >
                         <Label className='text-base my-auto'>{t('services.recognize.iflytek_ocr.apisecret')}</Label>
                         <Input
-                            variant='bordered'
+                            variant='secondary'
                             className='max-w-[50%]'
                         />
                     </TextField>
@@ -116,15 +116,15 @@ export function Config(props) {
                     >
                         <Label className='text-base my-auto'>{t('services.recognize.iflytek_ocr.apikey')}</Label>
                         <Input
-                            variant='bordered'
+                            variant='secondary'
                             className='max-w-[50%]'
                         />
                     </TextField>
                 </div>
                 <Button
+                    variant='primary'
                     type='submit'
-                    isLoading={isLoading}
-                    color='primary'
+                    isPending={isLoading}
                     fullWidth
                 >
                     {t('common.save')}

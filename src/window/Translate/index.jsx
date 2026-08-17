@@ -245,7 +245,7 @@ export default function Translate() {
                     <Button
                         isIconOnly
                         size='sm'
-                        variant='flat'
+                        variant='tertiary'
                         disableAnimation
                         className='my-auto bg-transparent'
                         onPress={() => {
@@ -266,7 +266,7 @@ export default function Translate() {
                     <Button
                         isIconOnly
                         size='sm'
-                        variant='flat'
+                        variant='tertiary'
                         disableAnimation
                         className={`my-auto ${osType === 'Darwin' ? 'hidden' : ''} bg-transparent`}
                         onPress={() => {

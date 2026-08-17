@@ -55,7 +55,7 @@ export default function ControlArea(props) {
                 <Dropdown>
                     <Button
                         className='my-auto'
-                        variant='bordered'
+                        variant='secondary'
                         size='sm'
                     >
                         <img
@@ -120,7 +120,7 @@ export default function ControlArea(props) {
                 <Dropdown>
                     <Button
                         className='my-auto'
-                        variant='bordered'
+                        variant='secondary'
                         size='sm'
                     >
                         {t(`languages.${language}`)}
@@ -154,8 +154,7 @@ export default function ControlArea(props) {
                 </Dropdown>
             )}
             <Button
-                variant='flat'
-                color='secondary'
+                variant='tertiary'
                 size='sm'
                 className='my-auto'
                 onPress={() => {
@@ -166,8 +165,7 @@ export default function ControlArea(props) {
                 {t('recognize.recognize')}
             </Button>
             <Button
-                variant='flat'
-                color='primary'
+                variant='tertiary'
                 size='sm'
                 className='my-auto'
                 onPress={async () => {

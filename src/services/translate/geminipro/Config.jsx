@@ -138,7 +138,7 @@ export function Config(props) {
                     >
                         <Label className='text-base my-auto'>{t('services.translate.geminipro.request_path')}</Label>
                         <Input
-                            variant='bordered'
+                            variant='secondary'
                             className='max-w-[50%]'
                         />
                     </TextField>
@@ -157,7 +157,7 @@ export function Config(props) {
                         <Label className='text-base my-auto'>{t('services.translate.geminipro.api_key')}</Label>
                         <Input
                             type='password'
-                            variant='bordered'
+                            variant='secondary'
                             className='max-w-[50%]'
                         />
                     </TextField>
@@ -173,7 +173,7 @@ export function Config(props) {
                                     <TextArea
                                         label={prompt.role}
                                         labelPlacement='outside'
-                                        variant='faded'
+                                        variant='secondary'
                                         value={prompt.parts[0].text}
                                         placeholder={`Input Some ${prompt.role} Prompt`}
                                         onValueChange={(value) => {
@@ -198,9 +198,8 @@ export function Config(props) {
                                     />
                                     <Button
                                         isIconOnly
-                                        color='danger'
                                         className='my-auto mx-1'
-                                        variant='flat'
+                                        variant='danger-soft'
                                         onPress={() => {
                                             setServiceConfig({
                                                 ...serviceConfig,
@@ -237,10 +236,10 @@ export function Config(props) {
                 </div>
                 <br />
                 <Button
+                    variant='primary'
                     type='submit'
-                    isLoading={isLoading}
+                    isPending={isLoading}
                     fullWidth
-                    color='primary'
                 >
                     {t('common.save')}
                 </Button>

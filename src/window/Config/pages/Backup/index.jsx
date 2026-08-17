@@ -178,7 +178,7 @@ export default function Backup() {
                     <h3 className='my-auto'>{t('config.backup.type')}</h3>
                     {backupType !== null && (
                         <Dropdown>
-                            <Button variant='bordered'>{t(`config.backup.${backupType}`)}</Button>
+                            <Button variant='secondary'>{t(`config.backup.${backupType}`)}</Button>
                             <Dropdown.Popover>
                                 <Dropdown.Menu
                                     aria-label='backup type'
@@ -221,7 +221,7 @@ export default function Backup() {
                                 }}
                             >
                                 <Label className='text-base my-auto'>{t('config.backup.webdav_url')}</Label>
-                                <Input variant='bordered' />
+                                <Input variant='secondary' />
                             </TextField>
                         )}
                     </div>
@@ -236,7 +236,7 @@ export default function Backup() {
                                 }}
                             >
                                 <Label className='text-base my-auto'>{t('config.backup.username')}</Label>
-                                <Input variant='bordered' />
+                                <Input variant='secondary' />
                             </TextField>
                         )}
                     </div>
@@ -253,7 +253,7 @@ export default function Backup() {
                                 <Label className='text-base my-auto'>{t('config.backup.password')}</Label>
                                 <Input
                                     type='password'
-                                    variant='bordered'
+                                    variant='secondary'
                                 />
                             </TextField>
                         )}
@@ -273,7 +273,7 @@ export default function Backup() {
                             <Tooltip>
                                 <Tooltip.Trigger>
                                     <Button
-                                        variant='light'
+                                        variant='tertiary'
                                         onClick={() => {
                                             setAliyunAccessToken('');
                                             // setAliyunRefreshToken('');
@@ -295,16 +295,14 @@ export default function Backup() {
                 </div>
                 <div className='flex justify-around'>
                     <Button
-                        color='success'
-                        variant='flat'
-                        isLoading={uploading}
+                        variant='tertiary'
+                        isPending={uploading}
                         onPress={onBackup}
                     >
                         {t('config.backup.backup')}
                     </Button>
                     <Button
-                        color='secondary'
-                        variant='flat'
+                        variant='tertiary'
                         onPress={onBackupListOpen}
                     >
                         {t('config.backup.restore')}

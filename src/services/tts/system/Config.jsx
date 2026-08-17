@@ -68,7 +68,7 @@ export function Config(props) {
                 <div className='config-item'>
                     <h3 className='my-auto'>{t('services.tts.system_tts.rate')}</h3>
                     <Dropdown>
-                        <Button variant='bordered'>{`${systemTtsConfig.rate ?? 1}x`}</Button>
+                        <Button variant='secondary'>{`${systemTtsConfig.rate ?? 1}x`}</Button>
                         <Dropdown.Popover>
                             <Dropdown.Menu
                                 aria-label='tts rate'
@@ -93,7 +93,7 @@ export function Config(props) {
                 <div className='config-item'>
                     <h3 className='my-auto'>{t('services.tts.system_tts.language')}</h3>
                     <Dropdown>
-                        <Button variant='bordered'>{t(`languages.${editingLanguage}`)}</Button>
+                        <Button variant='secondary'>{t(`languages.${editingLanguage}`)}</Button>
                         <Dropdown.Popover>
                             <Dropdown.Menu
                                 aria-label='tts language'
@@ -118,7 +118,7 @@ export function Config(props) {
                 <div className='config-item'>
                     <h3 className='my-auto'>{t('services.tts.system_tts.voice')}</h3>
                     <Dropdown>
-                        <Button variant='bordered'>
+                        <Button variant='secondary'>
                             {configuredVoice === ''
                                 ? `${t('services.tts.system_tts.auto_voice')}${
                                       autoVoice === null ? '' : ` (${autoVoice.name})`
@@ -158,9 +158,9 @@ export function Config(props) {
 
                 <div>
                     <Button
-                        isLoading={isLoading}
+                        variant='primary'
+                        isPending={isLoading}
                         fullWidth
-                        color='primary'
                         onPress={() => {
                             setIsLoading(true);
                             tts('hello', Language.en, { config: systemTtsConfig }).then(

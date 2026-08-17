@@ -57,14 +57,14 @@ export function Config(props) {
                         }}
                         aria-label={t('services.tts.lingva_tts.request_path')}
                     >
-                        <Input variant='bordered' />
+                        <Input variant='secondary' />
                     </TextField>
                 </div>
                 <div>
                     <Button
-                        isLoading={isLoading}
+                        variant='primary'
+                        isPending={isLoading}
                         fullWidth
-                        color='primary'
                         onPress={() => {
                             setIsLoading(true);
                             tts('hello', Language.en, { config: lingvaConfig }).then(

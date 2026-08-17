@@ -81,7 +81,7 @@ export function Config(props) {
                             {t('services.recognize.tencent_accurate_ocr.secret_id')}
                         </Label>
                         <Input
-                            variant='bordered'
+                            variant='secondary'
                             className='max-w-[50%]'
                         />
                     </TextField>
@@ -101,15 +101,15 @@ export function Config(props) {
                             {t('services.recognize.tencent_accurate_ocr.secret_key')}
                         </Label>
                         <Input
-                            variant='bordered'
+                            variant='secondary'
                             className='max-w-[50%]'
                         />
                     </TextField>
                 </div>
                 <Button
+                    variant='primary'
                     type='submit'
-                    isLoading={isLoading}
-                    color='primary'
+                    isPending={isLoading}
                     fullWidth
                 >
                     {t('common.save')}

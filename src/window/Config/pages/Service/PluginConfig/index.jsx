@@ -37,7 +37,7 @@ export function PluginConfig(props) {
                     >
                         <Label className='text-base my-auto'>{t('services.instance_name')}</Label>
                         <Input
-                            variant='bordered'
+                            variant='secondary'
                             className='max-w-[50%]'
                         />
                     </TextField>
@@ -68,13 +68,13 @@ export function PluginConfig(props) {
                                         }}
                                         aria-label={x.display}
                                     >
-                                        <Input variant='bordered' />
+                                        <Input variant='secondary' />
                                     </TextField>
                                 )}
                                 {x.type === 'select' && (
                                     <Dropdown>
                                         <Button
-                                            variant='bordered'
+                                            variant='secondary'
                                             className='max-w-[50%]'
                                         >
                                             {
@@ -128,7 +128,7 @@ export function PluginConfig(props) {
                                     }}
                                     aria-label={x.display}
                                 >
-                                    <Input variant='bordered' />
+                                    <Input variant='secondary' />
                                 </TextField>
                             </div>
                         ))
@@ -138,8 +138,8 @@ export function PluginConfig(props) {
 
             <div>
                 <Button
+                    variant='primary'
                     fullWidth
-                    color='primary'
                     onPress={() => {
                         setPluginConfig(pluginConfig, true);
                         updateServiceList(instanceKey);

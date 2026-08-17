@@ -181,7 +181,7 @@ export default function TextArea(props) {
                             <Button
                                 isIconOnly
                                 size='sm'
-                                variant='light'
+                                variant='tertiary'
                                 onPress={() => {
                                     writeText(text);
                                 }}
@@ -195,7 +195,7 @@ export default function TextArea(props) {
                         <Tooltip.Trigger>
                             <Button
                                 isIconOnly
-                                variant='light'
+                                variant='tertiary'
                                 size='sm'
                                 onPress={() => {
                                     setText(text.replace(/\-\s+/g, '').replace(/\s+/g, ' '));
@@ -210,7 +210,7 @@ export default function TextArea(props) {
                         <Tooltip.Trigger>
                             <Button
                                 isIconOnly
-                                variant='light'
+                                variant='tertiary'
                                 size='sm'
                                 onPress={() => {
                                     setText(text.replaceAll(' ', ''));

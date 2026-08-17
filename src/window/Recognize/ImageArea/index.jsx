@@ -106,7 +106,7 @@ export default function ImageArea() {
                         <Button
                             isIconOnly
                             size='sm'
-                            variant='light'
+                            variant='tertiary'
                             onPress={async () => {
                                 await invoke('copy_img');
                             }}
@@ -118,8 +118,8 @@ export default function ImageArea() {
                 </Tooltip>
                 <Button
                     size='sm'
-                    variant='light'
-                    isLoading={inPlace.state === 'ocr' || inPlace.state === 'translating'}
+                    variant='tertiary'
+                    isPending={inPlace.state === 'ocr' || inPlace.state === 'translating'}
                     isDisabled={base64 === ''}
                     onPress={toggleInPlace}
                 >

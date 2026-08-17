@@ -19,7 +19,7 @@ export default function Recognize() {
                     <h3 className='my-auto mx-0'>{t('config.recognize.language')}</h3>
                     {recognizeLanguage !== null && (
                         <Dropdown>
-                            <Button variant='bordered'>{t(`languages.${recognizeLanguage}`)}</Button>
+                            <Button variant='secondary'>{t(`languages.${recognizeLanguage}`)}</Button>
                             <Dropdown.Popover>
                                 <Dropdown.Menu
                                     aria-label='recognize language'

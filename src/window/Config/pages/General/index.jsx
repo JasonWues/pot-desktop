@@ -174,7 +174,7 @@ export default function General() {
                             >
                                 <Input
                                     type='number'
-                                    variant='bordered'
+                                    variant='secondary'
                                 />
                             </TextField>
                         )}
@@ -187,7 +187,7 @@ export default function General() {
                         <h3 className='my-auto'>{t('config.general.app_language')}</h3>
                         {appLanguage !== null && (
                             <Dropdown>
-                                <Button variant='bordered'>
+                                <Button variant='secondary'>
                                     <Flag code={LanguageFlag[appLanguage]} />
                                     {languageName[appLanguage]}
                                 </Button>
@@ -343,7 +343,7 @@ export default function General() {
                         <h3 className='my-auto'>{t('config.general.app_theme')}</h3>
                         {appTheme !== null && (
                             <Dropdown>
-                                <Button variant='bordered'>
+                                <Button variant='secondary'>
                                     <ThemeIcon name={appTheme} />
                                     {t(`config.general.theme.${appTheme}`)}
                                 </Button>
@@ -391,7 +391,7 @@ export default function General() {
                         {appFont !== null && fontList !== null && (
                             <Dropdown>
                                 <Button
-                                    variant='bordered'
+                                    variant='secondary'
                                     style={{
                                         fontFamily: appFont === 'default' ? 'sans-serif' : appFont,
                                     }}
@@ -437,7 +437,7 @@ export default function General() {
                         {appFallbackFont !== null && fontList !== null && (
                             <Dropdown>
                                 <Button
-                                    variant='bordered'
+                                    variant='secondary'
                                     style={{
                                         fontFamily: appFallbackFont === 'default' ? 'sans-serif' : appFallbackFont,
                                     }}
@@ -482,7 +482,7 @@ export default function General() {
                         <h3 className='my-auto mx-0'>{t('config.general.font_size.title')}</h3>
                         {appFontSize !== null && (
                             <Dropdown>
-                                <Button variant='bordered'>{t(`config.general.font_size.${appFontSize}`)}</Button>
+                                <Button variant='secondary'>{t(`config.general.font_size.${appFontSize}`)}</Button>
                                 <Dropdown.Popover>
                                     <Dropdown.Menu
                                         aria-label='window position'
@@ -543,7 +543,7 @@ export default function General() {
                         <h3 className='my-auto'>{t('config.general.tray_click_event')}</h3>
                         {trayClickEvent !== null && (
                             <Dropdown>
-                                <Button variant='bordered'>{t(`config.general.event.${trayClickEvent}`)}</Button>
+                                <Button variant='secondary'>{t(`config.general.event.${trayClickEvent}`)}</Button>
                                 <Dropdown.Popover>
                                     <Dropdown.Menu
                                         aria-label='tray click event'
@@ -628,7 +628,7 @@ export default function General() {
                         <h3>{t('config.general.proxy.title')}</h3>
                         {proxyMode !== null && (
                             <Dropdown>
-                                <Button variant='bordered'>{t(`config.general.proxy.mode.${proxyMode}`)}</Button>
+                                <Button variant='secondary'>{t(`config.general.proxy.mode.${proxyMode}`)}</Button>
                                 <Dropdown.Popover>
                                     <Dropdown.Menu
                                         aria-label='proxy mode'
@@ -721,7 +721,7 @@ export default function General() {
                                 <Label className='text-base my-auto'>{t('config.general.proxy.port')}</Label>
                                 <Input
                                     type='number'
-                                    variant='bordered'
+                                    variant='secondary'
                                 />
                             </TextField>
                         )}
@@ -738,7 +738,7 @@ export default function General() {
                                 <Label className='text-base my-auto'>{t('config.general.proxy.username')}</Label>
                                 <Input
                                     type='text'
-                                    variant='bordered'
+                                    variant='secondary'
                                 />
                             </TextField>
                         )}
@@ -753,7 +753,7 @@ export default function General() {
                                 <Label className='text-base my-auto'>{t('config.general.proxy.password')}</Label>
                                 <Input
                                     type='password'
-                                    variant='bordered'
+                                    variant='secondary'
                                 />
                             </TextField>
                         )}
@@ -768,7 +768,7 @@ export default function General() {
                                 }}
                             >
                                 <Label className='text-base my-auto'>{t('config.general.proxy.no_proxy')}</Label>
-                                <Input variant='bordered' />
+                                <Input variant='secondary' />
                             </TextField>
                         )}
                     </div>

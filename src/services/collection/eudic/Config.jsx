@@ -75,7 +75,7 @@ export function Config(props) {
                         >
                             <Label className='text-base my-auto'>{t('services.collection.eudic.name')}</Label>
                             <Input
-                                variant='bordered'
+                                variant='secondary'
                                 className='max-w-[50%]'
                             />
                         </TextField>
@@ -93,17 +93,17 @@ export function Config(props) {
                         >
                             <Label className='text-base my-auto'>{t('services.collection.eudic.token')}</Label>
                             <Input
-                                variant='bordered'
+                                variant='secondary'
                                 className='max-w-[50%]'
                             />
                         </TextField>
                     </div>
                     <div>
                         <Button
+                            variant='primary'
                             type='submit'
-                            isLoading={isLoading}
+                            isPending={isLoading}
                             fullWidth
-                            color='primary'
                         >
                             {t('common.save')}
                         </Button>

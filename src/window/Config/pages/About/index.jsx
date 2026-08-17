@@ -26,7 +26,7 @@ export default function About() {
                 <Separator />
                 <div className='flex justify-between'>
                     <Button
-                        variant='light'
+                        variant='tertiary'
                         className='my-[5px]'
                         size='sm'
                         onPress={() => {
@@ -36,7 +36,7 @@ export default function About() {
                         {t('config.about.website')}
                     </Button>
                     <Button
-                        variant='light'
+                        variant='tertiary'
                         className='my-[5px]'
                         size='sm'
                         onPress={() => {
@@ -51,7 +51,7 @@ export default function About() {
                     >
                         <PopoverTrigger>
                             <Button
-                                variant='light'
+                                variant='tertiary'
                                 className='my-[5px]'
                                 size='sm'
                             >
@@ -61,7 +61,7 @@ export default function About() {
                         <PopoverContent>
                             <div className='flex justify-between'>
                                 <Button
-                                    variant='light'
+                                    variant='tertiary'
                                     className='my-[5px]'
                                     size='sm'
                                     onPress={() => {
@@ -71,7 +71,7 @@ export default function About() {
                                     {t('config.about.issue')}
                                 </Button>
                                 <Button
-                                    variant='light'
+                                    variant='tertiary'
                                     className='my-[5px]'
                                     size='sm'
                                     onPress={() => {
@@ -90,7 +90,7 @@ export default function About() {
                     >
                         <PopoverTrigger>
                             <Button
-                                variant='light'
+                                variant='tertiary'
                                 className='my-[5px]'
                                 size='sm'
                             >
@@ -103,7 +103,7 @@ export default function About() {
                                     <Tooltip.Trigger>
                                         <Button
                                             isIconOnly
-                                            variant='light'
+                                            variant='tertiary'
                                             className='my-[5px]'
                                             size='lg'
                                             onPress={() => {
@@ -119,7 +119,7 @@ export default function About() {
                                     <Tooltip.Trigger>
                                         <Button
                                             isIconOnly
-                                            variant='light'
+                                            variant='tertiary'
                                             className='my-[5px]'
                                             size='lg'
                                             onPress={() => {
@@ -135,7 +135,7 @@ export default function About() {
                                     <Tooltip.Trigger>
                                         <Button
                                             isIconOnly
-                                            variant='light'
+                                            variant='tertiary'
                                             className='my-[5px]'
                                             size='lg'
                                             onPress={() => {
@@ -151,7 +151,7 @@ export default function About() {
                                     <Tooltip.Trigger>
                                         <Button
                                             isIconOnly
-                                            variant='light'
+                                            variant='tertiary'
                                             className='my-[5px]'
                                             size='lg'
                                             onPress={() => {
@@ -172,7 +172,7 @@ export default function About() {
             <div className='content-center px-[40px]'>
                 <div className='flex justify-between'>
                     <Button
-                        variant='light'
+                        variant='tertiary'
                         className='my-[5px]'
                         size='sm'
                         onPress={() => {
@@ -182,7 +182,7 @@ export default function About() {
                         {t('config.about.check_update')}
                     </Button>
                     <Button
-                        variant='light'
+                        variant='tertiary'
                         className='my-[5px]'
                         size='sm'
                         onPress={async () => {
@@ -193,7 +193,7 @@ export default function About() {
                         {t('config.about.view_log')}
                     </Button>
                     <Button
-                        variant='light'
+                        variant='tertiary'
                         className='my-[5px]'
                         size='sm'
                         onPress={async () => {

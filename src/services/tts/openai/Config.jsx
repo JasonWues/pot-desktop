@@ -62,7 +62,7 @@ export function Config(props) {
                     >
                         <Label className='text-base my-auto'>{t('services.tts.openai_tts.request_path')}</Label>
                         <Input
-                            variant='bordered'
+                            variant='secondary'
                             className='max-w-[50%]'
                         />
                     </TextField>
@@ -81,7 +81,7 @@ export function Config(props) {
                         <Label className='text-base my-auto'>{t('services.tts.openai_tts.api_key')}</Label>
                         <Input
                             type='password'
-                            variant='bordered'
+                            variant='secondary'
                             className='max-w-[50%]'
                         />
                     </TextField>
@@ -99,7 +99,7 @@ export function Config(props) {
                     >
                         <Label className='text-base my-auto'>{t('services.tts.openai_tts.model')}</Label>
                         <Input
-                            variant='bordered'
+                            variant='secondary'
                             className='max-w-[50%]'
                         />
                     </TextField>
@@ -107,7 +107,7 @@ export function Config(props) {
                 <div className='config-item'>
                     <h3 className='my-auto'>{t('services.tts.openai_tts.voice')}</h3>
                     <Dropdown>
-                        <Button variant='bordered'>{openaiTtsConfig['voice']}</Button>
+                        <Button variant='secondary'>{openaiTtsConfig['voice']}</Button>
                         <Dropdown.Popover>
                             <Dropdown.Menu
                                 aria-label='openai tts voice'
@@ -133,7 +133,7 @@ export function Config(props) {
                 <div className='config-item'>
                     <h3 className='my-auto'>{t('services.tts.openai_tts.speed')}</h3>
                     <Dropdown>
-                        <Button variant='bordered'>{`${openaiTtsConfig['speed'] ?? 1}x`}</Button>
+                        <Button variant='secondary'>{`${openaiTtsConfig['speed'] ?? 1}x`}</Button>
                         <Dropdown.Popover>
                             <Dropdown.Menu
                                 aria-label='openai tts speed'
@@ -156,9 +156,9 @@ export function Config(props) {
                 </div>
                 <div>
                     <Button
-                        isLoading={isLoading}
+                        variant='primary'
+                        isPending={isLoading}
                         fullWidth
-                        color='primary'
                         onPress={() => {
                             setIsLoading(true);
                             tts('hello', Language.en, { config: openaiTtsConfig }).then(

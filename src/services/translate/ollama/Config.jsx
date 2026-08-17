@@ -182,7 +182,7 @@ export function Config(props) {
                     >
                         <Label className='text-base my-auto'>{t('services.translate.ollama.request_path')}</Label>
                         <Input
-                            variant='bordered'
+                            variant='secondary'
                             className='max-w-[50%]'
                         />
                     </TextField>
@@ -203,7 +203,7 @@ export function Config(props) {
                             real <input>, which is a void element. The pull button
                             is a Suffix, which is what v2's `endContent` meant. */}
                         <InputGroup className='max-w-[50%]'>
-                            <InputGroup.Input variant='bordered' />
+                            <InputGroup.Input variant='secondary' />
                             <InputGroup.Suffix>
                                 {installedModels &&
                                 !installedModels.models
@@ -215,9 +215,8 @@ export function Config(props) {
                                         <Tooltip.Trigger>
                                             <Button
                                                 size='sm'
-                                                variant='flat'
-                                                color='warning'
-                                                isLoading={isPulling}
+                                                variant='tertiary'
+                                                isPending={isPulling}
                                                 onPress={pullModel}
                                             >
                                                 {t('services.translate.ollama.install_model')}
@@ -230,8 +229,7 @@ export function Config(props) {
                                 ) : (
                                     <Button
                                         size='sm'
-                                        variant='flat'
-                                        color='success'
+                                        variant='tertiary'
                                         disabled
                                     >
                                         {t('services.translate.ollama.ready')}
@@ -288,7 +286,7 @@ export function Config(props) {
                                     <TextArea
                                         label={prompt.role}
                                         labelPlacement='outside'
-                                        variant='faded'
+                                        variant='secondary'
                                         value={prompt.content}
                                         placeholder={`Input Some ${prompt.role} Prompt`}
                                         onValueChange={(value) => {
@@ -316,9 +314,8 @@ export function Config(props) {
                                     />
                                     <Button
                                         isIconOnly
-                                        color='danger'
                                         className='my-auto mx-1'
-                                        variant='flat'
+                                        variant='danger-soft'
                                         onPress={() => {
                                             setServiceConfig({
                                                 ...serviceConfig,
@@ -356,10 +353,10 @@ export function Config(props) {
                 </div>
                 <br />
                 <Button
+                    variant='primary'
                     type='submit'
-                    isLoading={isLoading}
+                    isPending={isLoading}
                     fullWidth
-                    color='primary'
                 >
                     {t('common.save')}
                 </Button>

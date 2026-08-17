@@ -450,7 +450,7 @@ export default function SourceArea(props) {
                                 <Tooltip.Trigger>
                                     <Button
                                         isIconOnly
-                                        variant='light'
+                                        variant='tertiary'
                                         size='sm'
                                         onPress={() => {
                                             handleSpeak().catch((e) => {
@@ -467,7 +467,7 @@ export default function SourceArea(props) {
                                 <Tooltip.Trigger>
                                     <Button
                                         isIconOnly
-                                        variant='light'
+                                        variant='tertiary'
                                         size='sm'
                                         onPress={() => {
                                             writeText(sourceText);
@@ -482,7 +482,7 @@ export default function SourceArea(props) {
                                 <Tooltip.Trigger>
                                     <Button
                                         isIconOnly
-                                        variant='light'
+                                        variant='tertiary'
                                         size='sm'
                                         onPress={() => {
                                             const newText = sourceText.replace(/\-\s+/g, '').replace(/\s+/g, ' ');
@@ -500,7 +500,7 @@ export default function SourceArea(props) {
                             <Tooltip>
                                 <Tooltip.Trigger>
                                     <Button
-                                        variant='light'
+                                        variant='tertiary'
                                         size='sm'
                                         isIconOnly
                                         isDisabled={sourceText === ''}
@@ -518,7 +518,7 @@ export default function SourceArea(props) {
                             <Chip
                                 size='sm'
                                 color='secondary'
-                                variant='dot'
+                                variant='soft'
                                 className='my-auto'
                             >
                                 {t(`languages.${detectLanguage}`)}
@@ -529,8 +529,7 @@ export default function SourceArea(props) {
                         <Tooltip.Trigger>
                             <Button
                                 size='sm'
-                                color='primary'
-                                variant='light'
+                                variant='tertiary'
                                 isIconOnly
                                 className='text-[14px] font-bold'
                                 onPress={() => {

@@ -75,7 +75,7 @@ export function Config(props) {
                     >
                         <Label className='text-base my-auto'>{t('services.translate.alibaba.accesskey_id')}</Label>
                         <Input
-                            variant='bordered'
+                            variant='secondary'
                             className='max-w-[50%]'
                         />
                     </TextField>
@@ -93,15 +93,15 @@ export function Config(props) {
                     >
                         <Label className='text-base my-auto'>{t('services.translate.alibaba.accesskey_secret')}</Label>
                         <Input
-                            variant='bordered'
+                            variant='secondary'
                             className='max-w-[50%]'
                         />
                     </TextField>
                 </div>
                 <Button
+                    variant='primary'
                     type='submit'
-                    isLoading={isLoading}
-                    color='primary'
+                    isPending={isLoading}
                     fullWidth
                 >
                     {t('common.save')}

@@ -118,7 +118,7 @@ export default function Recognize() {
                     <Button
                         isIconOnly
                         size='sm'
-                        variant='flat'
+                        variant='tertiary'
                         disableAnimation
                         className='my-auto mx-[5px] bg-transparent'
                         onPress={() => {

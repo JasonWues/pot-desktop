@@ -93,9 +93,9 @@ export default function WebDavModal(props) {
                                                     >
                                                         <Button
                                                             fullWidth
-                                                            variant='flat'
+                                                            variant='tertiary'
                                                             className='mb-[8px] mr-[8px]'
-                                                            isLoading={downloading[index]}
+                                                            isPending={downloading[index]}
                                                             onPress={async () => {
                                                                 setDownloading(
                                                                     downloading.map((_, i) => {
@@ -109,8 +109,7 @@ export default function WebDavModal(props) {
                                                         </Button>
                                                         <Button
                                                             isIconOnly
-                                                            color='danger'
-                                                            variant='flat'
+                                                            variant='danger-soft'
                                                             onPress={() => {
                                                                 webdav.remove(url, username, password, file).then(
                                                                     () => {
