@@ -118,9 +118,11 @@ export default function General() {
                                 }
                             }}
                         >
-                            <Switch.Control>
-                                <Switch.Thumb />
-                            </Switch.Control>
+                            <Switch.Content>
+                                <Switch.Control>
+                                    <Switch.Thumb />
+                                </Switch.Control>
+                            </Switch.Content>
                         </Switch>
                     </div>
                     <div className='config-item'>
@@ -132,9 +134,11 @@ export default function General() {
                                     setCheckUpdate(v);
                                 }}
                             >
-                                <Switch.Control>
-                                    <Switch.Thumb />
-                                </Switch.Control>
+                                <Switch.Content>
+                                    <Switch.Control>
+                                        <Switch.Thumb />
+                                    </Switch.Control>
+                                </Switch.Content>
                             </Switch>
                         )}
                     </div>
@@ -591,9 +595,11 @@ export default function General() {
                                     setTransparent(v);
                                 }}
                             >
-                                <Switch.Control>
-                                    <Switch.Thumb />
-                                </Switch.Control>
+                                <Switch.Content>
+                                    <Switch.Control>
+                                        <Switch.Thumb />
+                                    </Switch.Control>
+                                </Switch.Content>
                             </Switch>
                         )}
                     </div>
@@ -606,9 +612,11 @@ export default function General() {
                                     setDevMode(v);
                                 }}
                             >
-                                <Switch.Control>
-                                    <Switch.Thumb />
-                                </Switch.Control>
+                                <Switch.Content>
+                                    <Switch.Control>
+                                        <Switch.Thumb />
+                                    </Switch.Control>
+                                </Switch.Content>
                             </Switch>
                         )}
                     </div>

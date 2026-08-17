@@ -251,9 +251,11 @@ export default function Translate() {
                                     setHistoryDisable(v);
                                 }}
                             >
-                                <Switch.Control>
-                                    <Switch.Thumb />
-                                </Switch.Control>
+                                <Switch.Content>
+                                    <Switch.Control>
+                                        <Switch.Thumb />
+                                    </Switch.Control>
+                                </Switch.Content>
                             </Switch>
                         )}
                     </div>
@@ -266,9 +268,11 @@ export default function Translate() {
                                     setCacheEnable(v);
                                 }}
                             >
-                                <Switch.Control>
-                                    <Switch.Thumb />
-                                </Switch.Control>
+                                <Switch.Content>
+                                    <Switch.Control>
+                                        <Switch.Thumb />
+                                    </Switch.Control>
+                                </Switch.Content>
                             </Switch>
                         )}
                     </div>
@@ -328,9 +332,11 @@ export default function Translate() {
                                     setIncrementalTranslate(v);
                                 }}
                             >
-                                <Switch.Control>
-                                    <Switch.Thumb />
-                                </Switch.Control>
+                                <Switch.Content>
+                                    <Switch.Control>
+                                        <Switch.Thumb />
+                                    </Switch.Control>
+                                </Switch.Content>
                             </Switch>
                         )}
                     </div>
@@ -343,9 +349,11 @@ export default function Translate() {
                                     setDynamicTranslate(v);
                                 }}
                             >
-                                <Switch.Control>
-                                    <Switch.Thumb />
-                                </Switch.Control>
+                                <Switch.Content>
+                                    <Switch.Control>
+                                        <Switch.Thumb />
+                                    </Switch.Control>
+                                </Switch.Content>
                             </Switch>
                         )}
                     </div>
@@ -358,9 +366,11 @@ export default function Translate() {
                                     setDeleteNewline(v);
                                 }}
                             >
-                                <Switch.Control>
-                                    <Switch.Thumb />
-                                </Switch.Control>
+                                <Switch.Content>
+                                    <Switch.Control>
+                                        <Switch.Thumb />
+                                    </Switch.Control>
+                                </Switch.Content>
                             </Switch>
                         )}
                     </div>
@@ -373,9 +383,11 @@ export default function Translate() {
                                     setRememberLanguage(v);
                                 }}
                             >
-                                <Switch.Control>
-                                    <Switch.Thumb />
-                                </Switch.Control>
+                                <Switch.Content>
+                                    <Switch.Control>
+                                        <Switch.Thumb />
+                                    </Switch.Control>
+                                </Switch.Content>
                             </Switch>
                         )}
                     </div>
@@ -449,9 +461,11 @@ export default function Translate() {
                                     setRememberWindowSize(v);
                                 }}
                             >
-                                <Switch.Control>
-                                    <Switch.Thumb />
-                                </Switch.Control>
+                                <Switch.Content>
+                                    <Switch.Control>
+                                        <Switch.Thumb />
+                                    </Switch.Control>
+                                </Switch.Content>
                             </Switch>
                         )}
                     </div>
@@ -464,9 +478,11 @@ export default function Translate() {
                                     setCloseOnBlur(v);
                                 }}
                             >
-                                <Switch.Control>
-                                    <Switch.Thumb />
-                                </Switch.Control>
+                                <Switch.Content>
+                                    <Switch.Control>
+                                        <Switch.Thumb />
+                                    </Switch.Control>
+                                </Switch.Content>
                             </Switch>
                         )}
                     </div>
@@ -479,9 +495,11 @@ export default function Translate() {
                                     setAlwaysOnTop(v);
                                 }}
                             >
-                                <Switch.Control>
-                                    <Switch.Thumb />
-                                </Switch.Control>
+                                <Switch.Content>
+                                    <Switch.Control>
+                                        <Switch.Thumb />
+                                    </Switch.Control>
+                                </Switch.Content>
                             </Switch>
                         )}
                     </div>
@@ -494,9 +512,11 @@ export default function Translate() {
                                     setHideSource(v);
                                 }}
                             >
-                                <Switch.Control>
-                                    <Switch.Thumb />
-                                </Switch.Control>
+                                <Switch.Content>
+                                    <Switch.Control>
+                                        <Switch.Thumb />
+                                    </Switch.Control>
+                                </Switch.Content>
                             </Switch>
                         )}
                     </div>
@@ -509,9 +529,11 @@ export default function Translate() {
                                     setHideLanguage(v);
                                 }}
                             >
-                                <Switch.Control>
-                                    <Switch.Thumb />
-                                </Switch.Control>
+                                <Switch.Content>
+                                    <Switch.Control>
+                                        <Switch.Thumb />
+                                    </Switch.Control>
+                                </Switch.Content>
                             </Switch>
                         )}
                     </div>
@@ -524,9 +546,11 @@ export default function Translate() {
                                     setHideWindow(v);
                                 }}
                             >
-                                <Switch.Control>
-                                    <Switch.Thumb />
-                                </Switch.Control>
+                                <Switch.Content>
+                                    <Switch.Control>
+                                        <Switch.Thumb />
+                                    </Switch.Control>
+                                </Switch.Content>
                             </Switch>
                         )}
                     </div>

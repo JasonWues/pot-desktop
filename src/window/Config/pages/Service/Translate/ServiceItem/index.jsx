@@ -78,9 +78,11 @@ export default function ServiceItem(props) {
                             setServiceInstanceConfig({ ...serviceInstanceConfig, enable: v });
                         }}
                     >
-                        <Switch.Control>
-                            <Switch.Thumb />
-                        </Switch.Control>
+                        <Switch.Content>
+                            <Switch.Control>
+                                <Switch.Thumb />
+                            </Switch.Control>
+                        </Switch.Content>
                     </Switch>
                     <Button
                         isIconOnly

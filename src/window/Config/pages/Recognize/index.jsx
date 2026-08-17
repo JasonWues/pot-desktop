@@ -58,9 +58,11 @@ export default function Recognize() {
                                 setDeleteNewline(v);
                             }}
                         >
-                            <Switch.Control>
-                                <Switch.Thumb />
-                            </Switch.Control>
+                            <Switch.Content>
+                                <Switch.Control>
+                                    <Switch.Thumb />
+                                </Switch.Control>
+                            </Switch.Content>
                         </Switch>
                     )}
                 </div>
@@ -73,9 +75,11 @@ export default function Recognize() {
                                 setAutoCopy(v);
                             }}
                         >
-                            <Switch.Control>
-                                <Switch.Thumb />
-                            </Switch.Control>
+                            <Switch.Content>
+                                <Switch.Control>
+                                    <Switch.Thumb />
+                                </Switch.Control>
+                            </Switch.Content>
                         </Switch>
                     )}
                 </div>
@@ -88,9 +92,11 @@ export default function Recognize() {
                                 setCloseOnBlur(v);
                             }}
                         >
-                            <Switch.Control>
-                                <Switch.Thumb />
-                            </Switch.Control>
+                            <Switch.Content>
+                                <Switch.Control>
+                                    <Switch.Thumb />
+                                </Switch.Control>
+                            </Switch.Content>
                         </Switch>
                     )}
                 </div>
@@ -103,9 +109,11 @@ export default function Recognize() {
                                 setHideWindow(v);
                             }}
                         >
-                            <Switch.Control>
-                                <Switch.Thumb />
-                            </Switch.Control>
+                            <Switch.Content>
+                                <Switch.Control>
+                                    <Switch.Thumb />
+                                </Switch.Control>
+                            </Switch.Content>
                         </Switch>
                     )}
                 </div>

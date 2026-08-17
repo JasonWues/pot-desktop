@@ -161,10 +161,12 @@ export function Config(props) {
                         }}
                         className='flex flex-row-reverse justify-between w-full max-w-full'
                     >
-                        <Switch.Content>{t('services.translate.ollama.stream')}</Switch.Content>
-                        <Switch.Control>
-                            <Switch.Thumb />
-                        </Switch.Control>
+                        <Switch.Content>
+                            <Switch.Control>
+                                <Switch.Thumb />
+                            </Switch.Control>
+                            {t('services.translate.ollama.stream')}
+                        </Switch.Content>
                     </Switch>
                 </div>
                 <div className='config-item'>
