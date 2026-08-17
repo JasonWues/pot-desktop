@@ -6,9 +6,6 @@ import {
     Button,
     ButtonGroup,
     Dropdown,
-    DropdownItem,
-    DropdownMenu,
-    DropdownTrigger,
     Spinner,
     Tooltip,
 } from '@heroui/react';
@@ -357,7 +354,7 @@ export default function TargetArea(props) {
                 {/* current service instance and available service instance to change */}
                 <div className='flex'>
                     <Dropdown>
-                        <DropdownTrigger>
+                        <Dropdown.Trigger>
                             <Button
                                 size='sm'
                                 variant='solid'
@@ -395,45 +392,48 @@ export default function TargetArea(props) {
                                     </div>
                                 )}
                             </Button>
-                        </DropdownTrigger>
-                        <DropdownMenu
-                            aria-label='app language'
-                            className='max-h-[40vh] overflow-y-auto'
-                            onAction={(key) => {
-                                setCurrentTranslateServiceInstanceKey(key);
-                            }}
-                        >
-                            {translateServiceInstanceList.map((instanceKey) => {
-                                return (
-                                    <DropdownItem
-                                        key={instanceKey}
-                                        startContent={
-                                            whetherPluginService(instanceKey) ? (
-                                                <img
-                                                    src={pluginList['translate'][getServiceName(instanceKey)].icon}
-                                                    className='h-[20px] my-auto'
-                                                />
+                        </Dropdown.Trigger>
+                        <Dropdown.Popover>
+                            <Dropdown.Menu
+                                aria-label='app language'
+                                className='max-h-[40vh] overflow-y-auto'
+                                onAction={(key) => {
+                                    setCurrentTranslateServiceInstanceKey(key);
+                                }}
+                            >
+                                {translateServiceInstanceList.map((instanceKey) => {
+                                    return (
+                                        <Dropdown.Item
+                                            key={instanceKey}
+                                            id={instanceKey}
+                                            startContent={
+                                                whetherPluginService(instanceKey) ? (
+                                                    <img
+                                                        src={pluginList['translate'][getServiceName(instanceKey)].icon}
+                                                        className='h-[20px] my-auto'
+                                                    />
+                                                ) : (
+                                                    <img
+                                                        src={builtinServices[getServiceName(instanceKey)].info.icon}
+                                                        className='h-[20px] my-auto'
+                                                    />
+                                                )
+                                            }
+                                        >
+                                            {whetherPluginService(instanceKey) ? (
+                                                <div className='my-auto'>{`${getInstanceName(instanceKey, () => pluginList['translate'][getServiceName(instanceKey)].display)} `}</div>
                                             ) : (
-                                                <img
-                                                    src={builtinServices[getServiceName(instanceKey)].info.icon}
-                                                    className='h-[20px] my-auto'
-                                                />
-                                            )
-                                        }
-                                    >
-                                        {whetherPluginService(instanceKey) ? (
-                                            <div className='my-auto'>{`${getInstanceName(instanceKey, () => pluginList['translate'][getServiceName(instanceKey)].display)} `}</div>
-                                        ) : (
-                                            <div className='my-auto'>
-                                                {getInstanceName(instanceKey, () =>
-                                                    t(`services.translate.${getServiceName(instanceKey)}.title`)
-                                                )}
-                                            </div>
-                                        )}
-                                    </DropdownItem>
-                                );
-                            })}
-                        </DropdownMenu>
+                                                <div className='my-auto'>
+                                                    {getInstanceName(instanceKey, () =>
+                                                        t(`services.translate.${getServiceName(instanceKey)}.title`)
+                                                    )}
+                                                </div>
+                                            )}
+                                        </Dropdown.Item>
+                                    );
+                                })}
+                            </Dropdown.Menu>
+                        </Dropdown.Popover>
                     </Dropdown>
                     {/* `size` is deliberately not set. For the dots variant it sizes a fixed
                         square wrapper -- 40px at `lg` -- and this header is 30px tall, so the
@@ -496,16 +496,12 @@ export default function TargetArea(props) {
                                         return (
                                             <div key={nanoid()}>
                                                 {pronunciation['region'] && (
-                                                    <span
-                                                        className={`text-[${appFontSize}px] mr-[12px] text-muted`}
-                                                    >
+                                                    <span className={`text-[${appFontSize}px] mr-[12px] text-muted`}>
                                                         {pronunciation['region']}
                                                     </span>
                                                 )}
                                                 {pronunciation['symbol'] && (
-                                                    <span
-                                                        className={`text-[${appFontSize}px] mr-[12px] text-muted`}
-                                                    >
+                                                    <span className={`text-[${appFontSize}px] mr-[12px] text-muted`}>
                                                         {pronunciation['symbol']}
                                                     </span>
                                                 )}
@@ -619,7 +615,7 @@ export default function TargetArea(props) {
                     >
                         <ButtonGroup>
                             {/* speak button */}
-                            <Tooltip content={t('translate.speak')}>
+                            <Tooltip>
                                 <Button
                                     isIconOnly
                                     variant='light'
@@ -633,9 +629,10 @@ export default function TargetArea(props) {
                                 >
                                     <HiOutlineVolumeUp className='text-[16px]' />
                                 </Button>
+                                <Tooltip.Content>{t('translate.speak')}</Tooltip.Content>
                             </Tooltip>
                             {/* copy button */}
-                            <Tooltip content={t('translate.copy')}>
+                            <Tooltip>
                                 <Button
                                     isIconOnly
                                     variant='light'
@@ -647,9 +644,10 @@ export default function TargetArea(props) {
                                 >
                                     <MdContentCopy className='text-[16px]' />
                                 </Button>
+                                <Tooltip.Content>{t('translate.copy')}</Tooltip.Content>
                             </Tooltip>
                             {/* translate back button */}
-                            <Tooltip content={t('translate.translate_back')}>
+                            <Tooltip>
                                 <Button
                                     isIconOnly
                                     variant='light'
@@ -769,9 +767,10 @@ export default function TargetArea(props) {
                                 >
                                     <TbTransformFilled className='text-[16px]' />
                                 </Button>
+                                <Tooltip.Content>{t('translate.translate_back')}</Tooltip.Content>
                             </Tooltip>
                             {/* error retry button */}
-                            <Tooltip content={t('translate.retry')}>
+                            <Tooltip>
                                 <Button
                                     isIconOnly
                                     variant='light'
@@ -785,6 +784,7 @@ export default function TargetArea(props) {
                                 >
                                     <GiCycle className='text-[16px]' />
                                 </Button>
+                                <Tooltip.Content>{t('translate.retry')}</Tooltip.Content>
                             </Tooltip>
                             {/* available collection service instance */}
                             {collectionServiceList &&

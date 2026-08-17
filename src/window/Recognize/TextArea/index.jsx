@@ -176,7 +176,7 @@ export default function TextArea(props) {
             </CardContent>
             <CardFooter className='bg-surface flex justify-start px-[12px]'>
                 <ButtonGroup>
-                    <Tooltip content={t('recognize.copy_text')}>
+                    <Tooltip>
                         <Button
                             isIconOnly
                             size='sm'
@@ -187,8 +187,9 @@ export default function TextArea(props) {
                         >
                             <MdContentCopy className='text-[16px]' />
                         </Button>
+                        <Tooltip.Content>{t('recognize.copy_text')}</Tooltip.Content>
                     </Tooltip>
-                    <Tooltip content={t('recognize.delete_newline')}>
+                    <Tooltip>
                         <Button
                             isIconOnly
                             variant='light'
@@ -199,8 +200,9 @@ export default function TextArea(props) {
                         >
                             <MdSmartButton className='text-[16px]' />
                         </Button>
+                        <Tooltip.Content>{t('recognize.delete_newline')}</Tooltip.Content>
                     </Tooltip>
-                    <Tooltip content={t('recognize.delete_space')}>
+                    <Tooltip>
                         <Button
                             isIconOnly
                             variant='light'
@@ -211,6 +213,7 @@ export default function TextArea(props) {
                         >
                             <CgSpaceBetween className='text-[16px]' />
                         </Button>
+                        <Tooltip.Content>{t('recognize.delete_space')}</Tooltip.Content>
                     </Tooltip>
                 </ButtonGroup>
             </CardFooter>

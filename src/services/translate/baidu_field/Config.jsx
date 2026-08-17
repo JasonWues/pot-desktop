@@ -1,12 +1,8 @@
 import { INSTANCE_NAME_CONFIG_KEY } from '../../../utils/service_instance';
 import InstanceNameInput from '../../../components/InstanceNameInput';
-import { DropdownTrigger } from '@heroui/react';
-import { Input, Button } from '@heroui/react';
-import { DropdownMenu } from '@heroui/react';
-import { DropdownItem } from '@heroui/react';
+import { Input, Button, Dropdown } from '@heroui/react';
 import toast, { Toaster } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { Dropdown } from '@heroui/react';
 import { open } from '@tauri-apps/plugin-shell';
 import React, { useState } from 'react';
 
@@ -83,28 +79,33 @@ export function Config(props) {
                 <div className='config-item'>
                     <h3 className='my-auto'>{t('services.translate.deepl.type')}</h3>
                     <Dropdown>
-                        <DropdownTrigger>
+                        <Dropdown.Trigger>
                             <Button variant='bordered'>{t(`services.translate.baidu_field.${config.field}`)}</Button>
-                        </DropdownTrigger>
-                        <DropdownMenu
-                            autoFocus='first'
-                            aria-label='app language'
-                            className='max-h-[50vh] overflow-y-auto'
-                            onAction={(key) => {
-                                setConfig({
-                                    ...config,
-                                    field: key,
-                                });
-                            }}
-                        >
-                            {fieldList.map((item) => {
-                                return (
-                                    <DropdownItem key={item}>
-                                        {t(`services.translate.baidu_field.${item}`)}
-                                    </DropdownItem>
-                                );
-                            })}
-                        </DropdownMenu>
+                        </Dropdown.Trigger>
+                        <Dropdown.Popover>
+                            <Dropdown.Menu
+                                autoFocus='first'
+                                aria-label='app language'
+                                className='max-h-[50vh] overflow-y-auto'
+                                onAction={(key) => {
+                                    setConfig({
+                                        ...config,
+                                        field: key,
+                                    });
+                                }}
+                            >
+                                {fieldList.map((item) => {
+                                    return (
+                                        <Dropdown.Item
+                                            key={item}
+                                            id={item}
+                                        >
+                                            {t(`services.translate.baidu_field.${item}`)}
+                                        </Dropdown.Item>
+                                    );
+                                })}
+                            </Dropdown.Menu>
+                        </Dropdown.Popover>
                     </Dropdown>
                 </div>
                 <div className={'config-item'}>

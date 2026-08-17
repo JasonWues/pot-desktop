@@ -196,7 +196,7 @@ export function Config(props) {
                                     return model.name;
                                 })
                                 .includes(serviceConfig['model']) ? (
-                                <Tooltip content={t('services.translate.ollama.not_installed')}>
+                                <Tooltip>
                                     <Button
                                         size='sm'
                                         variant='flat'
@@ -206,6 +206,7 @@ export function Config(props) {
                                     >
                                         {t('services.translate.ollama.install_model')}
                                     </Button>
+                                    <Tooltip.Content>{t('services.translate.ollama.not_installed')}</Tooltip.Content>
                                 </Tooltip>
                             ) : (
                                 <Button

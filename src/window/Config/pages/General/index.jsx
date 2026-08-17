@@ -1,17 +1,9 @@
 import { enable, isEnabled, disable } from '@tauri-apps/plugin-autostart';
-import { DropdownTrigger } from '@heroui/react';
+import { CardContent, Dropdown, Button, Switch, Input, Card, Label } from '@heroui/react';
 import React, { useState, useEffect } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
-import { DropdownMenu } from '@heroui/react';
-import { DropdownItem } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
-import { CardContent } from '@heroui/react';
-import { Dropdown } from '@heroui/react';
 import { info } from '@tauri-apps/plugin-log';
-import { Button } from '@heroui/react';
-import { Switch } from '@heroui/react';
-import { Input } from '@heroui/react';
-import { Card } from '@heroui/react';
 import { LuSun, LuMoon, LuMonitor, LuSparkles } from 'react-icons/lu';
 import { invoke } from '@tauri-apps/api/core';
 import { useTheme } from 'next-themes';
@@ -180,138 +172,159 @@ export default function General() {
                         <h3 className='my-auto'>{t('config.general.app_language')}</h3>
                         {appLanguage !== null && (
                             <Dropdown>
-                                <DropdownTrigger>
+                                <Dropdown.Trigger>
                                     <Button
                                         variant='bordered'
                                         startContent={<Flag code={LanguageFlag[appLanguage]} />}
                                     >
                                         {languageName[appLanguage]}
                                     </Button>
-                                </DropdownTrigger>
-                                <DropdownMenu
-                                    aria-label='app language'
-                                    className='max-h-[40vh] overflow-y-auto'
-                                    onAction={(key) => {
-                                        setAppLanguage(key);
-                                        i18n.changeLanguage(key);
-                                        invoke('update_tray', { language: key, copyMode: '' });
-                                    }}
-                                >
-                                    <DropdownItem
-                                        key='zh_cn'
-                                        startContent={<Flag code={LanguageFlag.zh_cn} />}
+                                </Dropdown.Trigger>
+                                <Dropdown.Popover>
+                                    <Dropdown.Menu
+                                        aria-label='app language'
+                                        className='max-h-[40vh] overflow-y-auto'
+                                        onAction={(key) => {
+                                            setAppLanguage(key);
+                                            i18n.changeLanguage(key);
+                                            invoke('update_tray', { language: key, copyMode: '' });
+                                        }}
                                     >
-                                        简体中文
-                                    </DropdownItem>
-                                    <DropdownItem
-                                        key='zh_tw'
-                                        startContent={<Flag code={LanguageFlag.zh_cn} />}
-                                    >
-                                        繁體中文
-                                    </DropdownItem>
-                                    <DropdownItem
-                                        key='en'
-                                        startContent={<Flag code={LanguageFlag.en} />}
-                                    >
-                                        English
-                                    </DropdownItem>
-                                    <DropdownItem
-                                        key='ja'
-                                        startContent={<Flag code={LanguageFlag.ja} />}
-                                    >
-                                        日本語
-                                    </DropdownItem>
-                                    <DropdownItem
-                                        key='ko'
-                                        startContent={<Flag code={LanguageFlag.ko} />}
-                                    >
-                                        한국어
-                                    </DropdownItem>
-                                    <DropdownItem
-                                        key='fr'
-                                        startContent={<Flag code={LanguageFlag.fr} />}
-                                    >
-                                        Français
-                                    </DropdownItem>
-                                    <DropdownItem
-                                        key='de'
-                                        startContent={<Flag code={LanguageFlag.de} />}
-                                    >
-                                        Deutsch
-                                    </DropdownItem>
-                                    <DropdownItem
-                                        key='es'
-                                        startContent={<Flag code={LanguageFlag.es} />}
-                                    >
-                                        Español
-                                    </DropdownItem>
-                                    <DropdownItem
-                                        key='ru'
-                                        startContent={<Flag code={LanguageFlag.ru} />}
-                                    >
-                                        Русский
-                                    </DropdownItem>
-                                    <DropdownItem
-                                        key='it'
-                                        startContent={<Flag code={LanguageFlag.it} />}
-                                    >
-                                        Italiano
-                                    </DropdownItem>
-                                    <DropdownItem
-                                        key='tr'
-                                        startContent={<Flag code={LanguageFlag.tr} />}
-                                    >
-                                        Türkçe
-                                    </DropdownItem>
-                                    <DropdownItem
-                                        key='pt_pt'
-                                        startContent={<Flag code={LanguageFlag.pt_pt} />}
-                                    >
-                                        Português
-                                    </DropdownItem>
-                                    <DropdownItem
-                                        key='pt_br'
-                                        startContent={<Flag code={LanguageFlag.pt_br} />}
-                                    >
-                                        Português (Brasil)
-                                    </DropdownItem>
-                                    <DropdownItem
-                                        key='nb_no'
-                                        startContent={<Flag code={LanguageFlag.nb_no} />}
-                                    >
-                                        Norsk Bokmål
-                                    </DropdownItem>
-                                    <DropdownItem
-                                        key='nn_no'
-                                        startContent={<Flag code={LanguageFlag.nn_no} />}
-                                    >
-                                        Norsk Nynorsk
-                                    </DropdownItem>
-                                    <DropdownItem
-                                        key='fa'
-                                        startContent={<Flag code={LanguageFlag.fa} />}
-                                    >
-                                        فارسی
-                                    </DropdownItem>
-                                    <DropdownItem
-                                        key='uk'
-                                        startContent={<Flag code={LanguageFlag.uk} />}
-                                    >
-                                        Українська
-                                    </DropdownItem>
-                                    <DropdownItem
-                                        key='ar'
-                                        startContent={<Flag code={LanguageFlag.ar} />}
-                                    >
-                                        العربية
-                                    </DropdownItem>
-                                    <DropdownItem
-                                        key='he'
-                                        startContent={<Flag code={LanguageFlag.he} />}
-                                    >
-                                        עִבְרִית
-                                    </DropdownItem>
-                                </DropdownMenu>
+                                        <Dropdown.Item
+                                            key='zh_cn'
+                                            id='zh_cn'
+                                            startContent={<Flag code={LanguageFlag.zh_cn} />}
+                                        >
+                                            简体中文
+                                        </Dropdown.Item>
+                                        <Dropdown.Item
+                                            key='zh_tw'
+                                            id='zh_tw'
+                                            startContent={<Flag code={LanguageFlag.zh_cn} />}
+                                        >
+                                            繁體中文
+                                        </Dropdown.Item>
+                                        <Dropdown.Item
+                                            key='en'
+                                            id='en'
+                                            startContent={<Flag code={LanguageFlag.en} />}
+                                        >
+                                            English
+                                        </Dropdown.Item>
+                                        <Dropdown.Item
+                                            key='ja'
+                                            id='ja'
+                                            startContent={<Flag code={LanguageFlag.ja} />}
+                                        >
+                                            日本語
+                                        </Dropdown.Item>
+                                        <Dropdown.Item
+                                            key='ko'
+                                            id='ko'
+                                            startContent={<Flag code={LanguageFlag.ko} />}
+                                        >
+                                            한국어
+                                        </Dropdown.Item>
+                                        <Dropdown.Item
+                                            key='fr'
+                                            id='fr'
+                                            startContent={<Flag code={LanguageFlag.fr} />}
+                                        >
+                                            Français
+                                        </Dropdown.Item>
+                                        <Dropdown.Item
+                                            key='de'
+                                            id='de'
+                                            startContent={<Flag code={LanguageFlag.de} />}
+                                        >
+                                            Deutsch
+                                        </Dropdown.Item>
+                                        <Dropdown.Item
+                                            key='es'
+                                            id='es'
+                                            startContent={<Flag code={LanguageFlag.es} />}
+                                        >
+                                            Español
+                                        </Dropdown.Item>
+                                        <Dropdown.Item
+                                            key='ru'
+                                            id='ru'
+                                            startContent={<Flag code={LanguageFlag.ru} />}
+                                        >
+                                            Русский
+                                        </Dropdown.Item>
+                                        <Dropdown.Item
+                                            key='it'
+                                            id='it'
+                                            startContent={<Flag code={LanguageFlag.it} />}
+                                        >
+                                            Italiano
+                                        </Dropdown.Item>
+                                        <Dropdown.Item
+                                            key='tr'
+                                            id='tr'
+                                            startContent={<Flag code={LanguageFlag.tr} />}
+                                        >
+                                            Türkçe
+                                        </Dropdown.Item>
+                                        <Dropdown.Item
+                                            key='pt_pt'
+                                            id='pt_pt'
+                                            startContent={<Flag code={LanguageFlag.pt_pt} />}
+                                        >
+                                            Português
+                                        </Dropdown.Item>
+                                        <Dropdown.Item
+                                            key='pt_br'
+                                            id='pt_br'
+                                            startContent={<Flag code={LanguageFlag.pt_br} />}
+                                        >
+                                            Português (Brasil)
+                                        </Dropdown.Item>
+                                        <Dropdown.Item
+                                            key='nb_no'
+                                            id='nb_no'
+                                            startContent={<Flag code={LanguageFlag.nb_no} />}
+                                        >
+                                            Norsk Bokmål
+                                        </Dropdown.Item>
+                                        <Dropdown.Item
+                                            key='nn_no'
+                                            id='nn_no'
+                                            startContent={<Flag code={LanguageFlag.nn_no} />}
+                                        >
+                                            Norsk Nynorsk
+                                        </Dropdown.Item>
+                                        <Dropdown.Item
+                                            key='fa'
+                                            id='fa'
+                                            startContent={<Flag code={LanguageFlag.fa} />}
+                                        >
+                                            فارسی
+                                        </Dropdown.Item>
+                                        <Dropdown.Item
+                                            key='uk'
+                                            id='uk'
+                                            startContent={<Flag code={LanguageFlag.uk} />}
+                                        >
+                                            Українська
+                                        </Dropdown.Item>
+                                        <Dropdown.Item
+                                            key='ar'
+                                            id='ar'
+                                            startContent={<Flag code={LanguageFlag.ar} />}
+                                        >
+                                            العربية
+                                        </Dropdown.Item>
+                                        <Dropdown.Item
+                                            key='he'
+                                            id='he'
+                                            startContent={<Flag code={LanguageFlag.he} />}
+                                        >
+                                            עִבְרִית
+                                        </Dropdown.Item>
+                                    </Dropdown.Menu>
+                                </Dropdown.Popover>
                             </Dropdown>
                         )}
                     </div>
@@ -319,47 +332,50 @@ export default function General() {
                         <h3 className='my-auto'>{t('config.general.app_theme')}</h3>
                         {appTheme !== null && (
                             <Dropdown>
-                                <DropdownTrigger>
+                                <Dropdown.Trigger>
                                     <Button
                                         variant='bordered'
                                         startContent={<ThemeIcon name={appTheme} />}
                                     >
                                         {t(`config.general.theme.${appTheme}`)}
                                     </Button>
-                                </DropdownTrigger>
-                                <DropdownMenu
-                                    aria-label='app theme'
-                                    onAction={(key) => {
-                                        setAppTheme(key);
-                                        if (key !== 'system') {
-                                            setTheme(key);
-                                        } else {
-                                            if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                                                setTheme('dark');
+                                </Dropdown.Trigger>
+                                <Dropdown.Popover>
+                                    <Dropdown.Menu
+                                        aria-label='app theme'
+                                        onAction={(key) => {
+                                            setAppTheme(key);
+                                            if (key !== 'system') {
+                                                setTheme(key);
                                             } else {
-                                                setTheme('light');
+                                                if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                                                    setTheme('dark');
+                                                } else {
+                                                    setTheme('light');
+                                                }
+                                                window
+                                                    .matchMedia('(prefers-color-scheme: dark)')
+                                                    .addEventListener('change', (e) => {
+                                                        if (e.matches) {
+                                                            setTheme('dark');
+                                                        } else {
+                                                            setTheme('light');
+                                                        }
+                                                    });
                                             }
-                                            window
-                                                .matchMedia('(prefers-color-scheme: dark)')
-                                                .addEventListener('change', (e) => {
-                                                    if (e.matches) {
-                                                        setTheme('dark');
-                                                    } else {
-                                                        setTheme('light');
-                                                    }
-                                                });
-                                        }
-                                    }}
-                                >
-                                    {themeOptions.map((name) => (
-                                        <DropdownItem
-                                            key={name}
-                                            startContent={<ThemeIcon name={name} />}
-                                        >
-                                            {t(`config.general.theme.${name}`)}
-                                        </DropdownItem>
-                                    ))}
-                                </DropdownMenu>
+                                        }}
+                                    >
+                                        {themeOptions.map((name) => (
+                                            <Dropdown.Item
+                                                key={name}
+                                                id={name}
+                                                startContent={<ThemeIcon name={name} />}
+                                            >
+                                                {t(`config.general.theme.${name}`)}
+                                            </Dropdown.Item>
+                                        ))}
+                                    </Dropdown.Menu>
+                                </Dropdown.Popover>
                             </Dropdown>
                         )}
                     </div>
@@ -367,7 +383,7 @@ export default function General() {
                         <h3 className='my-auto'>{t('config.general.app_font')}</h3>
                         {appFont !== null && fontList !== null && (
                             <Dropdown>
-                                <DropdownTrigger>
+                                <Dropdown.Trigger>
                                     <Button
                                         variant='bordered'
                                         style={{
@@ -376,34 +392,38 @@ export default function General() {
                                     >
                                         {appFont === 'default' ? t('config.general.default_font') : appFont}
                                     </Button>
-                                </DropdownTrigger>
-                                <DropdownMenu
-                                    aria-label='app font'
-                                    className='max-h-[50vh] overflow-y-auto'
-                                    onAction={(key) => {
-                                        document.documentElement.style.fontFamily = `"${
-                                            key === 'default' ? 'sans-serif' : key
-                                        }","${appFallbackFont === 'default' ? 'sans-serif' : appFallbackFont}"`;
-                                        setAppFont(key);
-                                    }}
-                                >
-                                    <DropdownItem
-                                        style={{ fontFamily: 'sans-serif' }}
-                                        key='default'
+                                </Dropdown.Trigger>
+                                <Dropdown.Popover>
+                                    <Dropdown.Menu
+                                        aria-label='app font'
+                                        className='max-h-[50vh] overflow-y-auto'
+                                        onAction={(key) => {
+                                            document.documentElement.style.fontFamily = `"${
+                                                key === 'default' ? 'sans-serif' : key
+                                            }","${appFallbackFont === 'default' ? 'sans-serif' : appFallbackFont}"`;
+                                            setAppFont(key);
+                                        }}
                                     >
-                                        {t('config.general.default_font')}
-                                    </DropdownItem>
-                                    {fontList.map((x) => {
-                                        return (
-                                            <DropdownItem
-                                                style={{ fontFamily: x }}
-                                                key={x}
-                                            >
-                                                {x}
-                                            </DropdownItem>
-                                        );
-                                    })}
-                                </DropdownMenu>
+                                        <Dropdown.Item
+                                            style={{ fontFamily: 'sans-serif' }}
+                                            key='default'
+                                            id='default'
+                                        >
+                                            {t('config.general.default_font')}
+                                        </Dropdown.Item>
+                                        {fontList.map((x) => {
+                                            return (
+                                                <Dropdown.Item
+                                                    style={{ fontFamily: x }}
+                                                    key={x}
+                                                    id={x}
+                                                >
+                                                    {x}
+                                                </Dropdown.Item>
+                                            );
+                                        })}
+                                    </Dropdown.Menu>
+                                </Dropdown.Popover>
                             </Dropdown>
                         )}
                     </div>
@@ -411,7 +431,7 @@ export default function General() {
                         <h3 className='my-auto'>{t('config.general.app_fallback_font')}</h3>
                         {appFallbackFont !== null && fontList !== null && (
                             <Dropdown>
-                                <DropdownTrigger>
+                                <Dropdown.Trigger>
                                     <Button
                                         variant='bordered'
                                         style={{
@@ -422,34 +442,38 @@ export default function General() {
                                             ? t('config.general.default_font')
                                             : appFallbackFont}
                                     </Button>
-                                </DropdownTrigger>
-                                <DropdownMenu
-                                    aria-label='app font'
-                                    className='max-h-[50vh] overflow-y-auto'
-                                    onAction={(key) => {
-                                        document.documentElement.style.fontFamily = `"${
-                                            appFont === 'default' ? 'sans-serif' : appFont
-                                        }","${key === 'default' ? 'sans-serif' : key}"`;
-                                        setAppFallbackFont(key);
-                                    }}
-                                >
-                                    <DropdownItem
-                                        style={{ fontFamily: 'sans-serif' }}
-                                        key='default'
+                                </Dropdown.Trigger>
+                                <Dropdown.Popover>
+                                    <Dropdown.Menu
+                                        aria-label='app font'
+                                        className='max-h-[50vh] overflow-y-auto'
+                                        onAction={(key) => {
+                                            document.documentElement.style.fontFamily = `"${
+                                                appFont === 'default' ? 'sans-serif' : appFont
+                                            }","${key === 'default' ? 'sans-serif' : key}"`;
+                                            setAppFallbackFont(key);
+                                        }}
                                     >
-                                        {t('config.general.default_font')}
-                                    </DropdownItem>
-                                    {fontList.map((x) => {
-                                        return (
-                                            <DropdownItem
-                                                style={{ fontFamily: x }}
-                                                key={x}
-                                            >
-                                                {x}
-                                            </DropdownItem>
-                                        );
-                                    })}
-                                </DropdownMenu>
+                                        <Dropdown.Item
+                                            style={{ fontFamily: 'sans-serif' }}
+                                            key='default'
+                                            id='default'
+                                        >
+                                            {t('config.general.default_font')}
+                                        </Dropdown.Item>
+                                        {fontList.map((x) => {
+                                            return (
+                                                <Dropdown.Item
+                                                    style={{ fontFamily: x }}
+                                                    key={x}
+                                                    id={x}
+                                                >
+                                                    {x}
+                                                </Dropdown.Item>
+                                            );
+                                        })}
+                                    </Dropdown.Menu>
+                                </Dropdown.Popover>
                             </Dropdown>
                         )}
                     </div>
@@ -457,25 +481,62 @@ export default function General() {
                         <h3 className='my-auto mx-0'>{t('config.general.font_size.title')}</h3>
                         {appFontSize !== null && (
                             <Dropdown>
-                                <DropdownTrigger>
+                                <Dropdown.Trigger>
                                     <Button variant='bordered'>{t(`config.general.font_size.${appFontSize}`)}</Button>
-                                </DropdownTrigger>
-                                <DropdownMenu
-                                    aria-label='window position'
-                                    className='max-h-[50vh] overflow-y-auto'
-                                    onAction={(key) => {
-                                        document.documentElement.style.fontSize = `${key}px`;
-                                        setAppFontSize(key);
-                                    }}
-                                >
-                                    <DropdownItem key={10}>{t(`config.general.font_size.10`)}</DropdownItem>
-                                    <DropdownItem key={12}>{t(`config.general.font_size.12`)}</DropdownItem>
-                                    <DropdownItem key={14}>{t(`config.general.font_size.14`)}</DropdownItem>
-                                    <DropdownItem key={16}>{t(`config.general.font_size.16`)}</DropdownItem>
-                                    <DropdownItem key={18}>{t(`config.general.font_size.18`)}</DropdownItem>
-                                    <DropdownItem key={20}>{t(`config.general.font_size.20`)}</DropdownItem>
-                                    <DropdownItem key={24}>{t(`config.general.font_size.24`)}</DropdownItem>
-                                </DropdownMenu>
+                                </Dropdown.Trigger>
+                                <Dropdown.Popover>
+                                    <Dropdown.Menu
+                                        aria-label='window position'
+                                        className='max-h-[50vh] overflow-y-auto'
+                                        onAction={(key) => {
+                                            document.documentElement.style.fontSize = `${key}px`;
+                                            setAppFontSize(key);
+                                        }}
+                                    >
+                                        <Dropdown.Item
+                                            key={10}
+                                            id={10}
+                                        >
+                                            <Label>{t(`config.general.font_size.10`)}</Label>
+                                        </Dropdown.Item>
+                                        <Dropdown.Item
+                                            key={12}
+                                            id={12}
+                                        >
+                                            <Label>{t(`config.general.font_size.12`)}</Label>
+                                        </Dropdown.Item>
+                                        <Dropdown.Item
+                                            key={14}
+                                            id={14}
+                                        >
+                                            <Label>{t(`config.general.font_size.14`)}</Label>
+                                        </Dropdown.Item>
+                                        <Dropdown.Item
+                                            key={16}
+                                            id={16}
+                                        >
+                                            <Label>{t(`config.general.font_size.16`)}</Label>
+                                        </Dropdown.Item>
+                                        <Dropdown.Item
+                                            key={18}
+                                            id={18}
+                                        >
+                                            <Label>{t(`config.general.font_size.18`)}</Label>
+                                        </Dropdown.Item>
+                                        <Dropdown.Item
+                                            key={20}
+                                            id={20}
+                                        >
+                                            <Label>{t(`config.general.font_size.20`)}</Label>
+                                        </Dropdown.Item>
+                                        <Dropdown.Item
+                                            key={24}
+                                            id={24}
+                                        >
+                                            <Label>{t(`config.general.font_size.24`)}</Label>
+                                        </Dropdown.Item>
+                                    </Dropdown.Menu>
+                                </Dropdown.Popover>
                             </Dropdown>
                         )}
                     </div>
@@ -483,25 +544,48 @@ export default function General() {
                         <h3 className='my-auto'>{t('config.general.tray_click_event')}</h3>
                         {trayClickEvent !== null && (
                             <Dropdown>
-                                <DropdownTrigger>
+                                <Dropdown.Trigger>
                                     <Button variant='bordered'>{t(`config.general.event.${trayClickEvent}`)}</Button>
-                                </DropdownTrigger>
-                                <DropdownMenu
-                                    aria-label='tray click event'
-                                    onAction={(key) => {
-                                        setTrayClickEvent(key);
-                                    }}
-                                >
-                                    <DropdownItem key='config'>{t('config.general.event.config')}</DropdownItem>
-                                    <DropdownItem key='translate'>{t('config.general.event.translate')}</DropdownItem>
-                                    <DropdownItem key='ocr_recognize'>
-                                        {t('config.general.event.ocr_recognize')}
-                                    </DropdownItem>
-                                    <DropdownItem key='ocr_translate'>
-                                        {t('config.general.event.ocr_translate')}
-                                    </DropdownItem>
-                                    <DropdownItem key='disable'>{t('config.general.event.disable')}</DropdownItem>
-                                </DropdownMenu>
+                                </Dropdown.Trigger>
+                                <Dropdown.Popover>
+                                    <Dropdown.Menu
+                                        aria-label='tray click event'
+                                        onAction={(key) => {
+                                            setTrayClickEvent(key);
+                                        }}
+                                    >
+                                        <Dropdown.Item
+                                            key='config'
+                                            id='config'
+                                        >
+                                            <Label>{t('config.general.event.config')}</Label>
+                                        </Dropdown.Item>
+                                        <Dropdown.Item
+                                            key='translate'
+                                            id='translate'
+                                        >
+                                            <Label>{t('config.general.event.translate')}</Label>
+                                        </Dropdown.Item>
+                                        <Dropdown.Item
+                                            key='ocr_recognize'
+                                            id='ocr_recognize'
+                                        >
+                                            {t('config.general.event.ocr_recognize')}
+                                        </Dropdown.Item>
+                                        <Dropdown.Item
+                                            key='ocr_translate'
+                                            id='ocr_translate'
+                                        >
+                                            {t('config.general.event.ocr_translate')}
+                                        </Dropdown.Item>
+                                        <Dropdown.Item
+                                            key='disable'
+                                            id='disable'
+                                        >
+                                            <Label>{t('config.general.event.disable')}</Label>
+                                        </Dropdown.Item>
+                                    </Dropdown.Menu>
+                                </Dropdown.Popover>
                             </Dropdown>
                         )}
                     </div>
@@ -535,30 +619,47 @@ export default function General() {
                         <h3>{t('config.general.proxy.title')}</h3>
                         {proxyMode !== null && (
                             <Dropdown>
-                                <DropdownTrigger>
+                                <Dropdown.Trigger>
                                     <Button variant='bordered'>{t(`config.general.proxy.mode.${proxyMode}`)}</Button>
-                                </DropdownTrigger>
-                                <DropdownMenu
-                                    aria-label='proxy mode'
-                                    onAction={async (key) => {
-                                        if (key === 'manual' && (proxyHost === '' || proxyPort === '')) {
-                                            toast.error(t('config.general.proxy_error'), {
-                                                duration: 3000,
+                                </Dropdown.Trigger>
+                                <Dropdown.Popover>
+                                    <Dropdown.Menu
+                                        aria-label='proxy mode'
+                                        onAction={async (key) => {
+                                            if (key === 'manual' && (proxyHost === '' || proxyPort === '')) {
+                                                toast.error(t('config.general.proxy_error'), {
+                                                    duration: 3000,
+                                                    style: toastStyle,
+                                                });
+                                                return;
+                                            }
+                                            setProxyMode(key);
+                                            toast.success(t('config.general.proxy_change'), {
+                                                duration: 1000,
                                                 style: toastStyle,
                                             });
-                                            return;
-                                        }
-                                        setProxyMode(key);
-                                        toast.success(t('config.general.proxy_change'), {
-                                            duration: 1000,
-                                            style: toastStyle,
-                                        });
-                                    }}
-                                >
-                                    <DropdownItem key='system'>{t('config.general.proxy.mode.system')}</DropdownItem>
-                                    <DropdownItem key='manual'>{t('config.general.proxy.mode.manual')}</DropdownItem>
-                                    <DropdownItem key='off'>{t('config.general.proxy.mode.off')}</DropdownItem>
-                                </DropdownMenu>
+                                        }}
+                                    >
+                                        <Dropdown.Item
+                                            key='system'
+                                            id='system'
+                                        >
+                                            <Label>{t('config.general.proxy.mode.system')}</Label>
+                                        </Dropdown.Item>
+                                        <Dropdown.Item
+                                            key='manual'
+                                            id='manual'
+                                        >
+                                            <Label>{t('config.general.proxy.mode.manual')}</Label>
+                                        </Dropdown.Item>
+                                        <Dropdown.Item
+                                            key='off'
+                                            id='off'
+                                        >
+                                            <Label>{t('config.general.proxy.mode.off')}</Label>
+                                        </Dropdown.Item>
+                                    </Dropdown.Menu>
+                                </Dropdown.Popover>
                             </Dropdown>
                         )}
                     </div>

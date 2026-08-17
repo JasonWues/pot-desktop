@@ -1,17 +1,9 @@
 import { readTextFile, BaseDirectory } from '@tauri-apps/plugin-fs';
-import { DropdownTrigger } from '@heroui/react';
+import { CardContent, Dropdown, Button, Input, Card, Avatar, Tooltip, Label } from '@heroui/react';
 
 import toast, { Toaster } from 'react-hot-toast';
-import { DropdownMenu } from '@heroui/react';
-import { DropdownItem } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
-import { CardContent } from '@heroui/react';
-import { Dropdown } from '@heroui/react';
 import { warn } from '@tauri-apps/plugin-log';
-import { Button } from '@heroui/react';
-import { Input } from '@heroui/react';
-import { Card } from '@heroui/react';
-import { Avatar, Tooltip } from '@heroui/react';
 import React, { useEffect, useState } from 'react';
 
 import { useConfig, useToastStyle, useDisclosure } from '../../../../hooks';
@@ -186,19 +178,36 @@ export default function Backup() {
                     <h3 className='my-auto'>{t('config.backup.type')}</h3>
                     {backupType !== null && (
                         <Dropdown>
-                            <DropdownTrigger>
+                            <Dropdown.Trigger>
                                 <Button variant='bordered'>{t(`config.backup.${backupType}`)}</Button>
-                            </DropdownTrigger>
-                            <DropdownMenu
-                                aria-label='backup type'
-                                onAction={(key) => {
-                                    setBackupType(key);
-                                }}
-                            >
-                                <DropdownItem key='webdav'>{t('config.backup.webdav')}</DropdownItem>
-                                <DropdownItem key='aliyun'>{t('config.backup.aliyun')}</DropdownItem>
-                                <DropdownItem key='local'>{t('config.backup.local')}</DropdownItem>
-                            </DropdownMenu>
+                            </Dropdown.Trigger>
+                            <Dropdown.Popover>
+                                <Dropdown.Menu
+                                    aria-label='backup type'
+                                    onAction={(key) => {
+                                        setBackupType(key);
+                                    }}
+                                >
+                                    <Dropdown.Item
+                                        key='webdav'
+                                        id='webdav'
+                                    >
+                                        <Label>{t('config.backup.webdav')}</Label>
+                                    </Dropdown.Item>
+                                    <Dropdown.Item
+                                        key='aliyun'
+                                        id='aliyun'
+                                    >
+                                        <Label>{t('config.backup.aliyun')}</Label>
+                                    </Dropdown.Item>
+                                    <Dropdown.Item
+                                        key='local'
+                                        id='local'
+                                    >
+                                        <Label>{t('config.backup.local')}</Label>
+                                    </Dropdown.Item>
+                                </Dropdown.Menu>
+                            </Dropdown.Popover>
                         </Dropdown>
                     )}
                 </div>
@@ -258,10 +267,7 @@ export default function Backup() {
                         <>
                             <h3 className='my-auto'>{t('config.backup.username')}</h3>
 
-                            <Tooltip
-                                content={t('config.backup.logout')}
-                                placement='bottom-end'
-                            >
+                            <Tooltip>
                                 <Button
                                     variant='light'
                                     onClick={() => {
@@ -277,6 +283,7 @@ export default function Backup() {
                                     />
                                     <h3 className='my-auto'>{aliyunUserInfo.name}</h3>
                                 </Button>
+                                <Tooltip.Content placement='bottom-end'>{t('config.backup.logout')}</Tooltip.Content>
                             </Tooltip>
                         </>
                     )}

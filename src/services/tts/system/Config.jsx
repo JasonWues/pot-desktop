@@ -1,4 +1,4 @@
-import { Button, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@heroui/react';
+import { Button, Dropdown, Label } from '@heroui/react';
 import React, { useEffect, useState } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -68,49 +68,61 @@ export function Config(props) {
                 <div className='config-item'>
                     <h3 className='my-auto'>{t('services.tts.system_tts.rate')}</h3>
                     <Dropdown>
-                        <DropdownTrigger>
+                        <Dropdown.Trigger>
                             <Button variant='bordered'>{`${systemTtsConfig.rate ?? 1}x`}</Button>
-                        </DropdownTrigger>
-                        <DropdownMenu
-                            aria-label='tts rate'
-                            onAction={(key) => {
-                                setSystemTtsConfig({
-                                    ...systemTtsConfig,
-                                    rate: Number(key),
-                                });
-                            }}
-                        >
-                            {RATE_OPTIONS.map((rate) => (
-                                <DropdownItem key={rate}>{`${rate}x`}</DropdownItem>
-                            ))}
-                        </DropdownMenu>
+                        </Dropdown.Trigger>
+                        <Dropdown.Popover>
+                            <Dropdown.Menu
+                                aria-label='tts rate'
+                                onAction={(key) => {
+                                    setSystemTtsConfig({
+                                        ...systemTtsConfig,
+                                        rate: Number(key),
+                                    });
+                                }}
+                            >
+                                {RATE_OPTIONS.map((rate) => (
+                                    <Dropdown.Item
+                                        key={rate}
+                                        id={rate}
+                                    >{`${rate}x`}</Dropdown.Item>
+                                ))}
+                            </Dropdown.Menu>
+                        </Dropdown.Popover>
                     </Dropdown>
                 </div>
 
                 <div className='config-item'>
                     <h3 className='my-auto'>{t('services.tts.system_tts.language')}</h3>
                     <Dropdown>
-                        <DropdownTrigger>
+                        <Dropdown.Trigger>
                             <Button variant='bordered'>{t(`languages.${editingLanguage}`)}</Button>
-                        </DropdownTrigger>
-                        <DropdownMenu
-                            aria-label='tts language'
-                            className='max-h-[50vh] overflow-y-auto'
-                            onAction={(key) => {
-                                setEditingLanguage(key);
-                            }}
-                        >
-                            {Object.keys(Language).map((language) => (
-                                <DropdownItem key={language}>{t(`languages.${language}`)}</DropdownItem>
-                            ))}
-                        </DropdownMenu>
+                        </Dropdown.Trigger>
+                        <Dropdown.Popover>
+                            <Dropdown.Menu
+                                aria-label='tts language'
+                                className='max-h-[50vh] overflow-y-auto'
+                                onAction={(key) => {
+                                    setEditingLanguage(key);
+                                }}
+                            >
+                                {Object.keys(Language).map((language) => (
+                                    <Dropdown.Item
+                                        key={language}
+                                        id={language}
+                                    >
+                                        {t(`languages.${language}`)}
+                                    </Dropdown.Item>
+                                ))}
+                            </Dropdown.Menu>
+                        </Dropdown.Popover>
                     </Dropdown>
                 </div>
 
                 <div className='config-item'>
                     <h3 className='my-auto'>{t('services.tts.system_tts.voice')}</h3>
                     <Dropdown>
-                        <DropdownTrigger>
+                        <Dropdown.Trigger>
                             <Button variant='bordered'>
                                 {configuredVoice === ''
                                     ? `${t('services.tts.system_tts.auto_voice')}${
@@ -118,19 +130,29 @@ export function Config(props) {
                                       }`
                                     : configuredVoice}
                             </Button>
-                        </DropdownTrigger>
-                        <DropdownMenu
-                            aria-label='tts voice'
-                            className='max-h-[50vh] overflow-y-auto'
-                            onAction={(key) => {
-                                setVoiceForCurrentLanguage(key === '__auto__' ? '' : key);
-                            }}
-                        >
-                            <DropdownItem key='__auto__'>{t('services.tts.system_tts.auto_voice')}</DropdownItem>
-                            {voiceList.map((v) => (
-                                <DropdownItem key={v.name}>{`${v.name} (${v.language})`}</DropdownItem>
-                            ))}
-                        </DropdownMenu>
+                        </Dropdown.Trigger>
+                        <Dropdown.Popover>
+                            <Dropdown.Menu
+                                aria-label='tts voice'
+                                className='max-h-[50vh] overflow-y-auto'
+                                onAction={(key) => {
+                                    setVoiceForCurrentLanguage(key === '__auto__' ? '' : key);
+                                }}
+                            >
+                                <Dropdown.Item
+                                    key='__auto__'
+                                    id='__auto__'
+                                >
+                                    <Label>{t('services.tts.system_tts.auto_voice')}</Label>
+                                </Dropdown.Item>
+                                {voiceList.map((v) => (
+                                    <Dropdown.Item
+                                        key={v.name}
+                                        id={v.name}
+                                    >{`${v.name} (${v.language})`}</Dropdown.Item>
+                                ))}
+                            </Dropdown.Menu>
+                        </Dropdown.Popover>
                     </Dropdown>
                 </div>
 

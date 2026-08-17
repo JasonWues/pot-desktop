@@ -1,12 +1,8 @@
 import { INSTANCE_NAME_CONFIG_KEY } from '../../../utils/service_instance';
 import InstanceNameInput from '../../../components/InstanceNameInput';
-import { DropdownTrigger } from '@heroui/react';
-import { Input, Button } from '@heroui/react';
-import { DropdownMenu } from '@heroui/react';
-import { DropdownItem } from '@heroui/react';
+import { Input, Button, Dropdown, Label } from '@heroui/react';
 import toast, { Toaster } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { Dropdown } from '@heroui/react';
 import { open } from '@tauri-apps/plugin-shell';
 import React, { useState } from 'react';
 
@@ -74,23 +70,40 @@ export function Config(props) {
                 <div className='config-item'>
                     <h3 className='my-auto'>{t('services.translate.deepl.type')}</h3>
                     <Dropdown>
-                        <DropdownTrigger>
+                        <Dropdown.Trigger>
                             <Button variant='bordered'>{t(`services.translate.deepl.${deeplConfig.type}`)}</Button>
-                        </DropdownTrigger>
-                        <DropdownMenu
-                            autoFocus='first'
-                            aria-label='app language'
-                            onAction={(key) => {
-                                setDeeplConfig({
-                                    ...deeplConfig,
-                                    type: key,
-                                });
-                            }}
-                        >
-                            <DropdownItem key='free'>{t(`services.translate.deepl.free`)}</DropdownItem>
-                            <DropdownItem key='api'>{t(`services.translate.deepl.api`)}</DropdownItem>
-                            <DropdownItem key='deeplx'>{t(`services.translate.deepl.deeplx`)}</DropdownItem>
-                        </DropdownMenu>
+                        </Dropdown.Trigger>
+                        <Dropdown.Popover>
+                            <Dropdown.Menu
+                                autoFocus='first'
+                                aria-label='app language'
+                                onAction={(key) => {
+                                    setDeeplConfig({
+                                        ...deeplConfig,
+                                        type: key,
+                                    });
+                                }}
+                            >
+                                <Dropdown.Item
+                                    key='free'
+                                    id='free'
+                                >
+                                    <Label>{t(`services.translate.deepl.free`)}</Label>
+                                </Dropdown.Item>
+                                <Dropdown.Item
+                                    key='api'
+                                    id='api'
+                                >
+                                    <Label>{t(`services.translate.deepl.api`)}</Label>
+                                </Dropdown.Item>
+                                <Dropdown.Item
+                                    key='deeplx'
+                                    id='deeplx'
+                                >
+                                    <Label>{t(`services.translate.deepl.deeplx`)}</Label>
+                                </Dropdown.Item>
+                            </Dropdown.Menu>
+                        </Dropdown.Popover>
                     </Dropdown>
                 </div>
                 <div className={`config-item ${deeplConfig.type !== 'api' ? 'hidden' : ''}`}>

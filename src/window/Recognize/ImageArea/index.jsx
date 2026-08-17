@@ -101,7 +101,7 @@ export default function ImageArea() {
                 )}
             </CardContent>
             <CardFooter className='bg-surface flex justify-start px-[12px] gap-[4px]'>
-                <Tooltip content={t('recognize.copy_img')}>
+                <Tooltip>
                     <Button
                         isIconOnly
                         size='sm'
@@ -112,6 +112,7 @@ export default function ImageArea() {
                     >
                         <MdContentCopy className='text-[16px]' />
                     </Button>
+                    <Tooltip.Content>{t('recognize.copy_img')}</Tooltip.Content>
                 </Tooltip>
                 <Button
                     size='sm'

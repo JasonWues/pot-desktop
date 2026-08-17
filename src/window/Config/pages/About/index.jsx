@@ -99,7 +99,7 @@ export default function About() {
                         </PopoverTrigger>
                         <PopoverContent>
                             <div className='flex justify-between'>
-                                <Tooltip content={t('config.about.qq_channel')}>
+                                <Tooltip>
                                     <Button
                                         isIconOnly
                                         variant='light'
@@ -111,8 +111,9 @@ export default function About() {
                                     >
                                         <BsTencentQq />
                                     </Button>
+                                    <Tooltip.Content>{t('config.about.qq_channel')}</Tooltip.Content>
                                 </Tooltip>
-                                <Tooltip content={t('config.about.qq_group')}>
+                                <Tooltip>
                                     <Button
                                         isIconOnly
                                         variant='light'
@@ -124,8 +125,9 @@ export default function About() {
                                     >
                                         <BsTencentQq />
                                     </Button>
+                                    <Tooltip.Content>{t('config.about.qq_group')}</Tooltip.Content>
                                 </Tooltip>
-                                <Tooltip content={t('config.about.telegram')}>
+                                <Tooltip>
                                     <Button
                                         isIconOnly
                                         variant='light'
@@ -137,8 +139,9 @@ export default function About() {
                                     >
                                         <BsTelegram />
                                     </Button>
+                                    <Tooltip.Content>{t('config.about.telegram')}</Tooltip.Content>
                                 </Tooltip>
-                                <Tooltip content={t('config.about.discussion')}>
+                                <Tooltip>
                                     <Button
                                         isIconOnly
                                         variant='light'
@@ -150,6 +153,7 @@ export default function About() {
                                     >
                                         <BsGithub />
                                     </Button>
+                                    <Tooltip.Content>{t('config.about.discussion')}</Tooltip.Content>
                                 </Tooltip>
                             </div>
                         </PopoverContent>

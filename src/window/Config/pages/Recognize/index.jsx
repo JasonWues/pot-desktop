@@ -1,12 +1,5 @@
-import { DropdownTrigger } from '@heroui/react';
-import { DropdownMenu } from '@heroui/react';
-import { DropdownItem } from '@heroui/react';
+import { CardContent, Dropdown, Switch, Button, Card, Label } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
-import { CardContent } from '@heroui/react';
-import { Dropdown } from '@heroui/react';
-import { Switch } from '@heroui/react';
-import { Button } from '@heroui/react';
-import { Card } from '@heroui/react';
 import React from 'react';
 
 import { languageList } from '../../../../utils/language';
@@ -26,21 +19,35 @@ export default function Recognize() {
                     <h3 className='my-auto mx-0'>{t('config.recognize.language')}</h3>
                     {recognizeLanguage !== null && (
                         <Dropdown>
-                            <DropdownTrigger>
+                            <Dropdown.Trigger>
                                 <Button variant='bordered'>{t(`languages.${recognizeLanguage}`)}</Button>
-                            </DropdownTrigger>
-                            <DropdownMenu
-                                aria-label='recognize language'
-                                className='max-h-[50vh] overflow-y-auto'
-                                onAction={(key) => {
-                                    setRecognizeLanguage(key);
-                                }}
-                            >
-                                <DropdownItem key='auto'>{t('languages.auto')}</DropdownItem>
-                                {languageList.map((item) => {
-                                    return <DropdownItem key={item}>{t(`languages.${item}`)}</DropdownItem>;
-                                })}
-                            </DropdownMenu>
+                            </Dropdown.Trigger>
+                            <Dropdown.Popover>
+                                <Dropdown.Menu
+                                    aria-label='recognize language'
+                                    className='max-h-[50vh] overflow-y-auto'
+                                    onAction={(key) => {
+                                        setRecognizeLanguage(key);
+                                    }}
+                                >
+                                    <Dropdown.Item
+                                        key='auto'
+                                        id='auto'
+                                    >
+                                        <Label>{t('languages.auto')}</Label>
+                                    </Dropdown.Item>
+                                    {languageList.map((item) => {
+                                        return (
+                                            <Dropdown.Item
+                                                key={item}
+                                                id={item}
+                                            >
+                                                {t(`languages.${item}`)}
+                                            </Dropdown.Item>
+                                        );
+                                    })}
+                                </Dropdown.Menu>
+                            </Dropdown.Popover>
                         </Dropdown>
                     )}
                 </div>

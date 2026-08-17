@@ -1,4 +1,4 @@
-import { Button, Input, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@heroui/react';
+import { Button, Input, Dropdown, Label } from '@heroui/react';
 import toast, { Toaster } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { open } from '@tauri-apps/plugin-shell';
@@ -110,43 +110,55 @@ export function Config(props) {
                 <div className='config-item'>
                     <h3 className='my-auto'>{t('services.tts.openai_tts.voice')}</h3>
                     <Dropdown>
-                        <DropdownTrigger>
+                        <Dropdown.Trigger>
                             <Button variant='bordered'>{openaiTtsConfig['voice']}</Button>
-                        </DropdownTrigger>
-                        <DropdownMenu
-                            aria-label='openai tts voice'
-                            onAction={(key) => {
-                                setOpenaiTtsConfig({
-                                    ...openaiTtsConfig,
-                                    voice: key,
-                                });
-                            }}
-                        >
-                            {VOICE_OPTIONS.map((voice) => (
-                                <DropdownItem key={voice}>{voice}</DropdownItem>
-                            ))}
-                        </DropdownMenu>
+                        </Dropdown.Trigger>
+                        <Dropdown.Popover>
+                            <Dropdown.Menu
+                                aria-label='openai tts voice'
+                                onAction={(key) => {
+                                    setOpenaiTtsConfig({
+                                        ...openaiTtsConfig,
+                                        voice: key,
+                                    });
+                                }}
+                            >
+                                {VOICE_OPTIONS.map((voice) => (
+                                    <Dropdown.Item
+                                        key={voice}
+                                        id={voice}
+                                    >
+                                        <Label>{voice}</Label>
+                                    </Dropdown.Item>
+                                ))}
+                            </Dropdown.Menu>
+                        </Dropdown.Popover>
                     </Dropdown>
                 </div>
                 <div className='config-item'>
                     <h3 className='my-auto'>{t('services.tts.openai_tts.speed')}</h3>
                     <Dropdown>
-                        <DropdownTrigger>
+                        <Dropdown.Trigger>
                             <Button variant='bordered'>{`${openaiTtsConfig['speed'] ?? 1}x`}</Button>
-                        </DropdownTrigger>
-                        <DropdownMenu
-                            aria-label='openai tts speed'
-                            onAction={(key) => {
-                                setOpenaiTtsConfig({
-                                    ...openaiTtsConfig,
-                                    speed: Number(key),
-                                });
-                            }}
-                        >
-                            {SPEED_OPTIONS.map((speed) => (
-                                <DropdownItem key={speed}>{`${speed}x`}</DropdownItem>
-                            ))}
-                        </DropdownMenu>
+                        </Dropdown.Trigger>
+                        <Dropdown.Popover>
+                            <Dropdown.Menu
+                                aria-label='openai tts speed'
+                                onAction={(key) => {
+                                    setOpenaiTtsConfig({
+                                        ...openaiTtsConfig,
+                                        speed: Number(key),
+                                    });
+                                }}
+                            >
+                                {SPEED_OPTIONS.map((speed) => (
+                                    <Dropdown.Item
+                                        key={speed}
+                                        id={speed}
+                                    >{`${speed}x`}</Dropdown.Item>
+                                ))}
+                            </Dropdown.Menu>
+                        </Dropdown.Popover>
                     </Dropdown>
                 </div>
                 <div>

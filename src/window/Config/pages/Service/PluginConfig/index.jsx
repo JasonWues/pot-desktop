@@ -1,9 +1,5 @@
 import { INSTANCE_NAME_CONFIG_KEY } from '../../../../../utils/service_instance';
-import { Button, Input } from '@heroui/react';
-import { DropdownTrigger } from '@heroui/react';
-import { DropdownMenu } from '@heroui/react';
-import { DropdownItem } from '@heroui/react';
-import { Dropdown } from '@heroui/react';
+import { Button, Input, Dropdown, Label } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 import { open } from '@tauri-apps/plugin-shell';
 import React from 'react';
@@ -76,7 +72,7 @@ export function PluginConfig(props) {
                                 )}
                                 {x.type === 'select' && (
                                     <Dropdown>
-                                        <DropdownTrigger>
+                                        <Dropdown.Trigger>
                                             <Button
                                                 variant='bordered'
                                                 className='max-w-[50%]'
@@ -89,21 +85,30 @@ export function PluginConfig(props) {
                                                     ]
                                                 }
                                             </Button>
-                                        </DropdownTrigger>
-                                        <DropdownMenu
-                                            aria-label={x.key}
-                                            className='max-h-[40vh] overflow-y-auto'
-                                            onAction={(key) => {
-                                                setPluginConfig({
-                                                    ...pluginConfig,
-                                                    [x.key]: key,
-                                                });
-                                            }}
-                                        >
-                                            {Object.keys(x.options).map((y) => {
-                                                return <DropdownItem key={y}>{x.options[y]}</DropdownItem>;
-                                            })}
-                                        </DropdownMenu>
+                                        </Dropdown.Trigger>
+                                        <Dropdown.Popover>
+                                            <Dropdown.Menu
+                                                aria-label={x.key}
+                                                className='max-h-[40vh] overflow-y-auto'
+                                                onAction={(key) => {
+                                                    setPluginConfig({
+                                                        ...pluginConfig,
+                                                        [x.key]: key,
+                                                    });
+                                                }}
+                                            >
+                                                {Object.keys(x.options).map((y) => {
+                                                    return (
+                                                        <Dropdown.Item
+                                                            key={y}
+                                                            id={y}
+                                                        >
+                                                            <Label>{x.options[y]}</Label>
+                                                        </Dropdown.Item>
+                                                    );
+                                                })}
+                                            </Dropdown.Menu>
+                                        </Dropdown.Popover>
                                     </Dropdown>
                                 )}
                             </div>

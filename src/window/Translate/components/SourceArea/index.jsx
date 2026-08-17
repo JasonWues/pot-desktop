@@ -302,14 +302,17 @@ export default function SourceArea(props) {
                 }
             }, 1000);
         }
-    }
+    };
 
     const transformVarName = function (str) {
         let str2 = str;
 
         // snake_case to SNAKE_CASE
         if (/_[a-z]/.test(str2)) {
-            str2 = str2.split('_').map(it => it.toLocaleUpperCase()).join('_');
+            str2 = str2
+                .split('_')
+                .map((it) => it.toLocaleUpperCase())
+                .join('_');
         }
         if (str2 !== str) {
             return str2;
@@ -317,7 +320,10 @@ export default function SourceArea(props) {
 
         // SNAKE_CASE to kebab-case
         if (/^[A-Z]+(_[A-Z]+)*$/.test(str2)) {
-            str2 = str2.split('_').map(it => it.toLocaleLowerCase()).join('-');
+            str2 = str2
+                .split('_')
+                .map((it) => it.toLocaleLowerCase())
+                .join('-');
         }
         if (str2 !== str) {
             return str2;
@@ -325,7 +331,10 @@ export default function SourceArea(props) {
 
         // kebab-case to dot.notation
         if (/-/.test(str2)) {
-            str2 = str2.split('-').map(it => it.toLocaleLowerCase()).join('.');
+            str2 = str2
+                .split('-')
+                .map((it) => it.toLocaleLowerCase())
+                .join('.');
         }
         if (str2 !== str) {
             return str2;
@@ -373,9 +382,9 @@ export default function SourceArea(props) {
         }
 
         return str2;
-    }
+    };
     useEffect(() => {
-        textAreaRef.current.addEventListener("keydown", async (event) => {
+        textAreaRef.current.addEventListener('keydown', async (event) => {
             if (event.altKey && event.shiftKey && event.code === 'KeyU') {
                 const originText = textAreaRef.current.value;
                 const selectionStart = textAreaRef.current.selectionStart;
@@ -383,7 +392,8 @@ export default function SourceArea(props) {
                 const selectionText = originText.substring(selectionStart, selectionEnd);
 
                 const convertedText = transformVarName(selectionText);
-                const targetText = originText.substring(0, selectionStart) + convertedText + originText.substring(selectionEnd);
+                const targetText =
+                    originText.substring(0, selectionStart) + convertedText + originText.substring(selectionEnd);
 
                 await changeSourceText(targetText);
                 textAreaRef.current.selectionStart = selectionStart;
@@ -391,7 +401,6 @@ export default function SourceArea(props) {
             }
         });
     }, [textAreaRef]);
-
 
     return (
         <div className={hideSource && windowType !== '[INPUT_TRANSLATE]' ? 'hidden' : ''}>
@@ -437,7 +446,7 @@ export default function SourceArea(props) {
                 <CardFooter className='bg-surface rounded-none rounded-b-[10px] flex justify-between px-[12px] p-[5px]'>
                     <div className='flex justify-start'>
                         <ButtonGroup className='mr-[5px]'>
-                            <Tooltip content={t('translate.speak')}>
+                            <Tooltip>
                                 <Button
                                     isIconOnly
                                     variant='light'
@@ -450,8 +459,9 @@ export default function SourceArea(props) {
                                 >
                                     <HiOutlineVolumeUp className='text-[16px]' />
                                 </Button>
+                                <Tooltip.Content>{t('translate.speak')}</Tooltip.Content>
                             </Tooltip>
-                            <Tooltip content={t('translate.copy')}>
+                            <Tooltip>
                                 <Button
                                     isIconOnly
                                     variant='light'
@@ -462,8 +472,9 @@ export default function SourceArea(props) {
                                 >
                                     <MdContentCopy className='text-[16px]' />
                                 </Button>
+                                <Tooltip.Content>{t('translate.copy')}</Tooltip.Content>
                             </Tooltip>
-                            <Tooltip content={t('translate.delete_newline')}>
+                            <Tooltip>
                                 <Button
                                     isIconOnly
                                     variant='light'
@@ -478,8 +489,9 @@ export default function SourceArea(props) {
                                 >
                                     <MdSmartButton className='text-[16px]' />
                                 </Button>
+                                <Tooltip.Content>{t('translate.delete_newline')}</Tooltip.Content>
                             </Tooltip>
-                            <Tooltip content={t('common.clear')}>
+                            <Tooltip>
                                 <Button
                                     variant='light'
                                     size='sm'
@@ -491,6 +503,7 @@ export default function SourceArea(props) {
                                 >
                                     <LuDelete className='text-[16px]' />
                                 </Button>
+                                <Tooltip.Content>{t('common.clear')}</Tooltip.Content>
                             </Tooltip>
                         </ButtonGroup>
                         {detectLanguage !== '' && (
@@ -504,7 +517,7 @@ export default function SourceArea(props) {
                             </Chip>
                         )}
                     </div>
-                    <Tooltip content={t('translate.translate')}>
+                    <Tooltip>
                         <Button
                             size='sm'
                             color='primary'
@@ -518,6 +531,7 @@ export default function SourceArea(props) {
                                 });
                             }}
                         />
+                        <Tooltip.Content>{t('translate.translate')}</Tooltip.Content>
                     </Tooltip>
                 </CardFooter>
             </Card>

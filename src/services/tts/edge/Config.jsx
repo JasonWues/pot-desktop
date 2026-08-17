@@ -1,4 +1,4 @@
-import { Button, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@heroui/react';
+import { Button, Dropdown, Label } from '@heroui/react';
 import React, { useEffect, useState } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -64,18 +64,23 @@ export function Config(props) {
         <div className='config-item'>
             <h3 className='my-auto'>{label}</h3>
             <Dropdown>
-                <DropdownTrigger>
+                <Dropdown.Trigger>
                     <Button variant='bordered'>{`${(edgeConfig[key] ?? 0) > 0 ? '+' : ''}${edgeConfig[key] ?? 0}${unit}`}</Button>
-                </DropdownTrigger>
-                <DropdownMenu
-                    aria-label={key}
-                    className='max-h-[50vh] overflow-y-auto'
-                    onAction={(v) => setEdgeConfig({ ...edgeConfig, [key]: Number(v) })}
-                >
-                    {options.map((v) => (
-                        <DropdownItem key={v}>{`${v > 0 ? '+' : ''}${v}${unit}`}</DropdownItem>
-                    ))}
-                </DropdownMenu>
+                </Dropdown.Trigger>
+                <Dropdown.Popover>
+                    <Dropdown.Menu
+                        aria-label={key}
+                        className='max-h-[50vh] overflow-y-auto'
+                        onAction={(v) => setEdgeConfig({ ...edgeConfig, [key]: Number(v) })}
+                    >
+                        {options.map((v) => (
+                            <Dropdown.Item
+                                key={v}
+                                id={v}
+                            >{`${v > 0 ? '+' : ''}${v}${unit}`}</Dropdown.Item>
+                        ))}
+                    </Dropdown.Menu>
+                </Dropdown.Popover>
             </Dropdown>
         </div>
     );
@@ -96,25 +101,32 @@ export function Config(props) {
                 <div className='config-item'>
                     <h3 className='my-auto'>{t('services.tts.edge_tts.language')}</h3>
                     <Dropdown>
-                        <DropdownTrigger>
+                        <Dropdown.Trigger>
                             <Button variant='bordered'>{t(`languages.${editingLanguage}`)}</Button>
-                        </DropdownTrigger>
-                        <DropdownMenu
-                            aria-label='tts language'
-                            className='max-h-[50vh] overflow-y-auto'
-                            onAction={(key) => setEditingLanguage(key)}
-                        >
-                            {Object.keys(Language).map((language) => (
-                                <DropdownItem key={language}>{t(`languages.${language}`)}</DropdownItem>
-                            ))}
-                        </DropdownMenu>
+                        </Dropdown.Trigger>
+                        <Dropdown.Popover>
+                            <Dropdown.Menu
+                                aria-label='tts language'
+                                className='max-h-[50vh] overflow-y-auto'
+                                onAction={(key) => setEditingLanguage(key)}
+                            >
+                                {Object.keys(Language).map((language) => (
+                                    <Dropdown.Item
+                                        key={language}
+                                        id={language}
+                                    >
+                                        {t(`languages.${language}`)}
+                                    </Dropdown.Item>
+                                ))}
+                            </Dropdown.Menu>
+                        </Dropdown.Popover>
                     </Dropdown>
                 </div>
 
                 <div className='config-item'>
                     <h3 className='my-auto'>{t('services.tts.edge_tts.voice')}</h3>
                     <Dropdown>
-                        <DropdownTrigger>
+                        <Dropdown.Trigger>
                             <Button variant='bordered'>
                                 {configuredVoice === ''
                                     ? `${t('services.tts.edge_tts.auto_voice')}${
@@ -122,17 +134,27 @@ export function Config(props) {
                                       }`
                                     : configuredVoice}
                             </Button>
-                        </DropdownTrigger>
-                        <DropdownMenu
-                            aria-label='tts voice'
-                            className='max-h-[50vh] overflow-y-auto'
-                            onAction={(key) => setVoiceForCurrentLanguage(key === '__auto__' ? '' : key)}
-                        >
-                            <DropdownItem key='__auto__'>{t('services.tts.edge_tts.auto_voice')}</DropdownItem>
-                            {voicesForLanguage.map((v) => (
-                                <DropdownItem key={v.ShortName}>{`${v.ShortName} (${v.Gender})`}</DropdownItem>
-                            ))}
-                        </DropdownMenu>
+                        </Dropdown.Trigger>
+                        <Dropdown.Popover>
+                            <Dropdown.Menu
+                                aria-label='tts voice'
+                                className='max-h-[50vh] overflow-y-auto'
+                                onAction={(key) => setVoiceForCurrentLanguage(key === '__auto__' ? '' : key)}
+                            >
+                                <Dropdown.Item
+                                    key='__auto__'
+                                    id='__auto__'
+                                >
+                                    <Label>{t('services.tts.edge_tts.auto_voice')}</Label>
+                                </Dropdown.Item>
+                                {voicesForLanguage.map((v) => (
+                                    <Dropdown.Item
+                                        key={v.ShortName}
+                                        id={v.ShortName}
+                                    >{`${v.ShortName} (${v.Gender})`}</Dropdown.Item>
+                                ))}
+                            </Dropdown.Menu>
+                        </Dropdown.Popover>
                     </Dropdown>
                 </div>
 

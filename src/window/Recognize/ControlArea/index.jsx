@@ -1,4 +1,4 @@
-import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Button } from '@heroui/react';
+import { Dropdown, Button, Label } from '@heroui/react';
 import { atom, useAtom, useSetAtom, useAtomValue } from 'jotai';
 import { fetch, Body } from '../../../utils/http';
 import { useTranslation } from 'react-i18next';
@@ -53,7 +53,7 @@ export default function ControlArea(props) {
         <div className='flex justify-between px-[12px] h-full'>
             {currentServiceInstanceKey && (
                 <Dropdown>
-                    <DropdownTrigger>
+                    <Dropdown.Trigger>
                         <Button
                             className='my-auto'
                             variant='bordered'
@@ -81,48 +81,52 @@ export default function ControlArea(props) {
                                       t(`services.recognize.${currentServiceInstanceKey}.title`)
                                   )}
                         </Button>
-                    </DropdownTrigger>
-                    <DropdownMenu
-                        aria-label='service name'
-                        className='max-h-[70vh] overflow-y-auto'
-                        onAction={(key) => {
-                            setCurrentServiceInstanceKey(key);
-                        }}
-                    >
-                        {serviceInstanceList.map((instanceKey) => {
-                            return (
-                                <DropdownItem
-                                    key={instanceKey}
-                                    startContent={
-                                        <img
-                                            className='h-[16px] w-[16px] my-auto'
-                                            src={
-                                                getServiceSouceType(instanceKey) === ServiceSourceType.PLUGIN
-                                                    ? pluginList[getServiceName(instanceKey)].icon
-                                                    : builtinService[getServiceName(instanceKey)].info.icon === 'system'
-                                                      ? `logo/${osType}.svg`
-                                                      : builtinService[getServiceName(instanceKey)].info.icon
-                                            }
-                                        />
-                                    }
-                                >
-                                    {getServiceSouceType(instanceKey) === ServiceSourceType.PLUGIN
-                                        ? getInstanceName(
-                                              instanceKey,
-                                              () => pluginList[getServiceName(instanceKey)].display
-                                          )
-                                        : getInstanceName(instanceKey, () =>
-                                              t(`services.recognize.${instanceKey}.title`)
-                                          )}
-                                </DropdownItem>
-                            );
-                        })}
-                    </DropdownMenu>
+                    </Dropdown.Trigger>
+                    <Dropdown.Popover>
+                        <Dropdown.Menu
+                            aria-label='service name'
+                            className='max-h-[70vh] overflow-y-auto'
+                            onAction={(key) => {
+                                setCurrentServiceInstanceKey(key);
+                            }}
+                        >
+                            {serviceInstanceList.map((instanceKey) => {
+                                return (
+                                    <Dropdown.Item
+                                        key={instanceKey}
+                                        id={instanceKey}
+                                        startContent={
+                                            <img
+                                                className='h-[16px] w-[16px] my-auto'
+                                                src={
+                                                    getServiceSouceType(instanceKey) === ServiceSourceType.PLUGIN
+                                                        ? pluginList[getServiceName(instanceKey)].icon
+                                                        : builtinService[getServiceName(instanceKey)].info.icon ===
+                                                            'system'
+                                                          ? `logo/${osType}.svg`
+                                                          : builtinService[getServiceName(instanceKey)].info.icon
+                                                }
+                                            />
+                                        }
+                                    >
+                                        {getServiceSouceType(instanceKey) === ServiceSourceType.PLUGIN
+                                            ? getInstanceName(
+                                                  instanceKey,
+                                                  () => pluginList[getServiceName(instanceKey)].display
+                                              )
+                                            : getInstanceName(instanceKey, () =>
+                                                  t(`services.recognize.${instanceKey}.title`)
+                                              )}
+                                    </Dropdown.Item>
+                                );
+                            })}
+                        </Dropdown.Menu>
+                    </Dropdown.Popover>
                 </Dropdown>
             )}
             {language && (
                 <Dropdown>
-                    <DropdownTrigger>
+                    <Dropdown.Trigger>
                         <Button
                             className='my-auto'
                             variant='bordered'
@@ -130,19 +134,33 @@ export default function ControlArea(props) {
                         >
                             {t(`languages.${language}`)}
                         </Button>
-                    </DropdownTrigger>
-                    <DropdownMenu
-                        aria-label='language'
-                        className='max-h-[70vh] overflow-y-auto'
-                        onAction={(key) => {
-                            setLanguage(key);
-                        }}
-                    >
-                        <DropdownItem key='auto'>{t('languages.auto')}</DropdownItem>
-                        {languageList.map((name) => {
-                            return <DropdownItem key={name}>{t(`languages.${name}`)}</DropdownItem>;
-                        })}
-                    </DropdownMenu>
+                    </Dropdown.Trigger>
+                    <Dropdown.Popover>
+                        <Dropdown.Menu
+                            aria-label='language'
+                            className='max-h-[70vh] overflow-y-auto'
+                            onAction={(key) => {
+                                setLanguage(key);
+                            }}
+                        >
+                            <Dropdown.Item
+                                key='auto'
+                                id='auto'
+                            >
+                                <Label>{t('languages.auto')}</Label>
+                            </Dropdown.Item>
+                            {languageList.map((name) => {
+                                return (
+                                    <Dropdown.Item
+                                        key={name}
+                                        id={name}
+                                    >
+                                        {t(`languages.${name}`)}
+                                    </Dropdown.Item>
+                                );
+                            })}
+                        </Dropdown.Menu>
+                    </Dropdown.Popover>
                 </Dropdown>
             )}
             <Button

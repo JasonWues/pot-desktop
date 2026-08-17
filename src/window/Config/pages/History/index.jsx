@@ -1,14 +1,28 @@
-import { Modal, ModalHeader, ModalBody, ModalFooter } from '@heroui/react';
-import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
-import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@heroui/react';
+import {
+    Modal,
+    ModalHeader,
+    ModalBody,
+    ModalFooter,
+    Table,
+    TableHeader,
+    TableColumn,
+    TableBody,
+    TableRow,
+    TableCell,
+    Dropdown,
+    TextArea,
+    Button,
+    ButtonGroup,
+    Input,
+    Pagination,
+    Label,
+} from '@heroui/react';
 import { readDir, BaseDirectory, readTextFile, exists } from '@tauri-apps/plugin-fs';
-import { TextArea, Button, ButtonGroup, Input } from '@heroui/react';
 import { appConfigDir, join } from '@tauri-apps/api/path';
 import { convertFileSrc } from '@tauri-apps/api/core';
 import React, { useEffect, useState } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 import { save } from '@tauri-apps/plugin-dialog';
-import { Pagination } from '@heroui/react';
 import { MdDeleteOutline } from 'react-icons/md';
 import { useTranslation } from 'react-i18next';
 import { invoke } from '@tauri-apps/api/core';
@@ -257,7 +271,7 @@ export default function History() {
                         onClear={() => setSearch('')}
                     />
                     <Dropdown>
-                        <DropdownTrigger>
+                        <Dropdown.Trigger>
                             <Button
                                 size='sm'
                                 variant='bordered'
@@ -265,20 +279,32 @@ export default function History() {
                             >
                                 {serviceFilter === ALL ? t('config.history.all_services') : serviceLabel(serviceFilter)}
                             </Button>
-                        </DropdownTrigger>
-                        <DropdownMenu
-                            aria-label='service filter'
-                            className='max-h-[50vh] overflow-y-auto'
-                            onAction={(key) => setServiceFilter(key)}
-                        >
-                            <DropdownItem key={ALL}>{t('config.history.all_services')}</DropdownItem>
-                            {serviceOptions.map((service) => (
-                                <DropdownItem key={service}>{serviceLabel(service)}</DropdownItem>
-                            ))}
-                        </DropdownMenu>
+                        </Dropdown.Trigger>
+                        <Dropdown.Popover>
+                            <Dropdown.Menu
+                                aria-label='service filter'
+                                className='max-h-[50vh] overflow-y-auto'
+                                onAction={(key) => setServiceFilter(key)}
+                            >
+                                <Dropdown.Item
+                                    key={ALL}
+                                    id={ALL}
+                                >
+                                    <Label>{t('config.history.all_services')}</Label>
+                                </Dropdown.Item>
+                                {serviceOptions.map((service) => (
+                                    <Dropdown.Item
+                                        key={service}
+                                        id={service}
+                                    >
+                                        <Label>{serviceLabel(service)}</Label>
+                                    </Dropdown.Item>
+                                ))}
+                            </Dropdown.Menu>
+                        </Dropdown.Popover>
                     </Dropdown>
                     <Dropdown>
-                        <DropdownTrigger>
+                        <Dropdown.Trigger>
                             <Button
                                 size='sm'
                                 variant='bordered'
@@ -288,19 +314,29 @@ export default function History() {
                                     ? t('config.history.all_languages')
                                     : t(`languages.${targetFilter}`, { defaultValue: targetFilter })}
                             </Button>
-                        </DropdownTrigger>
-                        <DropdownMenu
-                            aria-label='language filter'
-                            className='max-h-[50vh] overflow-y-auto'
-                            onAction={(key) => setTargetFilter(key)}
-                        >
-                            <DropdownItem key={ALL}>{t('config.history.all_languages')}</DropdownItem>
-                            {targetOptions.map((language) => (
-                                <DropdownItem key={language}>
-                                    {t(`languages.${language}`, { defaultValue: language })}
-                                </DropdownItem>
-                            ))}
-                        </DropdownMenu>
+                        </Dropdown.Trigger>
+                        <Dropdown.Popover>
+                            <Dropdown.Menu
+                                aria-label='language filter'
+                                className='max-h-[50vh] overflow-y-auto'
+                                onAction={(key) => setTargetFilter(key)}
+                            >
+                                <Dropdown.Item
+                                    key={ALL}
+                                    id={ALL}
+                                >
+                                    <Label>{t('config.history.all_languages')}</Label>
+                                </Dropdown.Item>
+                                {targetOptions.map((language) => (
+                                    <Dropdown.Item
+                                        key={language}
+                                        id={language}
+                                    >
+                                        {t(`languages.${language}`, { defaultValue: language })}
+                                    </Dropdown.Item>
+                                ))}
+                            </Dropdown.Menu>
+                        </Dropdown.Popover>
                     </Dropdown>
                 </div>
                 <Table
