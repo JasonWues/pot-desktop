@@ -141,12 +141,10 @@ export default function General() {
                     <div className='config-item'>
                         <h3 className='my-auto'>{t('config.general.server_port')}</h3>
                         {serverPort !== null && (
-                            <Input
-                                type='number'
-                                variant='bordered'
+                            <TextField
+                                className='flex w-full justify-between max-w-[100px]'
                                 value={serverPort}
-                                labelPlacement='outside-left'
-                                onValueChange={(v) => {
+                                onChange={(v) => {
                                     if (parseInt(v) !== serverPort) {
                                         if (timer) {
                                             clearTimeout(timer);
@@ -168,8 +166,13 @@ export default function General() {
                                         setServerPort(parseInt(v));
                                     }
                                 }}
-                                className='max-w-[100px]'
-                            />
+                                aria-label={t('config.general.server_port')}
+                            >
+                                <Input
+                                    type='number'
+                                    variant='bordered'
+                                />
+                            </TextField>
                         )}
                     </div>
                 </CardContent>
@@ -693,13 +696,10 @@ export default function General() {
                             </TextField>
                         )}
                         {proxyPort !== null && (
-                            <Input
-                                type='number'
-                                variant='bordered'
-                                isRequired
-                                label={t('config.general.proxy.port')}
+                            <TextField
+                                className='flex w-full justify-between ml-2'
                                 value={proxyPort}
-                                onValueChange={(v) => {
+                                onChange={(v) => {
                                     if (parseInt(v) > 65535) {
                                         setProxyPort(65535);
                                     } else if (parseInt(v) < 0) {
@@ -708,46 +708,60 @@ export default function General() {
                                         setProxyPort(parseInt(v));
                                     }
                                 }}
-                                className='ml-2'
-                            />
+                                isRequired
+                            >
+                                <Label className='text-base my-auto'>{t('config.general.proxy.port')}</Label>
+                                <Input
+                                    type='number'
+                                    variant='bordered'
+                                />
+                            </TextField>
                         )}
                     </div>
                     <div className={`config-item ${proxyMode === 'manual' ? '' : 'hidden'}`}>
                         {proxyUsername !== null && (
-                            <Input
-                                type='text'
-                                variant='bordered'
-                                label={t('config.general.proxy.username')}
+                            <TextField
+                                className='flex w-full justify-between mr-2'
                                 value={proxyUsername}
-                                onValueChange={(v) => {
+                                onChange={(v) => {
                                     setProxyUsername(v);
                                 }}
-                                className='mr-2'
-                            />
+                            >
+                                <Label className='text-base my-auto'>{t('config.general.proxy.username')}</Label>
+                                <Input
+                                    type='text'
+                                    variant='bordered'
+                                />
+                            </TextField>
                         )}
                         {proxyPassword !== null && (
-                            <Input
-                                type='password'
-                                variant='bordered'
-                                label={t('config.general.proxy.password')}
+                            <TextField
+                                className='flex w-full justify-between ml-2'
                                 value={proxyPassword}
-                                onValueChange={(v) => {
+                                onChange={(v) => {
                                     setProxyPassword(v);
                                 }}
-                                className='ml-2'
-                            />
+                            >
+                                <Label className='text-base my-auto'>{t('config.general.proxy.password')}</Label>
+                                <Input
+                                    type='password'
+                                    variant='bordered'
+                                />
+                            </TextField>
                         )}
                     </div>
                     <div className={`config-item ${proxyMode === 'manual' ? '' : 'hidden'}`}>
                         {noProxy !== null && (
-                            <Input
-                                variant='bordered'
-                                label={t('config.general.proxy.no_proxy')}
+                            <TextField
+                                className='flex w-full justify-between'
                                 value={noProxy}
-                                onValueChange={(v) => {
+                                onChange={(v) => {
                                     setNoProxy(v);
                                 }}
-                            />
+                            >
+                                <Label className='text-base my-auto'>{t('config.general.proxy.no_proxy')}</Label>
+                                <Input variant='bordered' />
+                            </TextField>
                         )}
                     </div>
                 </CardContent>

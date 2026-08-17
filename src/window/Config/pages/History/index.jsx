@@ -260,16 +260,22 @@ export default function History() {
             <>
                 <Toaster />
                 <div className='flex gap-[8px] mb-[8px]'>
-                    <Input
-                        size='sm'
-                        isClearable
-                        variant='bordered'
+                    {/* SearchField, not Input: v3 dropped `isClearable`/`onClear`,
+                        and this is the component that carries a clear button of its
+                        own. Clearing goes through `onChange` like any other edit, so
+                        the separate `onClear` handler is no longer needed. */}
+                    <SearchField
                         className='max-w-[40%]'
-                        placeholder={t('config.history.search')}
                         value={search}
-                        onValueChange={setSearch}
-                        onClear={() => setSearch('')}
-                    />
+                        onChange={setSearch}
+                        aria-label={t('config.history.search')}
+                    >
+                        <SearchField.Group>
+                            <SearchField.SearchIcon />
+                            <SearchField.Input placeholder={t('config.history.search')} />
+                            <SearchField.ClearButton />
+                        </SearchField.Group>
+                    </SearchField>
                     <Dropdown>
                         <Button
                             size='sm'

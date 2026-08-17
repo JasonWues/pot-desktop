@@ -1,5 +1,5 @@
 import { readTextFile, BaseDirectory } from '@tauri-apps/plugin-fs';
-import { CardContent, Dropdown, Button, Input, Card, Avatar, Tooltip, Label } from '@heroui/react';
+import { CardContent, Dropdown, Button, Input, Card, Avatar, Tooltip, Label, TextField } from '@heroui/react';
 
 import toast, { Toaster } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -213,44 +213,49 @@ export default function Backup() {
                     <div className='config-item'>
                         <h3 className='my-auto'>{t('config.backup.webdav_url')}</h3>
                         {davUrl !== null && (
-                            <Input
-                                variant='bordered'
+                            <TextField
+                                className='flex w-full justify-between max-w-[300px]'
                                 value={davUrl}
-                                label={t('config.backup.webdav_url')}
-                                onValueChange={(v) => {
+                                onChange={(v) => {
                                     setDavUrl(v);
                                 }}
-                                className='max-w-[300px]'
-                            />
+                            >
+                                <Label className='text-base my-auto'>{t('config.backup.webdav_url')}</Label>
+                                <Input variant='bordered' />
+                            </TextField>
                         )}
                     </div>
                     <div className='config-item'>
                         <h3 className='my-auto'>{t('config.backup.username')}</h3>
                         {davUserName !== null && (
-                            <Input
-                                variant='bordered'
+                            <TextField
+                                className='flex w-full justify-between max-w-[300px]'
                                 value={davUserName}
-                                label={t('config.backup.username')}
-                                onValueChange={(v) => {
+                                onChange={(v) => {
                                     setDavUserName(v);
                                 }}
-                                className='max-w-[300px]'
-                            />
+                            >
+                                <Label className='text-base my-auto'>{t('config.backup.username')}</Label>
+                                <Input variant='bordered' />
+                            </TextField>
                         )}
                     </div>
                     <div className='config-item'>
                         <h3 className='my-auto'>{t('config.backup.password')}</h3>
                         {davPassword !== null && (
-                            <Input
-                                type='password'
-                                variant='bordered'
+                            <TextField
+                                className='flex w-full justify-between max-w-[300px]'
                                 value={davPassword}
-                                label={t('config.backup.password')}
-                                onValueChange={(v) => {
+                                onChange={(v) => {
                                     setDavPassword(v);
                                 }}
-                                className='max-w-[300px]'
-                            />
+                            >
+                                <Label className='text-base my-auto'>{t('config.backup.password')}</Label>
+                                <Input
+                                    type='password'
+                                    variant='bordered'
+                                />
+                            </TextField>
                         )}
                     </div>
                 </div>

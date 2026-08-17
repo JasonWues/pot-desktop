@@ -57,17 +57,19 @@ export function PluginConfig(props) {
                             >
                                 <h3 className='my-auto select-none cursor-default'>{x.display}</h3>
                                 {x.type === 'input' && (
-                                    <Input
+                                    <TextField
+                                        className='flex w-full justify-between max-w-[50%]'
                                         value={`${pluginConfig.hasOwnProperty(x.key) ? pluginConfig[x.key] : ''}`}
-                                        variant='bordered'
-                                        className='max-w-[50%]'
-                                        onValueChange={(value) => {
+                                        onChange={(value) => {
                                             setPluginConfig({
                                                 ...pluginConfig,
                                                 [x.key]: value,
                                             });
                                         }}
-                                    />
+                                        aria-label={x.display}
+                                    >
+                                        <Input variant='bordered' />
+                                    </TextField>
                                 )}
                                 {x.type === 'select' && (
                                     <Dropdown>
@@ -115,17 +117,19 @@ export function PluginConfig(props) {
                                 className={`config-item`}
                             >
                                 <h3 className='my-auto select-none cursor-default'>{x.display}</h3>
-                                <Input
+                                <TextField
+                                    className='flex w-full justify-between max-w-[50%]'
                                     value={`${pluginConfig.hasOwnProperty(x.key) ? pluginConfig[x.key] : ''}`}
-                                    variant='bordered'
-                                    className='max-w-[50%]'
-                                    onValueChange={(value) => {
+                                    onChange={(value) => {
                                         setPluginConfig({
                                             ...pluginConfig,
                                             [x.key]: value,
                                         });
                                     }}
-                                />
+                                    aria-label={x.display}
+                                >
+                                    <Input variant='bordered' />
+                                </TextField>
                             </div>
                         ))
                     );
