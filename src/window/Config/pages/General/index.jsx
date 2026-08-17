@@ -105,7 +105,7 @@ export default function General() {
                         <h3>{t('config.general.auto_start')}</h3>
                         <Switch
                             isSelected={autoStart}
-                            onValueChange={(v) => {
+                            onChange={(v) => {
                                 setAutoStart(v);
                                 if (v) {
                                     enable().then(() => {
@@ -117,17 +117,25 @@ export default function General() {
                                     });
                                 }
                             }}
-                        />
+                        >
+                            <Switch.Control>
+                                <Switch.Thumb />
+                            </Switch.Control>
+                        </Switch>
                     </div>
                     <div className='config-item'>
                         <h3>{t('config.general.check_update')}</h3>
                         {checkUpdate !== null && (
                             <Switch
                                 isSelected={checkUpdate}
-                                onValueChange={(v) => {
+                                onChange={(v) => {
                                     setCheckUpdate(v);
                                 }}
-                            />
+                            >
+                                <Switch.Control>
+                                    <Switch.Thumb />
+                                </Switch.Control>
+                            </Switch>
                         )}
                     </div>
                     <div className='config-item'>
@@ -576,10 +584,14 @@ export default function General() {
                         {transparent !== null && (
                             <Switch
                                 isSelected={transparent}
-                                onValueChange={(v) => {
+                                onChange={(v) => {
                                     setTransparent(v);
                                 }}
-                            />
+                            >
+                                <Switch.Control>
+                                    <Switch.Thumb />
+                                </Switch.Control>
+                            </Switch>
                         )}
                     </div>
                     <div className='config-item'>
@@ -587,10 +599,14 @@ export default function General() {
                         {devMode !== null && (
                             <Switch
                                 isSelected={devMode}
-                                onValueChange={(v) => {
+                                onChange={(v) => {
                                     setDevMode(v);
                                 }}
-                            />
+                            >
+                                <Switch.Control>
+                                    <Switch.Thumb />
+                                </Switch.Control>
+                            </Switch>
                         )}
                     </div>
                 </CardContent>

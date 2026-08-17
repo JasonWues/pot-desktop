@@ -65,12 +65,15 @@ export function Config(props) {
                 <div className={'config-item'}>
                     <Switch
                         isSelected={config['https'] ?? true}
-                        onValueChange={(v) => {
+                        onChange={(v) => {
                             setConfig({ ...config, https: v });
                         }}
                         className='flex flex-row-reverse justify-between w-full max-w-full'
                     >
-                        {t('services.translate.niutrans.https')}
+                        <Switch.Content>{t('services.translate.niutrans.https')}</Switch.Content>
+                        <Switch.Control>
+                            <Switch.Thumb />
+                        </Switch.Control>
                     </Switch>
                 </div>
                 <div className={'config-item'}>

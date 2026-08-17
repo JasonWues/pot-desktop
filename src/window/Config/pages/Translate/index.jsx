@@ -247,10 +247,14 @@ export default function Translate() {
                         {historyDisable !== null && (
                             <Switch
                                 isSelected={historyDisable}
-                                onValueChange={(v) => {
+                                onChange={(v) => {
                                     setHistoryDisable(v);
                                 }}
-                            />
+                            >
+                                <Switch.Control>
+                                    <Switch.Thumb />
+                                </Switch.Control>
+                            </Switch>
                         )}
                     </div>
                     <div className='config-item'>
@@ -258,10 +262,14 @@ export default function Translate() {
                         {cacheEnable !== null && (
                             <Switch
                                 isSelected={cacheEnable}
-                                onValueChange={(v) => {
+                                onChange={(v) => {
                                     setCacheEnable(v);
                                 }}
-                            />
+                            >
+                                <Switch.Control>
+                                    <Switch.Thumb />
+                                </Switch.Control>
+                            </Switch>
                         )}
                     </div>
                     <div className={`config-item ${!cacheEnable ? 'hidden' : ''}`}>
@@ -316,10 +324,14 @@ export default function Translate() {
                         {incrementalTranslate !== null && (
                             <Switch
                                 isSelected={incrementalTranslate}
-                                onValueChange={(v) => {
+                                onChange={(v) => {
                                     setIncrementalTranslate(v);
                                 }}
-                            />
+                            >
+                                <Switch.Control>
+                                    <Switch.Thumb />
+                                </Switch.Control>
+                            </Switch>
                         )}
                     </div>
                     <div className='config-item'>
@@ -327,10 +339,14 @@ export default function Translate() {
                         {dynamicTranslate !== null && (
                             <Switch
                                 isSelected={dynamicTranslate}
-                                onValueChange={(v) => {
+                                onChange={(v) => {
                                     setDynamicTranslate(v);
                                 }}
-                            />
+                            >
+                                <Switch.Control>
+                                    <Switch.Thumb />
+                                </Switch.Control>
+                            </Switch>
                         )}
                     </div>
                     <div className='config-item'>
@@ -338,10 +354,14 @@ export default function Translate() {
                         {deleteNewline !== null && (
                             <Switch
                                 isSelected={deleteNewline}
-                                onValueChange={(v) => {
+                                onChange={(v) => {
                                     setDeleteNewline(v);
                                 }}
-                            />
+                            >
+                                <Switch.Control>
+                                    <Switch.Thumb />
+                                </Switch.Control>
+                            </Switch>
                         )}
                     </div>
                     <div className='config-item'>
@@ -349,10 +369,14 @@ export default function Translate() {
                         {rememberLanguage !== null && (
                             <Switch
                                 isSelected={rememberLanguage}
-                                onValueChange={(v) => {
+                                onChange={(v) => {
                                     setRememberLanguage(v);
                                 }}
-                            />
+                            >
+                                <Switch.Control>
+                                    <Switch.Thumb />
+                                </Switch.Control>
+                            </Switch>
                         )}
                     </div>
                 </CardContent>
@@ -421,10 +445,14 @@ export default function Translate() {
                         {rememberWindowSize !== null && (
                             <Switch
                                 isSelected={rememberWindowSize}
-                                onValueChange={(v) => {
+                                onChange={(v) => {
                                     setRememberWindowSize(v);
                                 }}
-                            />
+                            >
+                                <Switch.Control>
+                                    <Switch.Thumb />
+                                </Switch.Control>
+                            </Switch>
                         )}
                     </div>
                     <div className='config-item'>
@@ -432,10 +460,14 @@ export default function Translate() {
                         {closeOnBlur !== null && (
                             <Switch
                                 isSelected={closeOnBlur}
-                                onValueChange={(v) => {
+                                onChange={(v) => {
                                     setCloseOnBlur(v);
                                 }}
-                            />
+                            >
+                                <Switch.Control>
+                                    <Switch.Thumb />
+                                </Switch.Control>
+                            </Switch>
                         )}
                     </div>
                     <div className='config-item'>
@@ -443,10 +475,14 @@ export default function Translate() {
                         {alwaysOnTop !== null && (
                             <Switch
                                 isSelected={alwaysOnTop}
-                                onValueChange={(v) => {
+                                onChange={(v) => {
                                     setAlwaysOnTop(v);
                                 }}
-                            />
+                            >
+                                <Switch.Control>
+                                    <Switch.Thumb />
+                                </Switch.Control>
+                            </Switch>
                         )}
                     </div>
                     <div className='config-item'>
@@ -454,10 +490,14 @@ export default function Translate() {
                         {hideSource !== null && (
                             <Switch
                                 isSelected={hideSource}
-                                onValueChange={(v) => {
+                                onChange={(v) => {
                                     setHideSource(v);
                                 }}
-                            />
+                            >
+                                <Switch.Control>
+                                    <Switch.Thumb />
+                                </Switch.Control>
+                            </Switch>
                         )}
                     </div>
                     <div className='config-item'>
@@ -465,10 +505,14 @@ export default function Translate() {
                         {hideLanguage !== null && (
                             <Switch
                                 isSelected={hideLanguage}
-                                onValueChange={(v) => {
+                                onChange={(v) => {
                                     setHideLanguage(v);
                                 }}
-                            />
+                            >
+                                <Switch.Control>
+                                    <Switch.Thumb />
+                                </Switch.Control>
+                            </Switch>
                         )}
                     </div>
                     <div className='config-item'>
@@ -476,10 +520,14 @@ export default function Translate() {
                         {hideWindow !== null && (
                             <Switch
                                 isSelected={hideWindow}
-                                onValueChange={(v) => {
+                                onChange={(v) => {
                                     setHideWindow(v);
                                 }}
-                            />
+                            >
+                                <Switch.Control>
+                                    <Switch.Thumb />
+                                </Switch.Control>
+                            </Switch>
                         )}
                     </div>
                 </CardContent>

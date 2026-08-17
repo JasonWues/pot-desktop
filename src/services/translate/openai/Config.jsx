@@ -139,7 +139,7 @@ export function Config(props) {
                 <div className='config-item'>
                     <Switch
                         isSelected={openaiConfig['stream']}
-                        onValueChange={(value) => {
+                        onChange={(value) => {
                             setOpenaiConfig({
                                 ...openaiConfig,
                                 stream: value,
@@ -147,7 +147,10 @@ export function Config(props) {
                         }}
                         className='flex flex-row-reverse justify-between w-full max-w-full'
                     >
-                        {t('services.translate.openai.stream')}
+                        <Switch.Content>{t('services.translate.openai.stream')}</Switch.Content>
+                        <Switch.Control>
+                            <Switch.Thumb />
+                        </Switch.Control>
                     </Switch>
                 </div>
                 <div className='config-item'>

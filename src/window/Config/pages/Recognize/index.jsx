@@ -54,10 +54,14 @@ export default function Recognize() {
                     {deleteNewline !== null && (
                         <Switch
                             isSelected={deleteNewline}
-                            onValueChange={(v) => {
+                            onChange={(v) => {
                                 setDeleteNewline(v);
                             }}
-                        />
+                        >
+                            <Switch.Control>
+                                <Switch.Thumb />
+                            </Switch.Control>
+                        </Switch>
                     )}
                 </div>
                 <div className='config-item'>
@@ -65,10 +69,14 @@ export default function Recognize() {
                     {autoCopy !== null && (
                         <Switch
                             isSelected={autoCopy}
-                            onValueChange={(v) => {
+                            onChange={(v) => {
                                 setAutoCopy(v);
                             }}
-                        />
+                        >
+                            <Switch.Control>
+                                <Switch.Thumb />
+                            </Switch.Control>
+                        </Switch>
                     )}
                 </div>
                 <div className='config-item'>
@@ -76,10 +84,14 @@ export default function Recognize() {
                     {closeOnBlur !== null && (
                         <Switch
                             isSelected={closeOnBlur}
-                            onValueChange={(v) => {
+                            onChange={(v) => {
                                 setCloseOnBlur(v);
                             }}
-                        />
+                        >
+                            <Switch.Control>
+                                <Switch.Thumb />
+                            </Switch.Control>
+                        </Switch>
                     )}
                 </div>
                 <div className='config-item'>
@@ -87,10 +99,14 @@ export default function Recognize() {
                     {hideWindow !== null && (
                         <Switch
                             isSelected={hideWindow}
-                            onValueChange={(v) => {
+                            onChange={(v) => {
                                 setHideWindow(v);
                             }}
-                        />
+                        >
+                            <Switch.Control>
+                                <Switch.Thumb />
+                            </Switch.Control>
+                        </Switch>
                     )}
                 </div>
             </CardContent>
