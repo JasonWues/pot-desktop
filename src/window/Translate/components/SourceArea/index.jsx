@@ -396,14 +396,14 @@ export default function SourceArea(props) {
         <div className={hideSource && windowType !== '[INPUT_TRANSLATE]' ? 'hidden' : ''}>
             <Card
                 shadow='none'
-                className='bg-content1 rounded-[10px] mt-px pb-0'
+                className='bg-surface rounded-[10px] mt-px pb-0'
             >
                 <Toaster />
-                <CardBody className='bg-content1 p-[12px] pb-0 max-h-[40vh] overflow-y-auto'>
+                <CardBody className='bg-surface p-[12px] pb-0 max-h-[40vh] overflow-y-auto'>
                     <textarea
                         autoFocus
                         ref={textAreaRef}
-                        className={`text-[${appFontSize}px] bg-content1 h-full resize-none outline-hidden`}
+                        className={`text-[${appFontSize}px] bg-surface h-full resize-none outline-hidden`}
                         value={sourceText}
                         onKeyDown={keyDown}
                         onChange={(e) => {
@@ -433,7 +433,7 @@ export default function SourceArea(props) {
                     />
                 </CardBody>
 
-                <CardFooter className='bg-content1 rounded-none rounded-b-[10px] flex justify-between px-[12px] p-[5px]'>
+                <CardFooter className='bg-surface rounded-none rounded-b-[10px] flex justify-between px-[12px] p-[5px]'>
                     <div className='flex justify-start'>
                         <ButtonGroup className='mr-[5px]'>
                             <Tooltip content={t('translate.speak')}>

@@ -564,7 +564,7 @@ export default function General() {
                     </div>
                     {proxyMode === 'system' && systemProxy !== null && (
                         <div className='config-item'>
-                            <span className='text-[12px] text-default-500 whitespace-pre-line'>
+                            <span className='text-[12px] text-muted whitespace-pre-line'>
                                 {systemProxy.pac_url
                                     ? t('config.general.proxy.detected_pac', { url: systemProxy.pac_url })
                                     : systemProxy.http || systemProxy.https

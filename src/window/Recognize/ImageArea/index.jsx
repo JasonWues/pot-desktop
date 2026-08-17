@@ -77,10 +77,10 @@ export default function ImageArea() {
     return (
         <Card
             shadow='none'
-            className='bg-content1 h-full ml-[12px] mr-[6px]'
+            className='bg-surface h-full ml-[12px] mr-[6px]'
             radius='10'
         >
-            <CardBody className='bg-content1 h-full p-0 relative'>
+            <CardBody className='bg-surface h-full p-0 relative'>
                 {base64 !== '' && (
                     <>
                         <img
@@ -100,7 +100,7 @@ export default function ImageArea() {
                     </>
                 )}
             </CardBody>
-            <CardFooter className='bg-content1 flex justify-start px-[12px] gap-[4px]'>
+            <CardFooter className='bg-surface flex justify-start px-[12px] gap-[4px]'>
                 <Tooltip content={t('recognize.copy_img')}>
                     <Button
                         isIconOnly

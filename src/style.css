@@ -1,30 +1,32 @@
-@import 'tailwindcss';
+/*
+  HeroUI v3 is CSS-first: it pulls in Tailwind itself and layers its own base,
+  component and theme styles behind it, so this is the only entry point. There is
+  no Tailwind plugin and no `@config` any more -- the v2 `tailwind.config.cjs`
+  that defined the three themes is gone, and the themes live in `themes/` as
+  plain `[data-theme]` blocks.
+*/
+@import '@heroui/styles';
+@import './themes/light.css';
+@import './themes/dark.css';
 @import './themes/nocturne.css';
 
-@config '../tailwind.config.cjs';
-
 /*
-  `darkMode: 'class'` in the config ties the `dark:` variant to `.dark` alone, so
-  every dark: utility -- the app's own handful plus the many that HeroUI's
-  components carry -- would fall back to its light value under Nocturne, which is
-  a dark theme. A CSS-first @custom-variant overrides the config and lets either
-  class trigger it.
+  v3 selects a theme with `data-theme` on <html> rather than a class, so the
+  `dark:` variant has to follow the attribute. Both dark themes trigger it:
+  Nocturne is a dark theme, and without this every `dark:` utility -- the app's
+  own handful plus the many HeroUI's own components carry -- would fall back to
+  its light value under it.
 
-  `:is()`, not the `:where()` that Tailwind's own docs suggest. `:where()` scores
-  zero, which would drop every dark: utility in the bundle from 0,2,0 to 0,1,0
-  and hand ties to whichever plain utility happens to be emitted later. `:is(.dark
-  *)` scores 0,1,0, so this reproduces `darkMode: 'class'` exactly and only widens
-  what matches.
+  `:is()`, not `:where()`. `:where()` scores zero, which would drop every dark:
+  utility from 0,2,0 to 0,1,0 and hand ties to whichever plain utility happens to
+  be emitted later.
 */
-@custom-variant dark (&:is(.dark *, .nocturne *));
+@custom-variant dark (&:is([data-theme='dark'] *, [data-theme='nocturne'] *));
 
 /*
-  The default border color has changed to `currentcolor` in Tailwind CSS v4,
-  so we've added these compatibility styles to make sure everything still
-  looks the same as it did with Tailwind CSS v3.
-
-  If we ever want to remove these styles, we need to add an explicit border
-  color utility to any element that depends on these defaults.
+  The default border color changed to `currentcolor` in Tailwind 4, so this keeps
+  unstyled borders looking as they did. Removing it means adding an explicit
+  border colour utility everywhere that relies on the default.
 */
 @layer base {
     *,
@@ -32,7 +34,7 @@
     ::before,
     ::backdrop,
     ::file-selector-button {
-        border-color: var(--color-gray-200, currentcolor);
+        border-color: var(--color-border, currentcolor);
     }
 }
 
@@ -40,9 +42,7 @@
   This has to sit in `base`. Tailwind 4 emits its utilities inside
   `@layer utilities`, and unlayered CSS beats every cascade layer no matter how
   specific the layered rule is -- so as plain top level CSS this reset silently
-  won over every margin and padding utility in the app. Under Tailwind 3, which
-  emitted unlayered utilities, `.mx-\[12px\]` simply outranked `*` on
-  specificity and the same code was fine.
+  won over every margin and padding utility in the app.
 */
 @layer base {
     * {

@@ -46,7 +46,7 @@ export default function Updater() {
 
     return (
         <div
-            className={`${transparent ? 'bg-background/90' : 'bg-background'} h-screen ${osType === 'Linux' ? 'rounded-[10px] border-1 border-default-100' : ''}`}
+            className={`${transparent ? 'bg-background/90' : 'bg-background'} h-screen ${osType === 'Linux' ? 'rounded-[10px] border-1 border-border' : ''}`}
         >
             <Toaster />
             <div className='p-[5px] h-[35px] w-full select-none cursor-default'>
@@ -67,10 +67,10 @@ export default function Updater() {
                     {body === '' ? (
                         <div className='space-y-3'>
                             <Skeleton className='w-3/5 rounded-lg'>
-                                <div className='h-3 w-3/5 rounded-lg bg-default-200'></div>
+                                <div className='h-3 w-3/5 rounded-lg bg-default'></div>
                             </Skeleton>
                             <Skeleton className='w-4/5 rounded-lg'>
-                                <div className='h-3 w-4/5 rounded-lg bg-default-200'></div>
+                                <div className='h-3 w-4/5 rounded-lg bg-default'></div>
                             </Skeleton>
                             <Skeleton className='w-2/5 rounded-lg'>
                                 <div className='h-3 w-2/5 rounded-lg bg-default-300'></div>

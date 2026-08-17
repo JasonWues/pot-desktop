@@ -1,0 +1,61 @@
+/*
+  The light theme, carried over from the v2 `heroui({themes:{light:...}})` block
+  in tailwind.config.cjs. Same hex values, so the app looks the same; only the
+  token names changed.
+
+  How the v2 scale maps onto v3's named tokens:
+    content1 -> surface            content2 -> surface-secondary
+    content3 -> surface-tertiary   content4 -> background-tertiary
+    default-100 (borders)          -> border
+    default-200 (fills)            -> default / default-soft
+    default-400,500 (muted text)   -> muted
+    primary                        -> accent
+  `overlay` is v3's surface for floating things -- dropdowns, popovers, modals --
+  which in v2 were painted `content1`, so it takes that value rather than a new
+  one.
+*/
+@layer base {
+    :root,
+    [data-theme='light'] {
+        color-scheme: light;
+
+        --background: #ffffff;
+        --background-secondary: #eeeeee;
+        --background-tertiary: #bbbbbb;
+        --foreground: #181818;
+
+        --surface: #eeeeee;
+        --surface-foreground: #181818;
+        --surface-secondary: #dddddd;
+        --surface-secondary-foreground: #181818;
+        --surface-tertiary: #cccccc;
+        --surface-tertiary-foreground: #181818;
+        --surface-hover: #dddddd;
+
+        --overlay: #eeeeee;
+        --overlay-foreground: #181818;
+
+        --default: #aaaaaa;
+        --default-foreground: #181818;
+        --default-hover: #999999;
+        --default-soft: #cccccc;
+        --default-soft-foreground: #181818;
+
+        --muted: #686868;
+
+        --border: #cccccc;
+        --border-secondary: #aaaaaa;
+        --separator: #cccccc;
+
+        --accent: #3578e5;
+        --accent-foreground: #ffffff;
+        --accent-hover: #2a68d0;
+        --focus: #3578e5;
+        --link: #3578e5;
+
+        --field-background: #ffffff;
+        --field-foreground: #181818;
+        --field-placeholder: #686868;
+        --field-border: #cccccc;
+    }
+}

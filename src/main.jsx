@@ -1,6 +1,5 @@
 import { ThemeProvider as NextThemesProvider } from 'next-themes';
 import { attachConsole, error as logError } from '@tauri-apps/plugin-log';
-import { HeroUIProvider } from '@heroui/react';
 import ReactDOM from 'react-dom/client';
 import React from 'react';
 
@@ -41,15 +40,19 @@ async function bootstrap() {
     }
     const rootElement = document.getElementById('root');
     const root = ReactDOM.createRoot(rootElement);
+    // No provider wrapping the tree: v3 dropped `HeroUIProvider`, and the pieces
+    // it used to carry are opt-in (`I18nProvider`, `RouterProvider`,
+    // `ToastProvider`) rather than required. Nothing here needs them yet.
+    //
+    // `attribute='data-theme'`, not 'class': v3 selects a theme with a
+    // `data-theme` attribute on the root element rather than a class name.
     root.render(
-        <HeroUIProvider>
-            <NextThemesProvider
-                attribute='class'
-                themes={colorThemes}
-            >
-                <App />
-            </NextThemesProvider>
-        </HeroUIProvider>
+        <NextThemesProvider
+            attribute='data-theme'
+            themes={colorThemes}
+        >
+            <App />
+        </NextThemesProvider>
     );
 }
 

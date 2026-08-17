@@ -234,7 +234,7 @@ export default function Translate() {
     return (
         pluginList && (
             <div
-                className={`bg-background h-screen w-screen ${osType === 'Linux' ? 'rounded-[10px] border-1 border-default-100' : ''}`}
+                className={`bg-background h-screen w-screen ${osType === 'Linux' ? 'rounded-[10px] border-1 border-border' : ''}`}
             >
                 <div
                     className='fixed top-[5px] left-[5px] right-[5px] h-[30px]'
@@ -260,7 +260,7 @@ export default function Translate() {
                             setPined(!pined);
                         }}
                     >
-                        <BsPinFill className={`text-[20px] ${pined ? 'text-primary' : 'text-default-400'}`} />
+                        <BsPinFill className={`text-[20px] ${pined ? 'text-accent' : 'text-muted'}`} />
                     </Button>
                     <Button
                         isIconOnly
@@ -272,7 +272,7 @@ export default function Translate() {
                             void appWindow.close();
                         }}
                     >
-                        <AiFillCloseCircle className='text-[20px] text-default-400' />
+                        <AiFillCloseCircle className='text-[20px] text-muted' />
                     </Button>
                 </div>
                 <div className={`${osType === 'Linux' ? 'h-[calc(100vh-37px)]' : 'h-[calc(100vh-35px)]'} px-[8px]`}>

@@ -48,9 +48,9 @@ export default function LanguageArea() {
     return (
         <Card
             shadow='none'
-            className='bg-content2 h-[35px] rounded-[10px]'
+            className='bg-surface-secondary h-[35px] rounded-[10px]'
         >
-            <CardFooter className='bg-content2 flex justify-between p-0 rounded-[10px]'>
+            <CardFooter className='bg-surface-secondary flex justify-between p-0 rounded-[10px]'>
                 <div className='flex'>
                     {/* The preset only reaches the LLM-backed services; the rest
                         ignore it, so it sits with the languages rather than in
@@ -61,11 +61,11 @@ export default function LanguageArea() {
                                 isIconOnly={aiPreset === DEFAULT_PRESET}
                                 radius='sm'
                                 variant='light'
-                                className={aiPreset === DEFAULT_PRESET ? '' : 'text-primary'}
+                                className={aiPreset === DEFAULT_PRESET ? '' : 'text-accent'}
                                 startContent={aiPreset === DEFAULT_PRESET ? null : <LuWand className='text-[16px]' />}
                             >
                                 {aiPreset === DEFAULT_PRESET ? (
-                                    <LuWand className='text-[16px] text-default-400' />
+                                    <LuWand className='text-[16px] text-muted' />
                                 ) : (
                                     t(`translate.ai_preset.${aiPreset}`)
                                 )}

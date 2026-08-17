@@ -351,7 +351,7 @@ export default function TargetArea(props) {
         >
             <Toaster />
             <CardHeader
-                className={`flex justify-between py-1 px-0 bg-content2 h-[30px] ${hide ? 'rounded-[10px]' : 'rounded-t-[10px]'}`}
+                className={`flex justify-between py-1 px-0 bg-surface-secondary h-[30px] ${hide ? 'rounded-[10px]' : 'rounded-t-[10px]'}`}
                 {...drag}
             >
                 {/* current service instance and available service instance to change */}
@@ -450,7 +450,7 @@ export default function TargetArea(props) {
                             classNames={{
                                 base: 'my-auto ml-[20px]',
                                 wrapper: 'w-auto h-2 gap-1',
-                                dots: 'size-2 bg-default-500',
+                                dots: 'size-2 bg-muted',
                             }}
                         />
                     )}
@@ -497,14 +497,14 @@ export default function TargetArea(props) {
                                             <div key={nanoid()}>
                                                 {pronunciation['region'] && (
                                                     <span
-                                                        className={`text-[${appFontSize}px] mr-[12px] text-default-500`}
+                                                        className={`text-[${appFontSize}px] mr-[12px] text-muted`}
                                                     >
                                                         {pronunciation['region']}
                                                     </span>
                                                 )}
                                                 {pronunciation['symbol'] && (
                                                     <span
-                                                        className={`text-[${appFontSize}px] mr-[12px] text-default-500`}
+                                                        className={`text-[${appFontSize}px] mr-[12px] text-muted`}
                                                     >
                                                         {pronunciation['symbol']}
                                                     </span>
@@ -531,7 +531,7 @@ export default function TargetArea(props) {
                                                                 {index === 0 ? (
                                                                     <>
                                                                         <span
-                                                                            className={`text-[${appFontSize - 2}px] text-default-500 mr-[12px]`}
+                                                                            className={`text-[${appFontSize - 2}px] text-muted mr-[12px]`}
                                                                         >
                                                                             {explanations['trait']}
                                                                         </span>
@@ -544,7 +544,7 @@ export default function TargetArea(props) {
                                                                     </>
                                                                 ) : (
                                                                     <span
-                                                                        className={`text-[${appFontSize - 2}px] text-default-500 select-text mr-1`}
+                                                                        className={`text-[${appFontSize - 2}px] text-muted select-text mr-1`}
                                                                         key={nanoid()}
                                                                     >
                                                                         {explain}
@@ -561,7 +561,7 @@ export default function TargetArea(props) {
                                     result['associations'].map((association) => {
                                         return (
                                             <div key={nanoid()}>
-                                                <span className={`text-[${appFontSize}px] text-default-500`}>
+                                                <span className={`text-[${appFontSize}px] text-muted`}>
                                                     {association}
                                                 </span>
                                             </div>
@@ -587,7 +587,7 @@ export default function TargetArea(props) {
                                                 <>
                                                     {sentence['target'] && (
                                                         <div
-                                                            className={`text-[${appFontSize}px] select-text text-default-500`}
+                                                            className={`text-[${appFontSize}px] select-text text-muted`}
                                                             dangerouslySetInnerHTML={{
                                                                 __html: sentence['target'],
                                                             }}
@@ -615,7 +615,7 @@ export default function TargetArea(props) {
                         )}
                     </CardBody>
                     <CardFooter
-                        className={`bg-content1 rounded-none rounded-b-[10px] flex px-[12px] p-[5px] ${hide ? 'hidden' : ''}`}
+                        className={`bg-surface rounded-none rounded-b-[10px] flex px-[12px] p-[5px] ${hide ? 'hidden' : ''}`}
                     >
                         <ButtonGroup>
                             {/* speak button */}

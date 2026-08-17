@@ -1,20 +1,81 @@
 /*
-  Nocturne -- the visual layer.
+  Nocturne -- obsidian glass over a drifting aurora, lit by violet and magenta.
 
-  The palette itself is a normal HeroUI theme (see tailwind.config.cjs), so every
-  `bg-content1` / `text-default-500` / `border-default-100` already in the app
-  recolours on its own. This file only adds what a colour token cannot express:
-  the aurora behind the window, the glass the panels are cut from, the glow on
-  the accent, the grain over everything.
+  The palette is a normal v3 theme block, so every `bg-surface` / `text-muted` /
+  `border-border` already in the app recolours on its own. The rest of this file
+  adds what a colour token cannot express: the aurora behind the window, the
+  glass the panels are cut from, the glow on the accent, the grain over
+  everything.
 
-  LAYER ORDER MATTERS. HeroUI's plugin emits `.dark { --heroui-* }` alongside
-  Tailwind's utilities, and every surface this file restyles (`.bg-content1`,
-  `.border-default-100`) is a utility. A cascade layer that sits before
-  `utilities` would lose no matter how specific its selectors are -- the same
-  trap that ate `.config-item`'s margin. So `nocturne` is declared LAST, after
-  `utilities`, and it is the only layer in the app allowed to sit there.
+  LAYER ORDER MATTERS. Every surface this file restyles (`.bg-surface`,
+  `.border-border`) is a Tailwind utility, and a cascade layer before `utilities`
+  loses to one no matter how specific its selectors are. `nocturne` is declared
+  LAST and is the only layer in the app allowed to sit after `utilities`.
+
+  v3 note: the theme variables are complete colour values, where v2's
+  `--heroui-*` were bare HSL triplets meant to be wrapped in `hsl(...)`. So
+  translucency is `color-mix(in oklab, var(--x) N%, transparent)` rather than
+  `hsl(var(--x) / 0.N)`.
 */
 @layer theme, base, components, utilities, nocturne;
+
+@layer base {
+    [data-theme='nocturne'] {
+        color-scheme: dark;
+
+        --background: #08080f;
+        --background-secondary: #0f0f1c;
+        --background-tertiary: #282847;
+        --foreground: #eae8fa;
+
+        --surface: #0f0f1c;
+        --surface-foreground: #eae8fa;
+        --surface-secondary: #16162a;
+        --surface-secondary-foreground: #eae8fa;
+        --surface-tertiary: #1e1e38;
+        --surface-tertiary-foreground: #eae8fa;
+        --surface-hover: #16162a;
+
+        --overlay: #0f0f1c;
+        --overlay-foreground: #eae8fa;
+
+        --default: #242440;
+        --default-foreground: #eae8fa;
+        --default-hover: #333355;
+        --default-soft: #191930;
+        --default-soft-foreground: #eae8fa;
+
+        --muted: #8b88b8;
+
+        --border: #191930;
+        --border-secondary: #242440;
+        --separator: #191930;
+
+        --accent: #7b61ff;
+        --accent-foreground: #ffffff;
+        --accent-hover: #9179ff;
+        --focus: #7b61ff;
+        --link: #7b61ff;
+
+        --success: #2ce8b4;
+        --success-foreground: #04140f;
+        --warning: #ffc247;
+        --warning-foreground: #1a1204;
+        --danger: #ff4d6d;
+        --danger-foreground: #ffffff;
+
+        --field-background: #0f0f1c;
+        --field-foreground: #eae8fa;
+        --field-placeholder: #8b88b8;
+        --field-border: #242440;
+
+        /* Sharp corners read as deliberate next to the soft aurora behind them. */
+        --radius: 0.3rem;
+        --field-radius: 0.3rem;
+        --border-width: 1px;
+        --disabled-opacity: 0.35;
+    }
+}
 
 @layer nocturne {
     /* ---------------------------------------------------------------- aurora */
@@ -30,20 +91,19 @@
       out against the viewport and escapes that clip, so it has to round itself
       or it squares off the window's corners.
     */
-    .nocturne body::before {
+    [data-theme='nocturne'] body::before {
         content: '';
         position: fixed;
         inset: 0;
         z-index: -1;
         border-radius: 10px;
         pointer-events: none;
-        background-color: hsl(var(--heroui-background));
+        background-color: var(--background);
         /*
           Sized in percentages, not rem. pot's windows run from a 460px translate
           popup to an 800px settings window, and absolute blob sizes meant a
           single 34rem gradient swallowed the small one whole -- one flat magenta
-          wash instead of a composition. Percentages keep the same four-blob
-          arrangement at every window size.
+          wash instead of a composition.
         */
         background-image:
             radial-gradient(90% 65% at 12% 8%, rgb(123 97 255 / 0.4), transparent 62%),
@@ -51,8 +111,6 @@
             radial-gradient(85% 70% at 72% 96%, rgb(44 232 180 / 0.2), transparent 64%),
             radial-gradient(65% 55% at 4% 88%, rgb(93 122 255 / 0.28), transparent 58%);
         background-repeat: no-repeat;
-        /* Blur keeps the blobs from reading as four distinct circles; the scale
-           hides the soft edges the blur leaves at the viewport boundary. */
         filter: blur(38px) saturate(150%);
         transform: scale(1.25);
         animation: nocturne-aurora 32s ease-in-out infinite alternate;
@@ -77,7 +135,7 @@
       mid-tones and lets it bite only in the dark areas, which is where flat
       gradients band. pointer-events must stay none -- this covers every control.
     */
-    .nocturne body::after {
+    [data-theme='nocturne'] body::after {
         content: '';
         position: fixed;
         inset: 0;
@@ -100,15 +158,14 @@
       right pane would push it off the titlebar and kill window dragging. The
       aurora underneath is already blurred by 38px, so translucency alone gets
       the depth; only the surfaces with no fixed children get the real filter.
-    */
-    /*
+
       The alphas are tuned against each other, not picked individually: the gap
       between two cards shows `bg-background` over the same aurora the cards sit
       on, so too large a gap between these two values turns every seam into a
       bright horizontal stripe.
     */
-    .nocturne .bg-background {
-        background-color: hsl(var(--heroui-background) / 0.68);
+    [data-theme='nocturne'] .bg-background {
+        background-color: color-mix(in oklab, var(--background) 68%, transparent);
     }
 
     /*
@@ -117,49 +174,48 @@
       build target needs, so an authored prefix made it emit ONLY the legacy
       property -- and Chrome 151 has dropped `-webkit-backdrop-filter` entirely
       (CSS.supports() returns false), which silently killed the blur in WebView2.
-      Left unprefixed, the windows target gets the standard property and the
-      safari11 target gets both.
     */
-    .nocturne .bg-content1 {
-        background-color: hsl(var(--heroui-content1) / 0.68);
+    [data-theme='nocturne'] .bg-surface {
+        background-color: color-mix(in oklab, var(--surface) 68%, transparent);
         backdrop-filter: blur(24px) saturate(160%);
     }
 
     /* The Config sidebar and Updater ask for `bg-background/90` explicitly; left
        at 90% it reads as a flat slab against the glass beside it. Neither holds
        a fixed child, so both can take the filter. */
-    .nocturne .bg-background\/90 {
-        background-color: hsl(var(--heroui-background) / 0.55);
+    [data-theme='nocturne'] .bg-background\/90 {
+        background-color: color-mix(in oklab, var(--background) 55%, transparent);
         backdrop-filter: blur(28px) saturate(160%);
     }
 
     /* Hairlines, lit rather than drawn: a violet edge at ~10% reads as a plane
        boundary instead of a border. */
-    .nocturne .border-default-100 {
+    [data-theme='nocturne'] .border-border {
         border-color: rgb(158 140 255 / 0.16);
     }
 
-    .nocturne .border-default-200 {
+    [data-theme='nocturne'] .border-border-secondary {
         border-color: rgb(158 140 255 / 0.24);
     }
 
-    .nocturne .divider,
-    .nocturne [role='separator'] {
+    [data-theme='nocturne'] [role='separator'] {
         background-color: rgb(158 140 255 / 0.16);
     }
 
     /* ------------------------------------------------------------ the accent */
 
     /*
-      Primary stops being a flat fill and becomes a violet -> magenta ramp with
+      The accent stops being a flat fill and becomes a violet -> magenta ramp with
       the light bleeding past the edge. `background-image` rather than
       `background-color` so the token stays the fallback everywhere else.
     */
-    .nocturne .bg-primary {
+    [data-theme='nocturne'] .bg-accent {
         background-image: linear-gradient(135deg, #7b61ff 0%, #9d5cff 48%, #ff3ea5 100%);
         box-shadow:
             inset 0 1px 0 0 rgb(255 255 255 / 0.18),
             0 6px 24px -8px rgb(123 97 255 / 0.75);
+        position: relative;
+        overflow: hidden;
     }
 
     /*
@@ -168,12 +224,7 @@
       the gradient fill that is the thing it is supposed to be sweeping across.
       Painting over the label is correct -- that is what a highlight does.
     */
-    .nocturne .bg-primary {
-        position: relative;
-        overflow: hidden;
-    }
-
-    .nocturne .bg-primary::after {
+    [data-theme='nocturne'] .bg-accent::after {
         content: '';
         position: absolute;
         inset: 0;
@@ -183,26 +234,26 @@
         transition: transform 0s;
     }
 
-    .nocturne .bg-primary:hover::after {
+    [data-theme='nocturne'] .bg-accent:hover::after {
         transform: translateX(120%);
         /* The long ease-out is the whole effect -- it should read as light
            travelling across the surface, not as a fade. */
         transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    .nocturne .text-primary {
+    [data-theme='nocturne'] .text-accent {
         color: #a48dff;
         text-shadow: 0 0 18px rgb(123 97 255 / 0.55);
     }
 
     /* Focus is the one place the theme is allowed to shout. */
-    .nocturne *:focus-visible {
+    [data-theme='nocturne'] *:focus-visible {
         outline: 1px solid rgb(123 97 255 / 0.9);
         outline-offset: 2px;
         box-shadow: 0 0 0 4px rgb(123 97 255 / 0.18);
     }
 
-    .nocturne ::selection {
+    [data-theme='nocturne'] ::selection {
         background: rgb(255 62 165 / 0.35);
         color: #ffffff;
     }
@@ -211,12 +262,10 @@
 
     /*
       Optical tightening, not a font swap -- the app's family is user-configurable
-      from Settings and this theme must not fight that choice. Negative tracking
-      at display sizes is what makes a UI title read as typeset rather than
-      defaulted.
+      from Settings and this theme must not fight that choice.
     */
-    .nocturne h1,
-    .nocturne h2 {
+    [data-theme='nocturne'] h1,
+    [data-theme='nocturne'] h2 {
         letter-spacing: -0.035em;
         font-weight: 600;
         background-image: linear-gradient(96deg, #ffffff 0%, #cdc2ff 42%, #ff9ed2 100%);
@@ -225,19 +274,19 @@
         color: transparent;
     }
 
-    .nocturne h3,
-    .nocturne h4 {
+    [data-theme='nocturne'] h3,
+    [data-theme='nocturne'] h4 {
         letter-spacing: -0.012em;
     }
 
     /* ------------------------------------------------------------- scrollbar */
 
-    .nocturne *::-webkit-scrollbar-thumb {
+    [data-theme='nocturne'] *::-webkit-scrollbar-thumb {
         background: linear-gradient(180deg, rgb(123 97 255 / 0.85), rgb(255 62 165 / 0.7));
         border-radius: 5px;
     }
 
-    .nocturne *::-webkit-scrollbar-thumb:hover {
+    [data-theme='nocturne'] *::-webkit-scrollbar-thumb:hover {
         background: linear-gradient(180deg, rgb(145 121 255 / 1), rgb(255 100 183 / 0.9));
     }
 
@@ -245,7 +294,7 @@
 
     /* One settle on mount. #root is created once per window, so this plays on
        open and never again -- it is the window arriving, not a transition. */
-    .nocturne #root {
+    [data-theme='nocturne'] #root {
         animation: nocturne-arrive 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
     }
 
@@ -266,16 +315,16 @@
       leave the untransformed box with its blurred edges inside the viewport.
     */
     @media (prefers-reduced-motion: reduce) {
-        .nocturne body::before {
+        [data-theme='nocturne'] body::before {
             animation: none;
             transform: scale(1.25);
         }
 
-        .nocturne #root {
+        [data-theme='nocturne'] #root {
             animation: none;
         }
 
-        .nocturne .bg-primary::after {
+        [data-theme='nocturne'] .bg-accent::after {
             display: none;
         }
     }

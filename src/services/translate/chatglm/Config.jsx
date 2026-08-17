@@ -127,9 +127,9 @@ export function Config(props) {
                 </div>
 
                 <h3 className='my-auto'>Prompt List</h3>
-                <p className='text-[10px] text-default-700'>{t('services.translate.chatglm.prompt_description')}</p>
+                <p className='text-[10px] text-foreground'>{t('services.translate.chatglm.prompt_description')}</p>
 
-                <div className='bg-content2 rounded-[10px] p-3'>
+                <div className='bg-surface-secondary rounded-[10px] p-3'>
                     {serviceConfig.promptList &&
                         serviceConfig.promptList.map((prompt, index) => {
                             return (

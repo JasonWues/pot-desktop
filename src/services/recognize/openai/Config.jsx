@@ -138,7 +138,7 @@ export function Config(props) {
                     />
                 </div>
                 <h3 className='my-auto'>Prompt</h3>
-                <p className='text-[10px] text-default-700'>{t('services.recognize.openai_ocr.prompt_description')}</p>
+                <p className='text-[10px] text-foreground'>{t('services.recognize.openai_ocr.prompt_description')}</p>
                 <div className={'config-item'}>
                     <Textarea
                         label='system'

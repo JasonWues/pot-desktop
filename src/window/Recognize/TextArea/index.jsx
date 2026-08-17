@@ -134,17 +134,17 @@ export default function TextArea(props) {
     return (
         <Card
             shadow='none'
-            className='bg-content1 h-full ml-[6px] mr-[12px]'
+            className='bg-surface h-full ml-[6px] mr-[12px]'
             radius='10'
         >
-            <CardBody className='bg-content1 p-0 h-full'>
+            <CardBody className='bg-surface p-0 h-full'>
                 {loading ? (
                     <div className='space-y-3 m-[12px]'>
                         <Skeleton className='w-3/5 rounded-lg'>
-                            <div className='h-3 w-3/5 rounded-lg bg-default-200'></div>
+                            <div className='h-3 w-3/5 rounded-lg bg-default'></div>
                         </Skeleton>
                         <Skeleton className='w-4/5 rounded-lg'>
-                            <div className='h-3 w-4/5 rounded-lg bg-default-200'></div>
+                            <div className='h-3 w-4/5 rounded-lg bg-default'></div>
                         </Skeleton>
                         <Skeleton className='w-2/5 rounded-lg'>
                             <div className='h-3 w-2/5 rounded-lg bg-default-300'></div>
@@ -155,7 +155,7 @@ export default function TextArea(props) {
                         {text && (
                             <textarea
                                 value={text}
-                                className='bg-content1 h-full m-[12px] mb-0 resize-none focus:outline-hidden'
+                                className='bg-surface h-full m-[12px] mb-0 resize-none focus:outline-hidden'
                                 onChange={(e) => {
                                     setText(e.target.value);
                                 }}
@@ -165,7 +165,7 @@ export default function TextArea(props) {
                             <textarea
                                 value={error}
                                 readOnly
-                                className='bg-content1 h-full m-[12px] mb-0 resize-none focus:outline-hidden text-red-500'
+                                className='bg-surface h-full m-[12px] mb-0 resize-none focus:outline-hidden text-red-500'
                                 onChange={(e) => {
                                     setText(e.target.value);
                                 }}
@@ -174,7 +174,7 @@ export default function TextArea(props) {
                     </>
                 )}
             </CardBody>
-            <CardFooter className='bg-content1 flex justify-start px-[12px]'>
+            <CardFooter className='bg-surface flex justify-start px-[12px]'>
                 <ButtonGroup>
                     <Tooltip content={t('recognize.copy_text')}>
                         <Button
