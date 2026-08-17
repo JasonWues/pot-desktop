@@ -210,17 +210,24 @@ export default function Backup() {
                     )}
                 </div>
                 <div className={backupType !== 'webdav' ? 'hidden' : ''}>
+                    {/* aria-label rather than a <Label> child, for all three rows below.
+                        These already name themselves with the <h3> to their left; v2 named
+                        them twice too, but its `label` prop defaulted to `labelPlacement:
+                        'inside'`, so the second copy floated inside the empty field as a
+                        placeholder and vanished on input. v3's Label is a real sibling
+                        element, which put a second full-size label between the heading and
+                        the box. */}
                     <div className='config-item'>
                         <h3 className='my-auto'>{t('config.backup.webdav_url')}</h3>
                         {davUrl !== null && (
                             <TextField
-                                className='flex w-full flex-row items-center justify-between max-w-[300px]'
+                                aria-label={t('config.backup.webdav_url')}
+                                className='flex w-full flex-row items-center justify-end max-w-[300px]'
                                 value={davUrl}
                                 onChange={(v) => {
                                     setDavUrl(v);
                                 }}
                             >
-                                <Label className='text-base my-auto'>{t('config.backup.webdav_url')}</Label>
                                 <Input />
                             </TextField>
                         )}
@@ -229,13 +236,13 @@ export default function Backup() {
                         <h3 className='my-auto'>{t('config.backup.username')}</h3>
                         {davUserName !== null && (
                             <TextField
-                                className='flex w-full flex-row items-center justify-between max-w-[300px]'
+                                aria-label={t('config.backup.username')}
+                                className='flex w-full flex-row items-center justify-end max-w-[300px]'
                                 value={davUserName}
                                 onChange={(v) => {
                                     setDavUserName(v);
                                 }}
                             >
-                                <Label className='text-base my-auto'>{t('config.backup.username')}</Label>
                                 <Input />
                             </TextField>
                         )}
@@ -244,13 +251,13 @@ export default function Backup() {
                         <h3 className='my-auto'>{t('config.backup.password')}</h3>
                         {davPassword !== null && (
                             <TextField
-                                className='flex w-full flex-row items-center justify-between max-w-[300px]'
+                                aria-label={t('config.backup.password')}
+                                className='flex w-full flex-row items-center justify-end max-w-[300px]'
                                 value={davPassword}
                                 onChange={(v) => {
                                     setDavPassword(v);
                                 }}
                             >
-                                <Label className='text-base my-auto'>{t('config.backup.password')}</Label>
                                 <Input type='password' />
                             </TextField>
                         )}
