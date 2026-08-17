@@ -11,8 +11,8 @@ export function Config(props) {
             <div>{t('services.no_need')}</div>
             <div>
                 <Button
+                    variant='primary'
                     fullWidth
-                    color='primary'
                     onPress={() => {
                         updateServiceList('ecdict');
                         onClose();

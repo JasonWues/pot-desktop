@@ -75,13 +75,18 @@ export async function translate(text, from, to, options = {}) {
             const reader = res.body.getReader();
             try {
                 let temp = '';
+                // One decoder for the whole stream, in streaming mode: a chunk
+                // boundary can fall inside a multi byte character, and decoding
+                // each chunk on its own turns that character into U+FFFD in the
+                // accumulated result, not just in the partial being shown.
+                const decoder = new TextDecoder();
                 while (true) {
                     const { done, value } = await reader.read();
                     if (done) {
                         setResult(target.trim());
                         return target.trim();
                     }
-                    const str = temp + new TextDecoder().decode(value).replaceAll(/\s+/g, ' ');
+                    const str = temp + decoder.decode(value, { stream: true }).replaceAll(/\s+/g, ' ');
                     const matchs = str.match(/{ \"text\": \".*\" } ],/);
                     if (matchs) {
                         for (let match of matchs) {

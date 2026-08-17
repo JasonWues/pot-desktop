@@ -1,12 +1,8 @@
 import { INSTANCE_NAME_CONFIG_KEY } from '../../../utils/service_instance';
 import InstanceNameInput from '../../../components/InstanceNameInput';
-import { DropdownTrigger } from '@heroui/react';
-import { Input, Button } from '@heroui/react';
-import { DropdownMenu } from '@heroui/react';
-import { DropdownItem } from '@heroui/react';
+import { Input, Button, Dropdown, Label, TextField } from '@heroui/react';
 import toast, { Toaster } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { Dropdown } from '@heroui/react';
 import { open } from '@tauri-apps/plugin-shell';
 import React, { useState } from 'react';
 
@@ -83,72 +79,67 @@ export function Config(props) {
                 <div className='config-item'>
                     <h3 className='my-auto'>{t('services.translate.deepl.type')}</h3>
                     <Dropdown>
-                        <DropdownTrigger>
-                            <Button variant='bordered'>{t(`services.translate.baidu_field.${config.field}`)}</Button>
-                        </DropdownTrigger>
-                        <DropdownMenu
-                            autoFocus='first'
-                            aria-label='app language'
-                            className='max-h-[50vh] overflow-y-auto'
-                            onAction={(key) => {
-                                setConfig({
-                                    ...config,
-                                    field: key,
-                                });
-                            }}
-                        >
-                            {fieldList.map((item) => {
-                                return (
-                                    <DropdownItem key={item}>
-                                        {t(`services.translate.baidu_field.${item}`)}
-                                    </DropdownItem>
-                                );
-                            })}
-                        </DropdownMenu>
+                        <Button variant='outline'>{t(`services.translate.baidu_field.${config.field}`)}</Button>
+                        <Dropdown.Popover>
+                            <Dropdown.Menu
+                                autoFocus='first'
+                                aria-label='app language'
+                                className='max-h-[50vh] overflow-y-auto'
+                                onAction={(key) => {
+                                    setConfig({
+                                        ...config,
+                                        field: key,
+                                    });
+                                }}
+                            >
+                                {fieldList.map((item) => {
+                                    return (
+                                        <Dropdown.Item
+                                            key={item}
+                                            id={item}
+                                        >
+                                            {t(`services.translate.baidu_field.${item}`)}
+                                        </Dropdown.Item>
+                                    );
+                                })}
+                            </Dropdown.Menu>
+                        </Dropdown.Popover>
                     </Dropdown>
                 </div>
                 <div className={'config-item'}>
-                    <Input
-                        label={t('services.translate.baidu.appid')}
-                        labelPlacement='outside-left'
+                    <TextField
+                        className='flex w-full flex-row items-center justify-between'
                         value={config['appid']}
-                        variant='bordered'
-                        classNames={{
-                            base: 'justify-between',
-                            label: 'text-(length:--heroui-font-size-medium)',
-                            mainWrapper: 'max-w-[50%]',
-                        }}
-                        onValueChange={(value) => {
+                        onChange={(value) => {
                             setConfig({
                                 ...config,
                                 appid: value,
                             });
                         }}
-                    />
+                    >
+                        <Label className='text-base my-auto'>{t('services.translate.baidu.appid')}</Label>
+                        <Input className='max-w-[50%]' />
+                    </TextField>
                 </div>
                 <div className={'config-item'}>
-                    <Input
-                        label={t('services.translate.baidu.secret')}
-                        labelPlacement='outside-left'
+                    <TextField
+                        className='flex w-full flex-row items-center justify-between'
                         value={config['secret']}
-                        variant='bordered'
-                        classNames={{
-                            base: 'justify-between',
-                            label: 'text-(length:--heroui-font-size-medium)',
-                            mainWrapper: 'max-w-[50%]',
-                        }}
-                        onValueChange={(value) => {
+                        onChange={(value) => {
                             setConfig({
                                 ...config,
                                 secret: value,
                             });
                         }}
-                    />
+                    >
+                        <Label className='text-base my-auto'>{t('services.translate.baidu.secret')}</Label>
+                        <Input className='max-w-[50%]' />
+                    </TextField>
                 </div>
                 <Button
+                    variant='primary'
                     type='submit'
-                    isLoading={isLoading}
-                    color='primary'
+                    isPending={isLoading}
                     fullWidth
                 >
                     {t('common.save')}

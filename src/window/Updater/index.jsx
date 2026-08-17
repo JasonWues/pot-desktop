@@ -1,4 +1,4 @@
-import { Code, Card, CardBody, Button, Progress, Skeleton } from '@heroui/react';
+import { Code, Card, CardContent, Button, ProgressBar, Skeleton } from '@heroui/react';
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 import React, { useEffect, useState } from 'react';
 import { relaunch } from '@tauri-apps/plugin-process';
@@ -46,7 +46,7 @@ export default function Updater() {
 
     return (
         <div
-            className={`${transparent ? 'bg-background/90' : 'bg-background'} h-screen ${osType === 'Linux' ? 'rounded-[10px] border-1 border-default-100' : ''}`}
+            className={`${transparent ? 'bg-background/90' : 'bg-background'} h-screen ${osType === 'Linux' ? 'rounded-[10px] border-1 border-border' : ''}`}
         >
             <Toaster />
             <div className='p-[5px] h-[35px] w-full select-none cursor-default'>
@@ -63,14 +63,14 @@ export default function Updater() {
                 </div>
             </div>
             <Card className='mx-[80px] mt-[10px] overscroll-auto h-[calc(100vh-150px)]'>
-                <CardBody>
+                <CardContent>
                     {body === '' ? (
                         <div className='space-y-3'>
                             <Skeleton className='w-3/5 rounded-lg'>
-                                <div className='h-3 w-3/5 rounded-lg bg-default-200'></div>
+                                <div className='h-3 w-3/5 rounded-lg bg-default'></div>
                             </Skeleton>
                             <Skeleton className='w-4/5 rounded-lg'>
-                                <div className='h-3 w-4/5 rounded-lg bg-default-200'></div>
+                                <div className='h-3 w-4/5 rounded-lg bg-default'></div>
                             </Skeleton>
                             <Skeleton className='w-2/5 rounded-lg'>
                                 <div className='h-3 w-2/5 rounded-lg bg-default-300'></div>
@@ -121,31 +121,33 @@ export default function Updater() {
                             </ReactMarkdown>
                         </div>
                     )}
-                </CardBody>
+                </CardContent>
             </Card>
+            {/* v3 has no `label`, `showValueLabel` or `classNames` here: the label
+                and the percentage are markup, and each former slot is a className
+                on the part it used to name. `ProgressBar.Output` renders the value
+                that `showValueLabel` used to switch on. */}
             {downloaded !== 0 && (
-                <Progress
+                <ProgressBar
                     aria-label='Downloading...'
-                    label={t('updater.progress')}
                     value={(downloaded / total) * 100}
-                    classNames={{
-                        base: 'w-full px-[80px]',
-                        track: 'drop-shadow-md border border-default',
-                        indicator: 'bg-linear-to-r from-pink-500 to-yellow-500',
-                        label: 'tracking-wider font-medium text-default-600',
-                        value: 'text-foreground/60',
-                    }}
-                    showValueLabel
-                    size='sm'
-                />
+                    className='w-full px-[80px]'
+                >
+                    <div className='flex justify-between'>
+                        <span className='tracking-wider font-medium text-muted'>{t('updater.progress')}</span>
+                        <ProgressBar.Output className='text-foreground/60' />
+                    </div>
+                    <ProgressBar.Track className='drop-shadow-md border border-default'>
+                        <ProgressBar.Fill className='bg-linear-to-r from-pink-500 to-yellow-500' />
+                    </ProgressBar.Track>
+                </ProgressBar>
             )}
 
             <div className='grid gap-4 grid-cols-2 h-[50px] my-[10px] mx-[80px]'>
                 <Button
-                    variant='flat'
-                    isLoading={downloaded !== 0}
+                    variant='tertiary'
+                    isPending={downloaded !== 0}
                     isDisabled={downloaded !== 0}
-                    color='primary'
                     onPress={() => {
                         if (pendingUpdate === null) {
                             toast.error(t('updater.latest'), { style: toastStyle });
@@ -159,7 +161,7 @@ export default function Updater() {
                                     case 'Started':
                                         setTotal(event.data.contentLength);
                                         break;
-                                    case 'Progress':
+                                    case 'ProgressBar':
                                         setDownloaded((a) => {
                                             return a + event.data.chunkLength;
                                         });
@@ -186,8 +188,7 @@ export default function Updater() {
                         : t('updater.update')}
                 </Button>
                 <Button
-                    variant='flat'
-                    color='danger'
+                    variant='danger-soft'
                     onPress={() => {
                         appWindow.close();
                     }}

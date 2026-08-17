@@ -1,6 +1,6 @@
 import { INSTANCE_NAME_CONFIG_KEY } from '../../../utils/service_instance';
 import InstanceNameInput from '../../../components/InstanceNameInput';
-import { Button, Input } from '@heroui/react';
+import { Button, Input, Label, TextField } from '@heroui/react';
 import { open } from '@tauri-apps/plugin-shell';
 import React, { useState } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
@@ -66,47 +66,39 @@ export function Config(props) {
                     </Button>
                 </div>
                 <div className={'config-item'}>
-                    <Input
-                        label={t('services.recognize.baidu_img_ocr.appid')}
-                        labelPlacement='outside-left'
+                    <TextField
+                        className='flex w-full flex-row items-center justify-between'
                         value={config['appid']}
-                        variant='bordered'
-                        classNames={{
-                            base: 'justify-between',
-                            label: 'text-(length:--heroui-font-size-medium)',
-                            mainWrapper: 'max-w-[50%]',
-                        }}
-                        onValueChange={(value) => {
+                        onChange={(value) => {
                             setConfig({
                                 ...config,
                                 appid: value,
                             });
                         }}
-                    />
+                    >
+                        <Label className='text-base my-auto'>{t('services.recognize.baidu_img_ocr.appid')}</Label>
+                        <Input className='max-w-[50%]' />
+                    </TextField>
                 </div>
                 <div className={'config-item'}>
-                    <Input
-                        label={t('services.recognize.baidu_img_ocr.secret')}
-                        labelPlacement='outside-left'
+                    <TextField
+                        className='flex w-full flex-row items-center justify-between'
                         value={config['secret']}
-                        variant='bordered'
-                        classNames={{
-                            base: 'justify-between',
-                            label: 'text-(length:--heroui-font-size-medium)',
-                            mainWrapper: 'max-w-[50%]',
-                        }}
-                        onValueChange={(value) => {
+                        onChange={(value) => {
                             setConfig({
                                 ...config,
                                 secret: value,
                             });
                         }}
-                    />
+                    >
+                        <Label className='text-base my-auto'>{t('services.recognize.baidu_img_ocr.secret')}</Label>
+                        <Input className='max-w-[50%]' />
+                    </TextField>
                 </div>
                 <Button
+                    variant='primary'
                     type='submit'
-                    isLoading={isLoading}
-                    color='primary'
+                    isPending={isLoading}
                     fullWidth
                 >
                     {t('common.save')}

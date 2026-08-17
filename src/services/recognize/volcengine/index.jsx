@@ -1,5 +1,5 @@
+import { hmacSha256, sha256, toHex } from '../../../utils/crypto';
 import { fetch, Body } from '../../../utils/http';
-import CryptoJS from 'crypto-js';
 
 export async function recognize(base64, language, options = {}) {
     const { config } = options;
@@ -42,7 +42,7 @@ async function query(img_base64, action, serviceVersion, appid, secret) {
     let body = `image_base64=${encodeURIComponent(
         img_base64
     )}&approximate_pixel=${approximate_pixel}&mode=${mode}&filter_thresh=${filter_thresh}`;
-    let body_hash = CryptoJS.SHA256(body).toString(CryptoJS.enc.Hex);
+    let body_hash = toHex(sha256(body));
 
     // Header X-Date
     let today = new Date();
@@ -109,15 +109,18 @@ async function query(img_base64, action, serviceVersion, appid, secret) {
         md['signed_headers'] +
         '\n' +
         body_hash;
-    let hashed_canon_req = CryptoJS.SHA256(canoncial_request).toString(CryptoJS.enc.Hex);
+    let hashed_canon_req = toHex(sha256(canoncial_request));
 
-    let kdate = CryptoJS.HmacSHA256(md['date'], secret);
-    let kregion = CryptoJS.HmacSHA256(md['region'], kdate);
-    let kservice = CryptoJS.HmacSHA256(md['service'], kregion);
-    let signing_key = CryptoJS.HmacSHA256('request', kservice);
+    // Key first, message second -- the reverse of crypto-js's HmacSHA256. Each
+    // step of the chain keys the next one on the previous digest, which arrives
+    // as a Uint8Array now rather than a WordArray and is passed straight through.
+    let kdate = hmacSha256(secret, md['date']);
+    let kregion = hmacSha256(kdate, md['region']);
+    let kservice = hmacSha256(kregion, md['service']);
+    let signing_key = hmacSha256(kservice, 'request');
 
     let signing_str = md['algorithm'] + '\n' + xDate + '\n' + md['credential_scope'] + '\n' + hashed_canon_req;
-    let sign = CryptoJS.HmacSHA256(signing_str, signing_key).toString(CryptoJS.enc.Hex);
+    let sign = toHex(hmacSha256(signing_key, signing_str));
     headers['Authorization'] =
         md['algorithm'] +
         ' Credential=' +

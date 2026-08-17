@@ -1,5 +1,6 @@
 import { RxDragHandleHorizontal } from 'react-icons/rx';
-import { Spacer, Button } from '@heroui/react';
+import Spacer from '../../../../../../components/Spacer';
+import { Button } from '@heroui/react';
 import { MdDeleteOutline } from 'react-icons/md';
 import { useTranslation } from 'react-i18next';
 import { BiSolidEdit } from 'react-icons/bi';
@@ -28,7 +29,7 @@ export default function ServiceItem(props) {
         <></>
     ) : (
         serviceInstanceConfig !== null && (
-            <div className='bg-content2 rounded-md px-[10px] py-[20px] flex justify-between'>
+            <div className='bg-surface-secondary rounded-md px-[10px] py-[20px] flex justify-between'>
                 <div className='flex'>
                     <div
                         {...drag}
@@ -71,7 +72,7 @@ export default function ServiceItem(props) {
                     <Button
                         isIconOnly
                         size='sm'
-                        variant='light'
+                        variant='tertiary'
                         onPress={() => {
                             setCurrentConfigKey(serviceInstanceKey);
                             onConfigOpen();
@@ -83,8 +84,7 @@ export default function ServiceItem(props) {
                     <Button
                         isIconOnly
                         size='sm'
-                        variant='light'
-                        color='danger'
+                        variant='danger-soft'
                         onPress={() => {
                             deleteServiceInstance(serviceInstanceKey);
                         }}

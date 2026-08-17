@@ -1,7 +1,5 @@
-import hmacSHA256 from 'crypto-js/hmac-sha256';
+import { hmacSha256, sha256 as sha256Hash, toHex } from '../../../utils/crypto';
 import { fetch } from '../../../utils/http';
-import hashSHA256 from 'crypto-js/sha256';
-import hex from 'crypto-js/enc-hex';
 import { nanoid } from 'nanoid';
 
 export async function recognize(base64, language, options = {}) {
@@ -10,11 +8,14 @@ export async function recognize(base64, language, options = {}) {
     const { secret_key, secret_id } = config;
 
     function sha256(message, secret = '') {
-        return hmacSHA256(message, secret);
+        // The arguments swap on the way through: crypto-js's HmacSHA256 took the
+        // message first, `hmacSha256` takes the key first. This helper keeps its
+        // own (message, secret) shape, so its callers below are unchanged.
+        return hmacSha256(secret, message);
     }
 
     function getHash(message) {
-        return hashSHA256(message).toString();
+        return toHex(sha256Hash(message));
     }
 
     function getDate(timestamp) {
@@ -78,7 +79,7 @@ export async function recognize(base64, language, options = {}) {
     const kDate = sha256(date, 'TC3' + secret_key);
     const kService = sha256(service, kDate);
     const kSigning = sha256('tc3_request', kService);
-    const signature = hex.stringify(sha256(stringToSign, kSigning));
+    const signature = toHex(sha256(stringToSign, kSigning));
 
     // ************* 步骤 4：拼接 Authorization *************
     const authorization =

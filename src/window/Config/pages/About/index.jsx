@@ -1,4 +1,4 @@
-import { Divider, Button, Popover, PopoverTrigger, PopoverContent, Tooltip } from '@heroui/react';
+import { Separator, Button, Popover, PopoverTrigger, PopoverContent, Tooltip } from '@heroui/react';
 import { appLogDir, appConfigDir } from '@tauri-apps/api/path';
 import { useTranslation } from 'react-i18next';
 import { open } from '@tauri-apps/plugin-shell';
@@ -23,10 +23,10 @@ export default function About() {
             <div className='content-center'>
                 <h1 className='font-bold text-2xl text-center'>Pot</h1>
                 <p className='text-center text-sm text-gray-500 mb-[5px]'>{appVersion}</p>
-                <Divider />
+                <Separator />
                 <div className='flex justify-between'>
                     <Button
-                        variant='light'
+                        variant='tertiary'
                         className='my-[5px]'
                         size='sm'
                         onPress={() => {
@@ -36,7 +36,7 @@ export default function About() {
                         {t('config.about.website')}
                     </Button>
                     <Button
-                        variant='light'
+                        variant='tertiary'
                         className='my-[5px]'
                         size='sm'
                         onPress={() => {
@@ -51,7 +51,7 @@ export default function About() {
                     >
                         <PopoverTrigger>
                             <Button
-                                variant='light'
+                                variant='tertiary'
                                 className='my-[5px]'
                                 size='sm'
                             >
@@ -61,7 +61,7 @@ export default function About() {
                         <PopoverContent>
                             <div className='flex justify-between'>
                                 <Button
-                                    variant='light'
+                                    variant='tertiary'
                                     className='my-[5px]'
                                     size='sm'
                                     onPress={() => {
@@ -71,7 +71,7 @@ export default function About() {
                                     {t('config.about.issue')}
                                 </Button>
                                 <Button
-                                    variant='light'
+                                    variant='tertiary'
                                     className='my-[5px]'
                                     size='sm'
                                     onPress={() => {
@@ -90,7 +90,7 @@ export default function About() {
                     >
                         <PopoverTrigger>
                             <Button
-                                variant='light'
+                                variant='tertiary'
                                 className='my-[5px]'
                                 size='sm'
                             >
@@ -99,68 +99,80 @@ export default function About() {
                         </PopoverTrigger>
                         <PopoverContent>
                             <div className='flex justify-between'>
-                                <Tooltip content={t('config.about.qq_channel')}>
-                                    <Button
-                                        isIconOnly
-                                        variant='light'
-                                        className='my-[5px]'
-                                        size='lg'
-                                        onPress={() => {
-                                            open('https://pd.qq.com/s/akns94e1r');
-                                        }}
-                                    >
-                                        <BsTencentQq />
-                                    </Button>
+                                <Tooltip>
+                                    <Tooltip.Trigger>
+                                        <Button
+                                            isIconOnly
+                                            variant='tertiary'
+                                            className='my-[5px]'
+                                            size='lg'
+                                            onPress={() => {
+                                                open('https://pd.qq.com/s/akns94e1r');
+                                            }}
+                                        >
+                                            <BsTencentQq />
+                                        </Button>
+                                    </Tooltip.Trigger>
+                                    <Tooltip.Content>{t('config.about.qq_channel')}</Tooltip.Content>
                                 </Tooltip>
-                                <Tooltip content={t('config.about.qq_group')}>
-                                    <Button
-                                        isIconOnly
-                                        variant='light'
-                                        className='my-[5px]'
-                                        size='lg'
-                                        onPress={() => {
-                                            open('https://pot-app.com/img/qq_group.png');
-                                        }}
-                                    >
-                                        <BsTencentQq />
-                                    </Button>
+                                <Tooltip>
+                                    <Tooltip.Trigger>
+                                        <Button
+                                            isIconOnly
+                                            variant='tertiary'
+                                            className='my-[5px]'
+                                            size='lg'
+                                            onPress={() => {
+                                                open('https://pot-app.com/img/qq_group.png');
+                                            }}
+                                        >
+                                            <BsTencentQq />
+                                        </Button>
+                                    </Tooltip.Trigger>
+                                    <Tooltip.Content>{t('config.about.qq_group')}</Tooltip.Content>
                                 </Tooltip>
-                                <Tooltip content={t('config.about.telegram')}>
-                                    <Button
-                                        isIconOnly
-                                        variant='light'
-                                        className='my-[5px]'
-                                        size='lg'
-                                        onPress={() => {
-                                            open('https://t.me/pot_app');
-                                        }}
-                                    >
-                                        <BsTelegram />
-                                    </Button>
+                                <Tooltip>
+                                    <Tooltip.Trigger>
+                                        <Button
+                                            isIconOnly
+                                            variant='tertiary'
+                                            className='my-[5px]'
+                                            size='lg'
+                                            onPress={() => {
+                                                open('https://t.me/pot_app');
+                                            }}
+                                        >
+                                            <BsTelegram />
+                                        </Button>
+                                    </Tooltip.Trigger>
+                                    <Tooltip.Content>{t('config.about.telegram')}</Tooltip.Content>
                                 </Tooltip>
-                                <Tooltip content={t('config.about.discussion')}>
-                                    <Button
-                                        isIconOnly
-                                        variant='light'
-                                        className='my-[5px]'
-                                        size='lg'
-                                        onPress={() => {
-                                            open('https://github.com/pot-app/pot-desktop/discussions');
-                                        }}
-                                    >
-                                        <BsGithub />
-                                    </Button>
+                                <Tooltip>
+                                    <Tooltip.Trigger>
+                                        <Button
+                                            isIconOnly
+                                            variant='tertiary'
+                                            className='my-[5px]'
+                                            size='lg'
+                                            onPress={() => {
+                                                open('https://github.com/pot-app/pot-desktop/discussions');
+                                            }}
+                                        >
+                                            <BsGithub />
+                                        </Button>
+                                    </Tooltip.Trigger>
+                                    <Tooltip.Content>{t('config.about.discussion')}</Tooltip.Content>
                                 </Tooltip>
                             </div>
                         </PopoverContent>
                     </Popover>
                 </div>
-                <Divider />
+                <Separator />
             </div>
             <div className='content-center px-[40px]'>
                 <div className='flex justify-between'>
                     <Button
-                        variant='light'
+                        variant='tertiary'
                         className='my-[5px]'
                         size='sm'
                         onPress={() => {
@@ -170,7 +182,7 @@ export default function About() {
                         {t('config.about.check_update')}
                     </Button>
                     <Button
-                        variant='light'
+                        variant='tertiary'
                         className='my-[5px]'
                         size='sm'
                         onPress={async () => {
@@ -181,7 +193,7 @@ export default function About() {
                         {t('config.about.view_log')}
                     </Button>
                     <Button
-                        variant='light'
+                        variant='tertiary'
                         className='my-[5px]'
                         size='sm'
                         onPress={async () => {
@@ -193,7 +205,7 @@ export default function About() {
                     </Button>
                 </div>
 
-                <Divider />
+                <Separator />
             </div>
         </div>
     );

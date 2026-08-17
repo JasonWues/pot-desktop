@@ -18,7 +18,7 @@ pub enum Error {
     #[error(transparent)]
     StripPrefix(#[from] std::path::StripPrefixError),
     #[error(transparent)]
-    Arboard(#[from] arboard::Error),
+    Clipboard(#[from] tauri_plugin_clipboard_manager::Error),
     #[error(transparent)]
     Image(#[from] image::ImageError),
     #[error(transparent)]

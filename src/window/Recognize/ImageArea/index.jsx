@@ -1,4 +1,4 @@
-import { Card, CardBody, CardFooter, Button, Tooltip } from '@heroui/react';
+import { Card, CardContent, CardFooter, Button, Tooltip } from '@heroui/react';
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 import React, { useEffect, useRef, useState } from 'react';
 import { listen } from '@tauri-apps/api/event';
@@ -77,10 +77,10 @@ export default function ImageArea() {
     return (
         <Card
             shadow='none'
-            className='bg-content1 h-full ml-[12px] mr-[6px]'
+            className='bg-surface h-full ml-[12px] mr-[6px]'
             radius='10'
         >
-            <CardBody className='bg-content1 h-full p-0 relative'>
+            <CardContent className='bg-surface h-full p-0 relative'>
                 {base64 !== '' && (
                     <>
                         <img
@@ -99,31 +99,31 @@ export default function ImageArea() {
                         />
                     </>
                 )}
-            </CardBody>
-            <CardFooter className='bg-content1 flex justify-start px-[12px] gap-[4px]'>
-                <Tooltip content={t('recognize.copy_img')}>
-                    <Button
-                        isIconOnly
-                        size='sm'
-                        variant='light'
-                        onPress={async () => {
-                            await invoke('copy_img', {
-                                width: imgRef.current.naturalWidth,
-                                height: imgRef.current.naturalHeight,
-                            });
-                        }}
-                    >
-                        <MdContentCopy className='text-[16px]' />
-                    </Button>
+            </CardContent>
+            <CardFooter className='bg-surface flex justify-start px-[12px] gap-[4px]'>
+                <Tooltip>
+                    <Tooltip.Trigger>
+                        <Button
+                            isIconOnly
+                            size='sm'
+                            variant='tertiary'
+                            onPress={async () => {
+                                await invoke('copy_img');
+                            }}
+                        >
+                            <MdContentCopy className='text-[16px]' />
+                        </Button>
+                    </Tooltip.Trigger>
+                    <Tooltip.Content>{t('recognize.copy_img')}</Tooltip.Content>
                 </Tooltip>
                 <Button
                     size='sm'
-                    variant='light'
-                    startContent={<HiTranslate className='text-[16px]' />}
-                    isLoading={inPlace.state === 'ocr' || inPlace.state === 'translating'}
+                    variant='tertiary'
+                    isPending={inPlace.state === 'ocr' || inPlace.state === 'translating'}
                     isDisabled={base64 === ''}
                     onPress={toggleInPlace}
                 >
+                    <HiTranslate className='text-[16px]' />
                     {inPlaceLabel}
                 </Button>
                 {inPlace.state === 'error' && (

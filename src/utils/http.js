@@ -36,6 +36,31 @@ export class Body {
     }
 }
 
+const BODY_TYPES = ['Json', 'Text', 'Bytes', 'Form'];
+
+// Tauri 1 handed the body to Rust as a tagged enum, so a bare `{ type, payload }`
+// object was indistinguishable from a `Body` instance -- and several services,
+// plus any third party plugin written the same way, pass exactly that. The
+// standard `Request` has no such notion: it stringifies an unrecognised object,
+// so the request goes out with a literal "[object Object]" as its body. Anything
+// carrying a known `type` and a `payload` is therefore normalised back into a
+// `Body` before it is serialized.
+function asBody(value) {
+    if (value instanceof Body) {
+        return value;
+    }
+    if (
+        value !== null &&
+        typeof value === 'object' &&
+        typeof value.type === 'string' &&
+        BODY_TYPES.includes(value.type) &&
+        'payload' in value
+    ) {
+        return new Body(value.type, value.payload);
+    }
+    return null;
+}
+
 function isFilePart(value) {
     return value !== null && typeof value === 'object' && 'file' in value;
 }
@@ -89,9 +114,10 @@ function findHeader(headers, name) {
 // Turns the Tauri 1 `Body` into something the standard `Request` understands.
 // `headers` is mutated when the browser has to own the `Content-Type` (multipart
 // needs to append its generated boundary).
-function serializeBody(body, headers) {
-    if (!(body instanceof Body)) {
-        return body;
+function serializeBody(rawBody, headers) {
+    const body = asBody(rawBody);
+    if (body === null) {
+        return rawBody;
     }
     switch (body.type) {
         case 'Json': {

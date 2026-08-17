@@ -1,11 +1,7 @@
-import { Input, Button, Switch, Textarea, Card, CardBody, Link } from '@heroui/react';
-import { DropdownTrigger } from '@heroui/react';
+import { Input, Button, Switch, TextArea, Card, CardContent, Link, Dropdown, Label, TextField } from '@heroui/react';
 import { MdDeleteOutline } from 'react-icons/md';
-import { DropdownMenu } from '@heroui/react';
-import { DropdownItem } from '@heroui/react';
 import toast, { Toaster } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { Dropdown } from '@heroui/react';
 import { open } from '@tauri-apps/plugin-shell';
 import React, { useState } from 'react';
 
@@ -112,85 +108,92 @@ export function Config(props) {
                 <div className='config-item'>
                     <h3 className='my-auto'>{t('services.translate.openai.service')}</h3>
                     <Dropdown>
-                        <DropdownTrigger>
-                            <Button variant='bordered'>{t(`services.translate.openai.${openaiConfig.service}`)}</Button>
-                        </DropdownTrigger>
-                        <DropdownMenu
-                            autoFocus='first'
-                            aria-label='service'
-                            onAction={(key) => {
-                                setOpenaiConfig({
-                                    ...openaiConfig,
-                                    service: key,
-                                });
-                            }}
-                        >
-                            <DropdownItem key='openai'>{t(`services.translate.openai.openai`)}</DropdownItem>
-                            <DropdownItem key='azure'>{t(`services.translate.openai.azure`)}</DropdownItem>
-                        </DropdownMenu>
+                        <Button variant='outline'>{t(`services.translate.openai.${openaiConfig.service}`)}</Button>
+                        <Dropdown.Popover>
+                            <Dropdown.Menu
+                                autoFocus='first'
+                                aria-label='service'
+                                onAction={(key) => {
+                                    setOpenaiConfig({
+                                        ...openaiConfig,
+                                        service: key,
+                                    });
+                                }}
+                            >
+                                <Dropdown.Item
+                                    key='openai'
+                                    id='openai'
+                                >
+                                    <Label>{t(`services.translate.openai.openai`)}</Label>
+                                </Dropdown.Item>
+                                <Dropdown.Item
+                                    key='azure'
+                                    id='azure'
+                                >
+                                    <Label>{t(`services.translate.openai.azure`)}</Label>
+                                </Dropdown.Item>
+                            </Dropdown.Menu>
+                        </Dropdown.Popover>
                     </Dropdown>
                 </div>
                 <div className='config-item'>
                     <Switch
                         isSelected={openaiConfig['stream']}
-                        onValueChange={(value) => {
+                        onChange={(value) => {
                             setOpenaiConfig({
                                 ...openaiConfig,
                                 stream: value,
                             });
                         }}
-                        classNames={{
-                            base: 'flex flex-row-reverse justify-between w-full max-w-full',
-                        }}
+                        className='w-full max-w-full'
                     >
-                        {t('services.translate.openai.stream')}
+                        <Switch.Content className='flex w-full flex-row-reverse items-center justify-between'>
+                            <Switch.Control>
+                                <Switch.Thumb />
+                            </Switch.Control>
+                            {t('services.translate.openai.stream')}
+                        </Switch.Content>
                     </Switch>
                 </div>
                 <div className='config-item'>
-                    <Input
-                        label={t('services.translate.openai.request_path')}
-                        labelPlacement='outside-left'
+                    <TextField
+                        className='flex w-full flex-row items-center justify-between'
                         value={openaiConfig['requestPath']}
-                        variant='bordered'
-                        classNames={{
-                            base: 'justify-between',
-                            label: 'text-(length:--heroui-font-size-medium)',
-                            mainWrapper: 'max-w-[50%]',
-                        }}
-                        onValueChange={(value) => {
+                        onChange={(value) => {
                             setOpenaiConfig({
                                 ...openaiConfig,
                                 requestPath: value,
                             });
                         }}
-                    />
+                    >
+                        <Label className='text-base my-auto'>{t('services.translate.openai.request_path')}</Label>
+                        <Input className='max-w-[50%]' />
+                    </TextField>
                 </div>
                 <div className='config-item'>
-                    <Input
-                        label={t('services.translate.openai.api_key')}
-                        labelPlacement='outside-left'
-                        type='password'
+                    <TextField
+                        className='flex w-full flex-row items-center justify-between'
                         value={openaiConfig['apiKey']}
-                        variant='bordered'
-                        classNames={{
-                            base: 'justify-between',
-                            label: 'text-(length:--heroui-font-size-medium)',
-                            mainWrapper: 'max-w-[50%]',
-                        }}
-                        onValueChange={(value) => {
+                        onChange={(value) => {
                             setOpenaiConfig({
                                 ...openaiConfig,
                                 apiKey: value,
                             });
                         }}
-                    />
+                    >
+                        <Label className='text-base my-auto'>{t('services.translate.openai.api_key')}</Label>
+                        <Input
+                            type='password'
+                            className='max-w-[50%]'
+                        />
+                    </TextField>
                 </div>
                 <Card
                     isBlurred
                     className='border-none bg-success/20 dark:bg-success/10'
                     shadow='sm'
                 >
-                    <CardBody>
+                    <CardContent>
                         <div>
                             推荐
                             <Link
@@ -209,42 +212,35 @@ export function Config(props) {
                                 配置文档
                             </Link>
                         </div>
-                    </CardBody>
+                    </CardContent>
                 </Card>
                 <div className={`config-item ${openaiConfig.service === 'azure' ? 'hidden' : ''}`}>
-                    <Input
-                        label={t('services.translate.openai.model')}
-                        labelPlacement='outside-left'
+                    <TextField
+                        className='flex w-full flex-row items-center justify-between'
                         value={openaiConfig['model']}
-                        variant='bordered'
-                        classNames={{
-                            base: 'justify-between',
-                            label: 'text-(length:--heroui-font-size-medium)',
-                            mainWrapper: 'max-w-[50%]',
-                        }}
-                        onValueChange={(value) => {
+                        onChange={(value) => {
                             setOpenaiConfig({
                                 ...openaiConfig,
                                 model: value,
                             });
                         }}
-                    />
+                    >
+                        <Label className='text-base my-auto'>{t('services.translate.openai.model')}</Label>
+                        <Input className='max-w-[50%]' />
+                    </TextField>
                 </div>
                 <h3 className='my-auto'>Prompt List</h3>
-                <p className='text-[10px] text-default-700'>{t('services.translate.openai.prompt_description')}</p>
+                <p className='text-[10px] text-foreground'>{t('services.translate.openai.prompt_description')}</p>
 
-                <div className='bg-content2 rounded-[10px] p-3'>
+                <div className='bg-surface-secondary rounded-[10px] p-3'>
                     {openaiConfig.promptList &&
                         openaiConfig.promptList.map((prompt, index) => {
                             return (
                                 <div className='config-item'>
-                                    <Textarea
-                                        label={prompt.role}
-                                        labelPlacement='outside'
-                                        variant='faded'
+                                    <TextField
+                                        className='w-full'
                                         value={prompt.content}
-                                        placeholder={`Input Some ${prompt.role} Prompt`}
-                                        onValueChange={(value) => {
+                                        onChange={(value) => {
                                             setOpenaiConfig({
                                                 ...openaiConfig,
                                                 promptList: openaiConfig.promptList.map((p, i) => {
@@ -266,12 +262,18 @@ export function Config(props) {
                                                 }),
                                             });
                                         }}
-                                    />
+                                    >
+                                        <Label>{prompt.role}</Label>
+                                        <TextArea
+                                            fullWidth
+                                            rows={3}
+                                            placeholder={`Input Some ${prompt.role} Prompt`}
+                                        />
+                                    </TextField>
                                     <Button
                                         isIconOnly
-                                        color='danger'
                                         className='my-auto mx-1'
-                                        variant='flat'
+                                        variant='danger-soft'
                                         onPress={() => {
                                             setOpenaiConfig({
                                                 ...openaiConfig,
@@ -311,26 +313,30 @@ export function Config(props) {
 
                 <h3 className='my-auto'>Request Arguments</h3>
                 <div className='config-item'>
-                    <Textarea
-                        label=''
-                        labelPlacement='outside'
-                        variant='faded'
+                    <TextField
+                        className='w-full'
+                        aria-label='Request Arguments'
                         value={openaiConfig['requestArguments']}
-                        placeholder={`Input API Request Arguments`}
-                        onValueChange={(value) => {
+                        onChange={(value) => {
                             setOpenaiConfig({
                                 ...openaiConfig,
                                 requestArguments: value,
                             });
                         }}
-                    />
+                    >
+                        <TextArea
+                            fullWidth
+                            rows={3}
+                            placeholder={`Input API Request Arguments`}
+                        />
+                    </TextField>
                 </div>
                 <br />
                 <Button
+                    variant='primary'
                     type='submit'
-                    isLoading={isLoading}
+                    isPending={isLoading}
                     fullWidth
-                    color='primary'
                 >
                     {t('common.save')}
                 </Button>

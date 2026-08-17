@@ -1,30 +1,32 @@
-@import 'tailwindcss';
+/*
+  HeroUI v3 is CSS-first: it pulls in Tailwind itself and layers its own base,
+  component and theme styles behind it, so this is the only entry point. There is
+  no Tailwind plugin and no `@config` any more -- the v2 `tailwind.config.cjs`
+  that defined the three themes is gone, and the themes live in `themes/` as
+  plain `[data-theme]` blocks.
+*/
+@import '@heroui/styles';
+@import './themes/light.css';
+@import './themes/dark.css';
 @import './themes/nocturne.css';
 
-@config '../tailwind.config.cjs';
-
 /*
-  `darkMode: 'class'` in the config ties the `dark:` variant to `.dark` alone, so
-  every dark: utility -- the app's own handful plus the many that HeroUI's
-  components carry -- would fall back to its light value under Nocturne, which is
-  a dark theme. A CSS-first @custom-variant overrides the config and lets either
-  class trigger it.
+  v3 selects a theme with `data-theme` on <html> rather than a class, so the
+  `dark:` variant has to follow the attribute. Both dark themes trigger it:
+  Nocturne is a dark theme, and without this every `dark:` utility -- the app's
+  own handful plus the many HeroUI's own components carry -- would fall back to
+  its light value under it.
 
-  `:is()`, not the `:where()` that Tailwind's own docs suggest. `:where()` scores
-  zero, which would drop every dark: utility in the bundle from 0,2,0 to 0,1,0
-  and hand ties to whichever plain utility happens to be emitted later. `:is(.dark
-  *)` scores 0,1,0, so this reproduces `darkMode: 'class'` exactly and only widens
-  what matches.
+  `:is()`, not `:where()`. `:where()` scores zero, which would drop every dark:
+  utility from 0,2,0 to 0,1,0 and hand ties to whichever plain utility happens to
+  be emitted later.
 */
-@custom-variant dark (&:is(.dark *, .nocturne *));
+@custom-variant dark (&:is([data-theme='dark'] *, [data-theme='nocturne'] *));
 
 /*
-  The default border color has changed to `currentcolor` in Tailwind CSS v4,
-  so we've added these compatibility styles to make sure everything still
-  looks the same as it did with Tailwind CSS v3.
-
-  If we ever want to remove these styles, we need to add an explicit border
-  color utility to any element that depends on these defaults.
+  The default border color changed to `currentcolor` in Tailwind 4, so this keeps
+  unstyled borders looking as they did. Removing it means adding an explicit
+  border colour utility everywhere that relies on the default.
 */
 @layer base {
     *,
@@ -32,7 +34,7 @@
     ::before,
     ::backdrop,
     ::file-selector-button {
-        border-color: var(--color-gray-200, currentcolor);
+        border-color: var(--color-border, currentcolor);
     }
 }
 
@@ -40,14 +42,145 @@
   This has to sit in `base`. Tailwind 4 emits its utilities inside
   `@layer utilities`, and unlayered CSS beats every cascade layer no matter how
   specific the layered rule is -- so as plain top level CSS this reset silently
-  won over every margin and padding utility in the app. Under Tailwind 3, which
-  emitted unlayered utilities, `.mx-\[12px\]` simply outranked `*` on
-  specificity and the same code was fine.
+  won over every margin and padding utility in the app.
 */
 @layer base {
     * {
         margin: 0;
         padding: 0;
+    }
+}
+
+/*
+  v3 hands the width to TextField and expects the Input to fill it -- that is
+  what `.textfield--full-width` does for its own children. Ours are sized by a
+  `max-w-*` on the root instead, and an unconstrained <input> falls back to its
+  intrinsic `size=20` width, ~212px. As a flex item with the default
+  `min-width: auto` it will not shrink below that either, so seven fields
+  (the listen port, the three WebDAV rows, two plugin fields, one TTS) hung
+  past the right edge of their card.
+
+  `min-width: 0` is the half that actually lets it shrink; `width: 100%` is what
+  makes it fill once it can. An Input carrying its own `max-w-*` still wins --
+  max-width beats width, and utilities outrank this layer anyway.
+*/
+@layer components {
+    .textfield > .input {
+        width: 100%;
+        min-width: 0;
+    }
+}
+
+/*
+  v3's switch is deliberately flatter than v2's: a 20px track (v2: 24px) with a
+  22x16 rounded rectangle for a thumb, where v2 had a 20px circle. v3 holds that
+  1.375:1 thumb at every size. It is not a bug, it is the new design -- but
+  everything else on this branch is a port of pot's existing look, so the
+  proportions go back: a circle inset 2px in the track, at all three sizes.
+
+  The checked offset has to move with the thumb, since v3 slides it by margin
+  rather than transform. Each is track width minus thumb minus the 2px margin,
+  expressed as `100% - (thumb + 2px)`.
+
+  `sm` is the one the service rows use. Its selectors carry v3's size class, so
+  they need it too or they lose to the more specific rule.
+*/
+@layer components {
+    .switch__control {
+        height: 1.5rem;
+    }
+
+    .switch__thumb {
+        width: 1.25rem;
+        height: 1.25rem;
+        border-radius: 9999px;
+    }
+
+    .switch[aria-checked='true'] .switch__thumb,
+    .switch[data-selected='true'] .switch__thumb {
+        margin-inline-start: calc(100% - 1.375rem);
+    }
+
+    .switch--sm .switch__thumb {
+        width: 0.75rem;
+        height: 0.75rem;
+    }
+
+    /*
+      `.switch.switch--sm`, not `.switch--sm`. v3 writes its checked offset with
+      native nesting -- `.switch[data-selected="true"] &` where `&` is
+      `.switch--sm .switch__thumb` -- and `&` takes the specificity of the whole
+      parent selector, so that rule scores 0,4,0. Its own layer is `components`
+      too, the same as this file's, so nothing but specificity separates them and
+      the obvious 0,3,0 form silently loses. The plain `.switch__thumb` sizes
+      above do win, because there v3's is only 0,2,0.
+    */
+    .switch.switch--sm[aria-checked='true'] .switch__thumb,
+    .switch.switch--sm[data-selected='true'] .switch__thumb {
+        margin-inline-start: calc(100% - 0.875rem);
+    }
+
+    .switch--lg .switch__thumb {
+        width: 1.25rem;
+        height: 1.25rem;
+    }
+
+    .switch.switch--lg[aria-checked='true'] .switch__thumb,
+    .switch.switch--lg[data-selected='true'] .switch__thumb {
+        margin-inline-start: calc(100% - 1.375rem);
+    }
+}
+
+/*
+  All 12 modals in the app are forms with an icon-plus-title header, and v3
+  changed both parts under them:
+
+  `.modal__header` is `flex-col` where v2's ModalHeader was a row, so every one
+  of them stacked its service icon above its title -- the same trap as
+  Card.Header and Switch.
+
+  `.modal__body` paints itself `--muted`. That is reasonable for prose and wrong
+  for a form: every plain <h3> row label inside inherited grey at 14px while the
+  v3 `Label` components beside them forced `--foreground` at 16px/500, so a
+  single column of labels came out in two different styles.
+
+  One rule each rather than a className on 12 call sites: the intent is uniform,
+  and a per-file class would be 24 places to keep in step.
+*/
+@layer components {
+    .modal__header {
+        flex-direction: row;
+        align-items: center;
+    }
+
+    /*
+      v2's ModalBody was `flex flex-col gap-3` and every modal leaned on it for
+      spacing. v3's is a plain block with no gap, so the five service pickers --
+      which are a bare `<div><Button/></div>` per row -- came out as a stack of
+      touching pills. The config modals do not notice either way: their body has
+      a single <form> child and the rows inside space themselves with
+      `.config-item`'s own margin.
+    */
+    .modal__body {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        color: var(--foreground);
+    }
+}
+
+/*
+  v2's `isLoading` swapped the label for a spinner. Its v3 successor `isPending`
+  draws nothing at all -- `@apply status-pending` resolves to `pointer-events:
+  none` and that is the whole of it -- so the ~40 "test connection" and "save"
+  buttons across the service configs went dead silent while their request ran.
+  A spinner needs the render-prop form of `children` at each call site; this is
+  the one-rule version that at least makes the wait visible everywhere.
+*/
+@layer components {
+    .button[data-pending='true'] {
+        opacity: 0.6;
+        cursor: wait;
     }
 }
 
@@ -59,6 +192,28 @@ html {
 
 *::-webkit-scrollbar {
     width: 5px;
+}
+
+/*
+  Only the thumb was ever styled, so Chrome kept drawing its default stepper
+  buttons at both ends of any scrollbar it did style.
+*/
+*::-webkit-scrollbar-button {
+    display: none;
+}
+
+/*
+  ...but the prompt textareas are not one of those. `scrollbar-color` is an
+  INHERITED property, and v3's `.scrollbar` utility sets it on the scroll slots
+  -- `.modal__body--scroll-inside` among them -- so everything inside a modal
+  inherits it. Chrome ignores every `::-webkit-scrollbar*` rule on an element
+  whose scrollbar is coloured that way, which quietly took the five rules above
+  out of play and handed the textareas the default colour scrollbar: full width,
+  with the arrowheads back at both ends. `scrollbar-width: thin` is the standard
+  property's own answer, and it is the one Chrome is listening to here.
+*/
+.textarea {
+    scrollbar-width: thin;
 }
 
 *::-webkit-scrollbar-thumb {

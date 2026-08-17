@@ -1,4 +1,4 @@
-import { Card, Button, CardFooter, Dropdown, DropdownMenu, DropdownTrigger, DropdownItem } from '@heroui/react';
+import { Card, Button, CardFooter, Dropdown, Label } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 import { BiTransferAlt } from 'react-icons/bi';
 import React, { useEffect } from 'react';
@@ -48,68 +48,84 @@ export default function LanguageArea() {
     return (
         <Card
             shadow='none'
-            className='bg-content2 h-[35px] rounded-[10px]'
+            className='bg-surface-secondary h-[35px] rounded-[10px] p-0 gap-0'
         >
-            <CardFooter className='bg-content2 flex justify-between p-0 rounded-[10px]'>
+            <CardFooter className='bg-surface-secondary flex justify-between p-0 rounded-[10px]'>
                 <div className='flex'>
                     {/* The preset only reaches the LLM-backed services; the rest
                         ignore it, so it sits with the languages rather than in
                         any one service's header. */}
                     <Dropdown>
-                        <DropdownTrigger>
-                            <Button
-                                isIconOnly={aiPreset === DEFAULT_PRESET}
-                                radius='sm'
-                                variant='light'
-                                className={aiPreset === DEFAULT_PRESET ? '' : 'text-primary'}
-                                startContent={aiPreset === DEFAULT_PRESET ? null : <LuWand className='text-[16px]' />}
-                            >
-                                {aiPreset === DEFAULT_PRESET ? (
-                                    <LuWand className='text-[16px] text-default-400' />
-                                ) : (
-                                    t(`translate.ai_preset.${aiPreset}`)
-                                )}
-                            </Button>
-                        </DropdownTrigger>
-                        <DropdownMenu
-                            aria-label='AI preset'
-                            onAction={(key) => {
-                                setAiPreset(key);
-                            }}
+                        <Button
+                            isIconOnly={aiPreset === DEFAULT_PRESET}
+                            variant='tertiary'
+                            className={`rounded-md ${aiPreset === DEFAULT_PRESET ? '' : 'text-accent'}`}
                         >
-                            {AI_PRESETS.map((preset) => (
-                                <DropdownItem key={preset.id}>{t(`translate.ai_preset.${preset.id}`)}</DropdownItem>
-                            ))}
-                        </DropdownMenu>
+                            {aiPreset === DEFAULT_PRESET ? null : <LuWand className='text-[16px]' />}
+                            {aiPreset === DEFAULT_PRESET ? (
+                                <LuWand className='text-[16px] text-muted' />
+                            ) : (
+                                t(`translate.ai_preset.${aiPreset}`)
+                            )}
+                        </Button>
+                        <Dropdown.Popover>
+                            <Dropdown.Menu
+                                aria-label='AI preset'
+                                onAction={(key) => {
+                                    setAiPreset(key);
+                                }}
+                            >
+                                {AI_PRESETS.map((preset) => (
+                                    <Dropdown.Item
+                                        key={preset.id}
+                                        id={preset.id}
+                                    >
+                                        {t(`translate.ai_preset.${preset.id}`)}
+                                    </Dropdown.Item>
+                                ))}
+                            </Dropdown.Menu>
+                        </Dropdown.Popover>
                     </Dropdown>
                     <Dropdown>
-                        <DropdownTrigger>
-                            <Button
-                                radius='sm'
-                                variant='light'
-                            >
-                                {t(`languages.${sourceLanguage}`)}
-                            </Button>
-                        </DropdownTrigger>
-                        <DropdownMenu
-                            aria-label='Source Language'
-                            className='max-h-[50vh] overflow-y-auto'
-                            onAction={(key) => {
-                                setSourceLanguage(key);
-                            }}
+                        <Button
+                            className='rounded-md'
+                            variant='tertiary'
                         >
-                            <DropdownItem key='auto'>{t('languages.auto')}</DropdownItem>
-                            {languageList.map((x) => {
-                                return <DropdownItem key={x}>{t(`languages.${x}`)}</DropdownItem>;
-                            })}
-                        </DropdownMenu>
+                            {t(`languages.${sourceLanguage}`)}
+                        </Button>
+                        <Dropdown.Popover>
+                            <Dropdown.Menu
+                                aria-label='Source Language'
+                                className='max-h-[50vh] overflow-y-auto'
+                                onAction={(key) => {
+                                    setSourceLanguage(key);
+                                }}
+                            >
+                                <Dropdown.Item
+                                    key='auto'
+                                    id='auto'
+                                >
+                                    <Label>{t('languages.auto')}</Label>
+                                </Dropdown.Item>
+                                {languageList.map((x) => {
+                                    return (
+                                        <Dropdown.Item
+                                            key={x}
+                                            id={x}
+                                        >
+                                            {t(`languages.${x}`)}
+                                        </Dropdown.Item>
+                                    );
+                                })}
+                            </Dropdown.Menu>
+                        </Dropdown.Popover>
                     </Dropdown>
                 </div>
                 <div className='flex'>
                     <Button
                         isIconOnly
                         size='sm'
-                        variant='light'
+                        variant='tertiary'
                         className='text-[20px]'
                         onPress={async () => {
                             if (sourceLanguage !== 'auto') {
@@ -127,7 +143,7 @@ export default function LanguageArea() {
                                     if (targetLanguage === translateSecondLanguage) {
                                         setTargetLanguage(translateTargetLanguage);
                                     } else {
-                                        setTargetLanguage(secondLanguage);
+                                        setTargetLanguage(translateSecondLanguage);
                                     }
                                 }
                             }
@@ -138,25 +154,32 @@ export default function LanguageArea() {
                 </div>
                 <div className='flex'>
                     <Dropdown>
-                        <DropdownTrigger>
-                            <Button
-                                radius='sm'
-                                variant='light'
-                            >
-                                {t(`languages.${targetLanguage}`)}
-                            </Button>
-                        </DropdownTrigger>
-                        <DropdownMenu
-                            aria-label='Target Language'
-                            className='max-h-[50vh] overflow-y-auto'
-                            onAction={(key) => {
-                                setTargetLanguage(key);
-                            }}
+                        <Button
+                            className='rounded-md'
+                            variant='tertiary'
                         >
-                            {languageList.map((x) => {
-                                return <DropdownItem key={x}>{t(`languages.${x}`)}</DropdownItem>;
-                            })}
-                        </DropdownMenu>
+                            {t(`languages.${targetLanguage}`)}
+                        </Button>
+                        <Dropdown.Popover>
+                            <Dropdown.Menu
+                                aria-label='Target Language'
+                                className='max-h-[50vh] overflow-y-auto'
+                                onAction={(key) => {
+                                    setTargetLanguage(key);
+                                }}
+                            >
+                                {languageList.map((x) => {
+                                    return (
+                                        <Dropdown.Item
+                                            key={x}
+                                            id={x}
+                                        >
+                                            {t(`languages.${x}`)}
+                                        </Dropdown.Item>
+                                    );
+                                })}
+                            </Dropdown.Menu>
+                        </Dropdown.Popover>
                     </Dropdown>
                 </div>
             </CardFooter>

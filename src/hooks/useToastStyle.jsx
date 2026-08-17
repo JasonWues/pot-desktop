@@ -12,6 +12,8 @@ export const useToastStyle = () => {
         background: 'hsl(var(--heroui-content1))',
         color: 'hsl(var(--heroui-foreground))',
         wordBreak: 'break-all',
-        select: 'text',
+        // `userSelect`, not `select`: the latter is not a CSS property, so React
+        // dropped it and toast text has never actually been selectable.
+        userSelect: 'text',
     };
 };

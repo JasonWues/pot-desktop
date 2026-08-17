@@ -1,4 +1,4 @@
-import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Button } from '@heroui/react';
+import { Dropdown, Button, Label } from '@heroui/react';
 import { atom, useAtom, useSetAtom, useAtomValue } from 'jotai';
 import { fetch, Body } from '../../../utils/http';
 import { useTranslation } from 'react-i18next';
@@ -53,47 +53,44 @@ export default function ControlArea(props) {
         <div className='flex justify-between px-[12px] h-full'>
             {currentServiceInstanceKey && (
                 <Dropdown>
-                    <DropdownTrigger>
-                        <Button
-                            className='my-auto'
-                            variant='bordered'
-                            size='sm'
-                            startContent={
-                                <img
-                                    className='h-[16px] w-[16px] my-auto'
-                                    src={
-                                        getServiceSouceType(currentServiceInstanceKey) === ServiceSourceType.PLUGIN
-                                            ? pluginList[getServiceName(currentServiceInstanceKey)].icon
-                                            : builtinService[getServiceName(currentServiceInstanceKey)].info.icon ===
-                                                'system'
-                                              ? `logo/${osType}.svg`
-                                              : builtinService[getServiceName(currentServiceInstanceKey)].info.icon
-                                    }
-                                />
-                            }
-                        >
-                            {getServiceSouceType(currentServiceInstanceKey) === ServiceSourceType.PLUGIN
-                                ? getInstanceName(
-                                      currentServiceInstanceKey,
-                                      () => pluginList[getServiceName(currentServiceInstanceKey)].display
-                                  )
-                                : getInstanceName(currentServiceInstanceKey, () =>
-                                      t(`services.recognize.${currentServiceInstanceKey}.title`)
-                                  )}
-                        </Button>
-                    </DropdownTrigger>
-                    <DropdownMenu
-                        aria-label='service name'
-                        className='max-h-[70vh] overflow-y-auto'
-                        onAction={(key) => {
-                            setCurrentServiceInstanceKey(key);
-                        }}
+                    <Button
+                        className='my-auto'
+                        variant='outline'
+                        size='sm'
                     >
-                        {serviceInstanceList.map((instanceKey) => {
-                            return (
-                                <DropdownItem
-                                    key={instanceKey}
-                                    startContent={
+                        <img
+                            className='h-[16px] w-[16px] my-auto'
+                            src={
+                                getServiceSouceType(currentServiceInstanceKey) === ServiceSourceType.PLUGIN
+                                    ? pluginList[getServiceName(currentServiceInstanceKey)].icon
+                                    : builtinService[getServiceName(currentServiceInstanceKey)].info.icon === 'system'
+                                      ? `logo/${osType}.svg`
+                                      : builtinService[getServiceName(currentServiceInstanceKey)].info.icon
+                            }
+                        />
+                        {getServiceSouceType(currentServiceInstanceKey) === ServiceSourceType.PLUGIN
+                            ? getInstanceName(
+                                  currentServiceInstanceKey,
+                                  () => pluginList[getServiceName(currentServiceInstanceKey)].display
+                              )
+                            : getInstanceName(currentServiceInstanceKey, () =>
+                                  t(`services.recognize.${currentServiceInstanceKey}.title`)
+                              )}
+                    </Button>
+                    <Dropdown.Popover>
+                        <Dropdown.Menu
+                            aria-label='service name'
+                            className='max-h-[70vh] overflow-y-auto'
+                            onAction={(key) => {
+                                setCurrentServiceInstanceKey(key);
+                            }}
+                        >
+                            {serviceInstanceList.map((instanceKey) => {
+                                return (
+                                    <Dropdown.Item
+                                        key={instanceKey}
+                                        id={instanceKey}
+                                    >
                                         <img
                                             className='h-[16px] w-[16px] my-auto'
                                             src={
@@ -104,65 +101,73 @@ export default function ControlArea(props) {
                                                       : builtinService[getServiceName(instanceKey)].info.icon
                                             }
                                         />
-                                    }
-                                >
-                                    {getServiceSouceType(instanceKey) === ServiceSourceType.PLUGIN
-                                        ? getInstanceName(
-                                              instanceKey,
-                                              () => pluginList[getServiceName(instanceKey)].display
-                                          )
-                                        : getInstanceName(instanceKey, () =>
-                                              t(`services.recognize.${instanceKey}.title`)
-                                          )}
-                                </DropdownItem>
-                            );
-                        })}
-                    </DropdownMenu>
+                                        {getServiceSouceType(instanceKey) === ServiceSourceType.PLUGIN
+                                            ? getInstanceName(
+                                                  instanceKey,
+                                                  () => pluginList[getServiceName(instanceKey)].display
+                                              )
+                                            : getInstanceName(instanceKey, () =>
+                                                  t(`services.recognize.${instanceKey}.title`)
+                                              )}
+                                    </Dropdown.Item>
+                                );
+                            })}
+                        </Dropdown.Menu>
+                    </Dropdown.Popover>
                 </Dropdown>
             )}
             {language && (
                 <Dropdown>
-                    <DropdownTrigger>
-                        <Button
-                            className='my-auto'
-                            variant='bordered'
-                            size='sm'
-                        >
-                            {t(`languages.${language}`)}
-                        </Button>
-                    </DropdownTrigger>
-                    <DropdownMenu
-                        aria-label='language'
-                        className='max-h-[70vh] overflow-y-auto'
-                        onAction={(key) => {
-                            setLanguage(key);
-                        }}
+                    <Button
+                        className='my-auto'
+                        variant='outline'
+                        size='sm'
                     >
-                        <DropdownItem key='auto'>{t('languages.auto')}</DropdownItem>
-                        {languageList.map((name) => {
-                            return <DropdownItem key={name}>{t(`languages.${name}`)}</DropdownItem>;
-                        })}
-                    </DropdownMenu>
+                        {t(`languages.${language}`)}
+                    </Button>
+                    <Dropdown.Popover>
+                        <Dropdown.Menu
+                            aria-label='language'
+                            className='max-h-[70vh] overflow-y-auto'
+                            onAction={(key) => {
+                                setLanguage(key);
+                            }}
+                        >
+                            <Dropdown.Item
+                                key='auto'
+                                id='auto'
+                            >
+                                <Label>{t('languages.auto')}</Label>
+                            </Dropdown.Item>
+                            {languageList.map((name) => {
+                                return (
+                                    <Dropdown.Item
+                                        key={name}
+                                        id={name}
+                                    >
+                                        {t(`languages.${name}`)}
+                                    </Dropdown.Item>
+                                );
+                            })}
+                        </Dropdown.Menu>
+                    </Dropdown.Popover>
                 </Dropdown>
             )}
             <Button
-                variant='flat'
-                color='secondary'
+                variant='tertiary'
                 size='sm'
                 className='my-auto'
-                startContent={<GiCycle className='text-[16px]' />}
                 onPress={() => {
                     setRecognizeFlag(nanoid());
                 }}
             >
+                <GiCycle className='text-[16px]' />
                 {t('recognize.recognize')}
             </Button>
             <Button
-                variant='flat'
-                color='primary'
+                variant='tertiary'
                 size='sm'
                 className='my-auto'
-                startContent={<HiTranslate className='text-[16px]' />}
                 onPress={async () => {
                     if (text) {
                         void fetch(`http://127.0.0.1:${serverPort}/translate`, {
@@ -173,6 +178,7 @@ export default function ControlArea(props) {
                     }
                 }}
             >
+                <HiTranslate className='text-[16px]' />
                 {t('recognize.translate')}
             </Button>
         </div>

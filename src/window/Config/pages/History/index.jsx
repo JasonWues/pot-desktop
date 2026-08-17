@@ -1,14 +1,25 @@
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from '@heroui/react';
-import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
-import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@heroui/react';
+import {
+    Modal,
+    ModalHeader,
+    ModalBody,
+    ModalFooter,
+    Table,
+    TableHeader,
+    Dropdown,
+    TextArea,
+    Button,
+    ButtonGroup,
+    Input,
+    Pagination,
+    Label,
+    SearchField,
+} from '@heroui/react';
 import { readDir, BaseDirectory, readTextFile, exists } from '@tauri-apps/plugin-fs';
-import { Textarea, Button, ButtonGroup, Input } from '@heroui/react';
 import { appConfigDir, join } from '@tauri-apps/api/path';
 import { convertFileSrc } from '@tauri-apps/api/core';
 import React, { useEffect, useState } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 import { save } from '@tauri-apps/plugin-dialog';
-import { Pagination } from '@heroui/react';
 import { MdDeleteOutline } from 'react-icons/md';
 import { useTranslation } from 'react-i18next';
 import { invoke } from '@tauri-apps/api/core';
@@ -16,7 +27,7 @@ import { invoke } from '@tauri-apps/api/core';
 import * as builtinCollectionServices from '../../../../services/collection';
 import { invoke_plugin } from '../../../../utils/invoke_plugin';
 import * as builtinServices from '../../../../services/translate';
-import { useConfig, useToastStyle } from '../../../../hooks';
+import { useConfig, useToastStyle, useDisclosure } from '../../../../hooks';
 import { LanguageFlag } from '../../../../utils/language';
 import { getDatabase } from '../../../../utils/db';
 import { store } from '../../../../utils/store';
@@ -31,6 +42,32 @@ import {
 
 const PAGE_SIZE = 20;
 const ALL = '__all__';
+
+const ELLIPSIS = Symbol('ellipsis');
+
+// The page numbers to actually draw. v3's Pagination has no notion of collapsing
+// a long run, so this is what v2's `isCompact` did on its own: first and last
+// always, a window either side of the current page, and an ellipsis for each gap.
+function pageWindow(current, totalPages) {
+    if (!Number.isFinite(totalPages) || totalPages < 1) {
+        return [1];
+    }
+    if (totalPages <= 7) {
+        return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+    const pages = new Set([1, totalPages, current, current - 1, current + 1]);
+    const shown = [...pages].filter((p) => p >= 1 && p <= totalPages).sort((a, b) => a - b);
+    const out = [];
+    let previous = 0;
+    for (const p of shown) {
+        if (p - previous > 1) {
+            out.push(ELLIPSIS);
+        }
+        out.push(p);
+        previous = p;
+    }
+    return out;
+}
 
 // `text`/`result` come straight from the user, so every field is quoted and
 // embedded quotes are doubled. The BOM makes Excel read it as UTF-8.
@@ -246,159 +283,234 @@ export default function History() {
             <>
                 <Toaster />
                 <div className='flex gap-[8px] mb-[8px]'>
-                    <Input
-                        size='sm'
-                        isClearable
-                        variant='bordered'
+                    {/* SearchField, not Input: v3 dropped `isClearable`/`onClear`,
+                        and this is the component that carries a clear button of its
+                        own. Clearing goes through `onChange` like any other edit, so
+                        the separate `onClear` handler is no longer needed. */}
+                    <SearchField
                         className='max-w-[40%]'
-                        placeholder={t('config.history.search')}
                         value={search}
-                        onValueChange={setSearch}
-                        onClear={() => setSearch('')}
-                    />
+                        onChange={setSearch}
+                        aria-label={t('config.history.search')}
+                    >
+                        <SearchField.Group>
+                            <SearchField.SearchIcon />
+                            <SearchField.Input placeholder={t('config.history.search')} />
+                            <SearchField.ClearButton />
+                        </SearchField.Group>
+                    </SearchField>
                     <Dropdown>
-                        <DropdownTrigger>
-                            <Button
-                                size='sm'
-                                variant='bordered'
-                                className='my-auto'
-                            >
-                                {serviceFilter === ALL ? t('config.history.all_services') : serviceLabel(serviceFilter)}
-                            </Button>
-                        </DropdownTrigger>
-                        <DropdownMenu
-                            aria-label='service filter'
-                            className='max-h-[50vh] overflow-y-auto'
-                            onAction={(key) => setServiceFilter(key)}
+                        <Button
+                            size='sm'
+                            variant='outline'
+                            className='my-auto'
                         >
-                            <DropdownItem key={ALL}>{t('config.history.all_services')}</DropdownItem>
-                            {serviceOptions.map((service) => (
-                                <DropdownItem key={service}>{serviceLabel(service)}</DropdownItem>
-                            ))}
-                        </DropdownMenu>
+                            {serviceFilter === ALL ? t('config.history.all_services') : serviceLabel(serviceFilter)}
+                        </Button>
+                        <Dropdown.Popover>
+                            <Dropdown.Menu
+                                aria-label='service filter'
+                                className='max-h-[50vh] overflow-y-auto'
+                                onAction={(key) => setServiceFilter(key)}
+                            >
+                                <Dropdown.Item
+                                    key={ALL}
+                                    id={ALL}
+                                >
+                                    <Label>{t('config.history.all_services')}</Label>
+                                </Dropdown.Item>
+                                {serviceOptions.map((service) => (
+                                    <Dropdown.Item
+                                        key={service}
+                                        id={service}
+                                    >
+                                        <Label>{serviceLabel(service)}</Label>
+                                    </Dropdown.Item>
+                                ))}
+                            </Dropdown.Menu>
+                        </Dropdown.Popover>
                     </Dropdown>
                     <Dropdown>
-                        <DropdownTrigger>
-                            <Button
-                                size='sm'
-                                variant='bordered'
-                                className='my-auto'
-                            >
-                                {targetFilter === ALL
-                                    ? t('config.history.all_languages')
-                                    : t(`languages.${targetFilter}`, { defaultValue: targetFilter })}
-                            </Button>
-                        </DropdownTrigger>
-                        <DropdownMenu
-                            aria-label='language filter'
-                            className='max-h-[50vh] overflow-y-auto'
-                            onAction={(key) => setTargetFilter(key)}
+                        <Button
+                            size='sm'
+                            variant='outline'
+                            className='my-auto'
                         >
-                            <DropdownItem key={ALL}>{t('config.history.all_languages')}</DropdownItem>
-                            {targetOptions.map((language) => (
-                                <DropdownItem key={language}>
-                                    {t(`languages.${language}`, { defaultValue: language })}
-                                </DropdownItem>
-                            ))}
-                        </DropdownMenu>
+                            {targetFilter === ALL
+                                ? t('config.history.all_languages')
+                                : t(`languages.${targetFilter}`, { defaultValue: targetFilter })}
+                        </Button>
+                        <Dropdown.Popover>
+                            <Dropdown.Menu
+                                aria-label='language filter'
+                                className='max-h-[50vh] overflow-y-auto'
+                                onAction={(key) => setTargetFilter(key)}
+                            >
+                                <Dropdown.Item
+                                    key={ALL}
+                                    id={ALL}
+                                >
+                                    <Label>{t('config.history.all_languages')}</Label>
+                                </Dropdown.Item>
+                                {targetOptions.map((language) => (
+                                    <Dropdown.Item
+                                        key={language}
+                                        id={language}
+                                    >
+                                        {t(`languages.${language}`, { defaultValue: language })}
+                                    </Dropdown.Item>
+                                ))}
+                            </Dropdown.Menu>
+                        </Dropdown.Popover>
                     </Dropdown>
                 </div>
+                {/* v3's Table is three components, not one: the root styles the
+                    container, ScrollContainer owns the scrolling, and Content is
+                    the actual table -- which is where aria-label, selectionMode and
+                    onRowAction now live. Getting this wrong does not fail the
+                    build: the flat TableHeader/TableRow/TableCell names still
+                    exist, and are literally the same objects, so the v2
+                    arrangement compiled and then threw "cannot be rendered outside
+                    a collection" the moment this page opened.
+
+                    Columns and rows are keyed by `id` rather than React's `key`,
+                    the same distinction the dropdown items have. */}
                 <Table
-                    fullWidth
-                    hideHeader
-                    selectionMode='single'
-                    selectionBehavior='toggle'
-                    aria-label='History Table'
-                    classNames={{
-                        base: `${
-                            osType === 'Linux' ? 'h-[calc(100vh-180px)]' : 'h-[calc(100vh-150px)]'
-                        } overflow-y-auto`,
-                        td: 'px-0',
-                    }}
-                    onRowAction={(id) => {
-                        getSelectedData(id);
-                        onOpen();
-                    }}
+                    className={`${
+                        osType === 'Linux' ? 'h-[calc(100vh-180px)]' : 'h-[calc(100vh-150px)]'
+                    } overflow-y-auto`}
                 >
-                    <TableHeader>
-                        <TableColumn key='service' />
-                        <TableColumn key='text' />
-                        <TableColumn key='source' />
-                        <TableColumn key='target' />
-                        <TableColumn key='result' />
-                        <TableColumn key='timestamp' />
-                    </TableHeader>
-                    <TableBody
-                        emptyContent={'No History to display.'}
-                        items={items}
-                    >
-                        {(item) =>
-                            whetherAvailableService(item.service, {
-                                [ServiceSourceType.BUILDIN]: builtinServices,
-                                [ServiceSourceType.PLUGIN]: pluginList[ServiceType.TRANSLATE],
-                            }) && (
-                                <TableRow key={item.id}>
-                                    <TableCell>
-                                        {getServiceSouceType(item.service) === ServiceSourceType.PLUGIN ? (
-                                            <img
-                                                src={pluginList['translate'][getServiceName(item.service)].icon}
-                                                className='h-[18px] w-[18px] my-auto mr-[8px]'
-                                                draggable={false}
-                                            />
-                                        ) : (
-                                            <img
-                                                src={`${builtinServices[getServiceName(item.service)].info.icon}`}
-                                                className='h-[18px] w-[18px] my-auto mr-[8px]'
-                                                draggable={false}
-                                            />
-                                        )}
-                                    </TableCell>
-                                    <TableCell>
-                                        <p
-                                            className={`whitespace-nowrap ${
-                                                osType === 'Linux'
-                                                    ? 'w-[calc((100vw-287px-26px-60px-140px-30px)*0.5)]'
-                                                    : 'w-[calc((100vw-287px-26px-60px-140px)*0.5)]'
-                                            } text-ellipsis overflow-hidden`}
-                                        >
-                                            {item.text}
-                                        </p>
-                                    </TableCell>
-                                    <TableCell>
-                                        <span className={`w-[30px] fi fi-${LanguageFlag[item.source]}`} />
-                                    </TableCell>
-                                    <TableCell>
-                                        <span className={`w-[30px] fi fi-${LanguageFlag[item.target]}`} />
-                                    </TableCell>
-                                    <TableCell>
-                                        <p
-                                            className={`whitespace-nowrap ${
-                                                osType === 'Linux'
-                                                    ? 'w-[calc((100vw-287px-26px-60px-140px-30px)*0.5)]'
-                                                    : 'w-[calc((100vw-287px-26px-60px-140px)*0.5)]'
-                                            } text-ellipsis overflow-hidden`}
-                                        >
-                                            {item.result}
-                                        </p>
-                                    </TableCell>
-                                    <TableCell>
-                                        <p className='text-center whitespace-nowrap w-[140px]'>
-                                            {formatDate(new Date(item.timestamp))}
-                                        </p>
-                                    </TableCell>
-                                </TableRow>
-                            )
-                        }
-                    </TableBody>
+                    <Table.ScrollContainer>
+                        <Table.Content
+                            selectionMode='single'
+                            selectionBehavior='toggle'
+                            aria-label='History Table'
+                            onRowAction={(id) => {
+                                getSelectedData(id);
+                                onOpen();
+                            }}
+                        >
+                            {/* v2's `hideHeader` on Table is gone, and an unknown prop is
+                                not an error -- it just did nothing, leaving a 20px band of
+                                empty column dividers above the first row. The columns still
+                                have to exist for the collection, so the header row is hidden
+                                instead of dropped. */}
+                            <Table.Header className='hidden'>
+                                <Table.Column id='service' />
+                                <Table.Column id='text' />
+                                <Table.Column id='source' />
+                                <Table.Column id='target' />
+                                <Table.Column id='result' />
+                                <Table.Column id='timestamp' />
+                            </Table.Header>
+                            <Table.Body
+                                renderEmptyState={() => 'No History to display.'}
+                                items={items}
+                            >
+                                {(item) =>
+                                    whetherAvailableService(item.service, {
+                                        [ServiceSourceType.BUILDIN]: builtinServices,
+                                        [ServiceSourceType.PLUGIN]: pluginList[ServiceType.TRANSLATE],
+                                    }) && (
+                                        <Table.Row id={item.id}>
+                                            <Table.Cell className='px-0'>
+                                                {getServiceSouceType(item.service) === ServiceSourceType.PLUGIN ? (
+                                                    <img
+                                                        src={pluginList['translate'][getServiceName(item.service)].icon}
+                                                        className='h-[18px] w-[18px] my-auto mr-[8px]'
+                                                        draggable={false}
+                                                    />
+                                                ) : (
+                                                    <img
+                                                        src={`${builtinServices[getServiceName(item.service)].info.icon}`}
+                                                        className='h-[18px] w-[18px] my-auto mr-[8px]'
+                                                        draggable={false}
+                                                    />
+                                                )}
+                                            </Table.Cell>
+                                            <Table.Cell className='px-0'>
+                                                <p
+                                                    className={`whitespace-nowrap ${
+                                                        osType === 'Linux'
+                                                            ? 'w-[calc((100vw-287px-26px-60px-140px-30px)*0.5)]'
+                                                            : 'w-[calc((100vw-287px-26px-60px-140px)*0.5)]'
+                                                    } text-ellipsis overflow-hidden`}
+                                                >
+                                                    {item.text}
+                                                </p>
+                                            </Table.Cell>
+                                            <Table.Cell className='px-0'>
+                                                <span className={`w-[30px] fi fi-${LanguageFlag[item.source]}`} />
+                                            </Table.Cell>
+                                            <Table.Cell className='px-0'>
+                                                <span className={`w-[30px] fi fi-${LanguageFlag[item.target]}`} />
+                                            </Table.Cell>
+                                            <Table.Cell className='px-0'>
+                                                <p
+                                                    className={`whitespace-nowrap ${
+                                                        osType === 'Linux'
+                                                            ? 'w-[calc((100vw-287px-26px-60px-140px-30px)*0.5)]'
+                                                            : 'w-[calc((100vw-287px-26px-60px-140px)*0.5)]'
+                                                    } text-ellipsis overflow-hidden`}
+                                                >
+                                                    {item.result}
+                                                </p>
+                                            </Table.Cell>
+                                            <Table.Cell className='px-0'>
+                                                <p className='text-center whitespace-nowrap w-[140px]'>
+                                                    {formatDate(new Date(item.timestamp))}
+                                                </p>
+                                            </Table.Cell>
+                                        </Table.Row>
+                                    )
+                                }
+                            </Table.Body>
+                        </Table.Content>
+                    </Table.ScrollContainer>
                 </Table>
                 <div className='mt-[8px] flex justify-around'>
-                    <Pagination
-                        showControls
-                        isCompact
-                        total={Math.ceil(total / PAGE_SIZE)}
-                        page={page}
-                        onChange={setPage}
-                    />
+                    {/* v3's Pagination renders no pages of its own: `total`, `page`
+                        and `onChange` are gone and every link is written out. With
+                        none, it produced an empty <nav> with `total` and `page`
+                        leaked onto it as DOM attributes.
+
+                        `pageWindow` is what v2's `isCompact` did for free -- keep
+                        the run short and stand in an ellipsis -- since a history
+                        of any size would otherwise print every page number. */}
+                    <Pagination>
+                        <Pagination.Content>
+                            <Pagination.Item>
+                                <Pagination.Previous
+                                    isDisabled={page <= 1}
+                                    onPress={() => setPage(page - 1)}
+                                >
+                                    <Pagination.PreviousIcon />
+                                </Pagination.Previous>
+                            </Pagination.Item>
+                            {pageWindow(page, Math.ceil(total / PAGE_SIZE)).map((entry, index) => (
+                                <Pagination.Item key={entry === ELLIPSIS ? `gap-${index}` : entry}>
+                                    {entry === ELLIPSIS ? (
+                                        <Pagination.Ellipsis />
+                                    ) : (
+                                        <Pagination.Link
+                                            isActive={entry === page}
+                                            onPress={() => setPage(entry)}
+                                        >
+                                            {entry}
+                                        </Pagination.Link>
+                                    )}
+                                </Pagination.Item>
+                            ))}
+                            <Pagination.Item>
+                                <Pagination.Next
+                                    isDisabled={page >= Math.ceil(total / PAGE_SIZE)}
+                                    onPress={() => setPage(page + 1)}
+                                >
+                                    <Pagination.NextIcon />
+                                </Pagination.Next>
+                            </Pagination.Item>
+                        </Pagination.Content>
+                    </Pagination>
                     <ButtonGroup className='my-auto'>
                         <Button
                             size='sm'
@@ -422,165 +534,175 @@ export default function History() {
                     </Button>
                 </div>
 
-                <Modal
-                    isOpen={isOpen}
-                    onOpenChange={onOpenChange}
-                    scrollBehavior='inside'
-                >
-                    <ModalContent className='max-h-[80vh]'>
-                        {(onClose) =>
-                            selectedItem && (
-                                <>
-                                    <ModalHeader>
-                                        <div className='flex justify-start'>
-                                            {getServiceSouceType(selectedItem.service) === ServiceSourceType.PLUGIN ? (
-                                                <img
-                                                    src={
-                                                        pluginList['translate'][getServiceName(selectedItem.service)]
-                                                            .icon
-                                                    }
-                                                    className='h-[24px] w-[24px] my-auto'
-                                                    draggable={false}
+                <Modal>
+                    <Modal.Backdrop
+                        isOpen={isOpen}
+                        onOpenChange={onOpenChange}
+                    >
+                        <Modal.Container scroll='inside'>
+                            <Modal.Dialog className='max-h-[80vh]'>
+                                {({ close }) =>
+                                    selectedItem && (
+                                        <>
+                                            <ModalHeader>
+                                                <div className='flex justify-start'>
+                                                    {getServiceSouceType(selectedItem.service) ===
+                                                    ServiceSourceType.PLUGIN ? (
+                                                        <img
+                                                            src={
+                                                                pluginList['translate'][
+                                                                    getServiceName(selectedItem.service)
+                                                                ].icon
+                                                            }
+                                                            className='h-[24px] w-[24px] my-auto'
+                                                            draggable={false}
+                                                        />
+                                                    ) : (
+                                                        <img
+                                                            src={`${builtinServices[getServiceName(selectedItem.service)].info.icon}`}
+                                                            className='h-[24px] w-[24px] m-auto mr-[8px]'
+                                                            draggable={false}
+                                                        />
+                                                    )}
+                                                </div>
+                                            </ModalHeader>
+                                            <ModalBody>
+                                                <TextArea
+                                                    value={selectedItem.text}
+                                                    onChange={(e) => {
+                                                        setSelectItem({ ...selectedItem, text: e.target.value });
+                                                    }}
                                                 />
-                                            ) : (
-                                                <img
-                                                    src={`${builtinServices[getServiceName(selectedItem.service)].info.icon}`}
-                                                    className='h-[24px] w-[24px] m-auto mr-[8px]'
-                                                    draggable={false}
+                                                <TextArea
+                                                    value={selectedItem.result}
+                                                    onChange={(e) => {
+                                                        setSelectItem({ ...selectedItem, result: e.target.value });
+                                                    }}
                                                 />
-                                            )}
-                                        </div>
-                                    </ModalHeader>
-                                    <ModalBody>
-                                        <Textarea
-                                            value={selectedItem.text}
-                                            onChange={(e) => {
-                                                setSelectItem({ ...selectedItem, text: e.target.value });
-                                            }}
-                                        />
-                                        <Textarea
-                                            value={selectedItem.result}
-                                            onChange={(e) => {
-                                                setSelectItem({ ...selectedItem, result: e.target.value });
-                                            }}
-                                        />
-                                    </ModalBody>
-                                    <ModalFooter className='flex justify-between'>
-                                        <ButtonGroup>
-                                            <Button
-                                                color='primary'
-                                                onPress={async () => {
-                                                    await updateData();
-                                                    onClose();
-                                                }}
-                                            >
-                                                {t('common.save')}
-                                            </Button>
-                                            <Button
-                                                isIconOnly
-                                                color='danger'
-                                                variant='flat'
-                                                aria-label={t('config.history.delete')}
-                                                onPress={async () => {
-                                                    await deleteItem(selectedItem.id);
-                                                    onClose();
-                                                }}
-                                            >
-                                                <MdDeleteOutline />
-                                            </Button>
-                                        </ButtonGroup>
-                                        <ButtonGroup>
-                                            {collectionServiceList &&
-                                                collectionServiceList.map((instanceKey) => {
-                                                    return (
-                                                        <Button
-                                                            key={instanceKey}
-                                                            isIconOnly
-                                                            variant='light'
-                                                            onPress={async () => {
-                                                                if (
-                                                                    getServiceSouceType(instanceKey) ===
-                                                                    ServiceSourceType.PLUGIN
-                                                                ) {
-                                                                    const pluginConfig =
-                                                                        (await store.get(instanceKey)) ?? {};
-                                                                    let [func, utils] = await invoke_plugin(
-                                                                        'collection',
-                                                                        getServiceName(instanceKey)
-                                                                    );
-                                                                    func(selectedItem.text, selectedItem.result, {
-                                                                        config: pluginConfig,
-                                                                        utils,
-                                                                    }).then(
-                                                                        (_) => {
-                                                                            toast.success(
-                                                                                t('translate.add_collection_success'),
+                                            </ModalBody>
+                                            <ModalFooter className='flex justify-between'>
+                                                <ButtonGroup>
+                                                    <Button
+                                                        variant='primary'
+                                                        onPress={async () => {
+                                                            await updateData();
+                                                            close();
+                                                        }}
+                                                    >
+                                                        {t('common.save')}
+                                                    </Button>
+                                                    <Button
+                                                        isIconOnly
+                                                        variant='danger-soft'
+                                                        aria-label={t('config.history.delete')}
+                                                        onPress={async () => {
+                                                            await deleteItem(selectedItem.id);
+                                                            close();
+                                                        }}
+                                                    >
+                                                        <MdDeleteOutline />
+                                                    </Button>
+                                                </ButtonGroup>
+                                                <ButtonGroup>
+                                                    {collectionServiceList &&
+                                                        collectionServiceList.map((instanceKey) => {
+                                                            return (
+                                                                <Button
+                                                                    key={instanceKey}
+                                                                    isIconOnly
+                                                                    variant='tertiary'
+                                                                    onPress={async () => {
+                                                                        if (
+                                                                            getServiceSouceType(instanceKey) ===
+                                                                            ServiceSourceType.PLUGIN
+                                                                        ) {
+                                                                            const pluginConfig =
+                                                                                (await store.get(instanceKey)) ?? {};
+                                                                            let [func, utils] = await invoke_plugin(
+                                                                                'collection',
+                                                                                getServiceName(instanceKey)
+                                                                            );
+                                                                            func(
+                                                                                selectedItem.text,
+                                                                                selectedItem.result,
                                                                                 {
-                                                                                    style: toastStyle,
+                                                                                    config: pluginConfig,
+                                                                                    utils,
+                                                                                }
+                                                                            ).then(
+                                                                                (_) => {
+                                                                                    toast.success(
+                                                                                        t(
+                                                                                            'translate.add_collection_success'
+                                                                                        ),
+                                                                                        {
+                                                                                            style: toastStyle,
+                                                                                        }
+                                                                                    );
+                                                                                },
+                                                                                (e) => {
+                                                                                    toast.error(e.toString(), {
+                                                                                        style: toastStyle,
+                                                                                    });
                                                                                 }
                                                                             );
-                                                                        },
-                                                                        (e) => {
-                                                                            toast.error(e.toString(), {
-                                                                                style: toastStyle,
-                                                                            });
-                                                                        }
-                                                                    );
-                                                                } else {
-                                                                    const instanceConfig =
-                                                                        (await store.get(instanceKey)) ?? {};
-                                                                    builtinCollectionServices[
-                                                                        getServiceName(instanceKey)
-                                                                    ]
-                                                                        .collection(
-                                                                            selectedItem.text,
-                                                                            selectedItem.result,
-                                                                            {
-                                                                                config: instanceConfig,
-                                                                            }
-                                                                        )
-                                                                        .then(
-                                                                            (_) => {
-                                                                                toast.success(
-                                                                                    t(
-                                                                                        'translate.add_collection_success'
-                                                                                    ),
+                                                                        } else {
+                                                                            const instanceConfig =
+                                                                                (await store.get(instanceKey)) ?? {};
+                                                                            builtinCollectionServices[
+                                                                                getServiceName(instanceKey)
+                                                                            ]
+                                                                                .collection(
+                                                                                    selectedItem.text,
+                                                                                    selectedItem.result,
                                                                                     {
-                                                                                        style: toastStyle,
+                                                                                        config: instanceConfig,
+                                                                                    }
+                                                                                )
+                                                                                .then(
+                                                                                    (_) => {
+                                                                                        toast.success(
+                                                                                            t(
+                                                                                                'translate.add_collection_success'
+                                                                                            ),
+                                                                                            {
+                                                                                                style: toastStyle,
+                                                                                            }
+                                                                                        );
+                                                                                    },
+                                                                                    (e) => {
+                                                                                        toast.error(e.toString(), {
+                                                                                            style: toastStyle,
+                                                                                        });
                                                                                     }
                                                                                 );
-                                                                            },
-                                                                            (e) => {
-                                                                                toast.error(e.toString(), {
-                                                                                    style: toastStyle,
-                                                                                });
-                                                                            }
-                                                                        );
-                                                                }
-                                                            }}
-                                                        >
-                                                            <img
-                                                                src={
-                                                                    getServiceSouceType(instanceKey) ===
-                                                                    ServiceSourceType.PLUGIN
-                                                                        ? pluginList['collection'][
-                                                                              getServiceName(instanceKey)
-                                                                          ].icon
-                                                                        : builtinCollectionServices[
-                                                                              getServiceName(instanceKey)
-                                                                          ].info.icon
-                                                                }
-                                                                className='h-[24px] w-[24px]'
-                                                            />
-                                                        </Button>
-                                                    );
-                                                })}
-                                        </ButtonGroup>
-                                    </ModalFooter>
-                                </>
-                            )
-                        }
-                    </ModalContent>
+                                                                        }
+                                                                    }}
+                                                                >
+                                                                    <img
+                                                                        src={
+                                                                            getServiceSouceType(instanceKey) ===
+                                                                            ServiceSourceType.PLUGIN
+                                                                                ? pluginList['collection'][
+                                                                                      getServiceName(instanceKey)
+                                                                                  ].icon
+                                                                                : builtinCollectionServices[
+                                                                                      getServiceName(instanceKey)
+                                                                                  ].info.icon
+                                                                        }
+                                                                        className='h-[24px] w-[24px]'
+                                                                    />
+                                                                </Button>
+                                                            );
+                                                        })}
+                                                </ButtonGroup>
+                                            </ModalFooter>
+                                        </>
+                                    )
+                                }
+                            </Modal.Dialog>
+                        </Modal.Container>
+                    </Modal.Backdrop>
                 </Modal>
             </>
         )

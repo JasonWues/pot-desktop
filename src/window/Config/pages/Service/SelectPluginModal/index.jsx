@@ -1,4 +1,4 @@
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button } from '@heroui/react';
+import { Modal, ModalHeader, ModalBody, ModalFooter, Button } from '@heroui/react';
 import { remove, BaseDirectory } from '@tauri-apps/plugin-fs';
 import { open as openInBrowser } from '@tauri-apps/plugin-shell';
 import toast, { Toaster } from 'react-hot-toast';
@@ -19,133 +19,132 @@ export default function SelectPluginModal(props) {
     const toastStyle = useToastStyle();
 
     return (
-        <Modal
-            isOpen={isOpen}
-            onOpenChange={onOpenChange}
-            scrollBehavior='inside'
-        >
-            <Toaster />
-            <ModalContent className='max-h-[80vh]'>
-                {(onClose) => (
-                    <>
-                        <ModalHeader>{t('config.service.add_service')}</ModalHeader>
-                        <ModalBody>
-                            {Object.keys(pluginList).length === 0 && (
-                                <Button
-                                    fullWidth
-                                    variant='flat'
-                                    onPress={() => {
-                                        openInBrowser('http://pot-app.com/plugin.html');
-                                    }}
-                                >
-                                    <div className='w-full'>{t('config.service.view_plugin_list')}</div>
-                                </Button>
-                            )}
-
-                            {Object.keys(pluginList).map((x) => {
-                                return (
-                                    <div
-                                        className='flex justify-between'
-                                        key={x}
-                                    >
+        <Modal>
+            <Modal.Backdrop
+                isOpen={isOpen}
+                onOpenChange={onOpenChange}
+            >
+                <Modal.Container scroll='inside'>
+                    <Toaster />
+                    <Modal.Dialog className='max-h-[80vh]'>
+                        {({ close }) => (
+                            <>
+                                <ModalHeader>{t('config.service.add_service')}</ModalHeader>
+                                <ModalBody>
+                                    {Object.keys(pluginList).length === 0 && (
                                         <Button
                                             fullWidth
-                                            className='mr-[8px]'
+                                            variant='tertiary'
                                             onPress={() => {
-                                                setCurrentConfigKey(createServiceInstanceKey(x));
-                                                onConfigOpen();
+                                                openInBrowser('http://pot-app.com/plugin.html');
                                             }}
-                                            startContent={
-                                                <img
-                                                    src={pluginList[x].icon}
-                                                    className='h-[24px] w-[24px] my-auto'
-                                                />
-                                            }
                                         >
-                                            <div className='w-full'>{pluginList[x].display}</div>
+                                            <div className='w-full'>{t('config.service.view_plugin_list')}</div>
                                         </Button>
+                                    )}
+
+                                    {Object.keys(pluginList).map((x) => {
+                                        return (
+                                            <div
+                                                className='flex justify-between'
+                                                key={x}
+                                            >
+                                                <Button
+                                                    variant='tertiary'
+                                                    fullWidth
+                                                    className='mr-[8px]'
+                                                    onPress={() => {
+                                                        setCurrentConfigKey(createServiceInstanceKey(x));
+                                                        onConfigOpen();
+                                                    }}
+                                                >
+                                                    <img
+                                                        src={pluginList[x].icon}
+                                                        className='h-[24px] w-[24px] my-auto'
+                                                    />
+                                                    <div className='w-full'>{pluginList[x].display}</div>
+                                                </Button>
+                                                <Button
+                                                    isIconOnly
+                                                    variant='danger-soft'
+                                                    onPress={() => {
+                                                        remove(`plugins/${pluginType}/${x}`, {
+                                                            baseDir: BaseDirectory.AppConfig,
+                                                            recursive: true,
+                                                        }).then(
+                                                            (v) => {
+                                                                toast.success(t('config.service.uninstall_success'), {
+                                                                    style: toastStyle,
+                                                                });
+                                                                deleteService(x);
+                                                                emit('reload_plugin_list');
+                                                            },
+                                                            (e) => {
+                                                                toast.error(e.toString(), { style: toastStyle });
+                                                            }
+                                                        );
+                                                    }}
+                                                >
+                                                    <MdDeleteOutline className='text-xl' />
+                                                </Button>
+                                            </div>
+                                        );
+                                    })}
+                                    <div>
                                         <Button
-                                            isIconOnly
-                                            color='danger'
-                                            variant='flat'
-                                            onPress={() => {
-                                                remove(`plugins/${pluginType}/${x}`, {
-                                                    baseDir: BaseDirectory.AppConfig,
-                                                    recursive: true,
-                                                }).then(
-                                                    (v) => {
-                                                        toast.success(t('config.service.uninstall_success'), {
-                                                            style: toastStyle,
-                                                        });
-                                                        deleteService(x);
-                                                        emit('reload_plugin_list');
-                                                    },
-                                                    (e) => {
-                                                        toast.error(e.toString(), { style: toastStyle });
-                                                    }
-                                                );
+                                            fullWidth
+                                            isPending={installing}
+                                            variant='tertiary'
+                                            onPress={async () => {
+                                                setInstalling(true);
+                                                const selected = await open({
+                                                    multiple: true,
+                                                    directory: false,
+                                                    filters: [
+                                                        {
+                                                            name: '*.potext',
+                                                            extensions: ['potext'],
+                                                        },
+                                                    ],
+                                                });
+                                                if (selected !== null) {
+                                                    invoke('install_plugin', {
+                                                        pathList: selected,
+                                                    }).then(
+                                                        (count) => {
+                                                            setInstalling(false);
+                                                            toast.success('Installed ' + count + ' plugins', {
+                                                                style: toastStyle,
+                                                            });
+                                                            emit('reload_plugin_list');
+                                                        },
+                                                        (e) => {
+                                                            setInstalling(false);
+                                                            toast.error(e.toString(), { style: toastStyle });
+                                                        }
+                                                    );
+                                                } else {
+                                                    setInstalling(false);
+                                                }
                                             }}
                                         >
-                                            <MdDeleteOutline className='text-xl' />
+                                            <div className='w-full'>{t('config.service.install_plugin')}</div>
                                         </Button>
                                     </div>
-                                );
-                            })}
-                            <div>
-                                <Button
-                                    fullWidth
-                                    isLoading={installing}
-                                    color='secondary'
-                                    variant='flat'
-                                    onPress={async () => {
-                                        setInstalling(true);
-                                        const selected = await open({
-                                            multiple: true,
-                                            directory: false,
-                                            filters: [
-                                                {
-                                                    name: '*.potext',
-                                                    extensions: ['potext'],
-                                                },
-                                            ],
-                                        });
-                                        if (selected !== null) {
-                                            invoke('install_plugin', {
-                                                pathList: selected,
-                                            }).then(
-                                                (count) => {
-                                                    setInstalling(false);
-                                                    toast.success('Installed ' + count + ' plugins', {
-                                                        style: toastStyle,
-                                                    });
-                                                    emit('reload_plugin_list');
-                                                },
-                                                (e) => {
-                                                    setInstalling(false);
-                                                    toast.error(e.toString(), { style: toastStyle });
-                                                }
-                                            );
-                                        } else {
-                                            setInstalling(false);
-                                        }
-                                    }}
-                                >
-                                    <div className='w-full'>{t('config.service.install_plugin')}</div>
-                                </Button>
-                            </div>
-                        </ModalBody>
-                        <ModalFooter>
-                            <Button
-                                color='danger'
-                                variant='light'
-                                onPress={onClose}
-                            >
-                                {t('common.cancel')}
-                            </Button>
-                        </ModalFooter>
-                    </>
-                )}
-            </ModalContent>
+                                </ModalBody>
+                                <ModalFooter>
+                                    <Button
+                                        variant='danger-soft'
+                                        onPress={close}
+                                    >
+                                        {t('common.cancel')}
+                                    </Button>
+                                </ModalFooter>
+                            </>
+                        )}
+                    </Modal.Dialog>
+                </Modal.Container>
+            </Modal.Backdrop>
         </Modal>
     );
 }

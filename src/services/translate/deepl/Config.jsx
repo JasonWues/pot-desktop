@@ -1,12 +1,8 @@
 import { INSTANCE_NAME_CONFIG_KEY } from '../../../utils/service_instance';
 import InstanceNameInput from '../../../components/InstanceNameInput';
-import { DropdownTrigger } from '@heroui/react';
-import { Input, Button } from '@heroui/react';
-import { DropdownMenu } from '@heroui/react';
-import { DropdownItem } from '@heroui/react';
+import { Input, Button, Dropdown, Label, TextField } from '@heroui/react';
 import toast, { Toaster } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { Dropdown } from '@heroui/react';
 import { open } from '@tauri-apps/plugin-shell';
 import React, { useState } from 'react';
 
@@ -74,68 +70,77 @@ export function Config(props) {
                 <div className='config-item'>
                     <h3 className='my-auto'>{t('services.translate.deepl.type')}</h3>
                     <Dropdown>
-                        <DropdownTrigger>
-                            <Button variant='bordered'>{t(`services.translate.deepl.${deeplConfig.type}`)}</Button>
-                        </DropdownTrigger>
-                        <DropdownMenu
-                            autoFocus='first'
-                            aria-label='app language'
-                            onAction={(key) => {
-                                setDeeplConfig({
-                                    ...deeplConfig,
-                                    type: key,
-                                });
-                            }}
-                        >
-                            <DropdownItem key='free'>{t(`services.translate.deepl.free`)}</DropdownItem>
-                            <DropdownItem key='api'>{t(`services.translate.deepl.api`)}</DropdownItem>
-                            <DropdownItem key='deeplx'>{t(`services.translate.deepl.deeplx`)}</DropdownItem>
-                        </DropdownMenu>
+                        <Button variant='outline'>{t(`services.translate.deepl.${deeplConfig.type}`)}</Button>
+                        <Dropdown.Popover>
+                            <Dropdown.Menu
+                                autoFocus='first'
+                                aria-label='app language'
+                                onAction={(key) => {
+                                    setDeeplConfig({
+                                        ...deeplConfig,
+                                        type: key,
+                                    });
+                                }}
+                            >
+                                <Dropdown.Item
+                                    key='free'
+                                    id='free'
+                                >
+                                    <Label>{t(`services.translate.deepl.free`)}</Label>
+                                </Dropdown.Item>
+                                <Dropdown.Item
+                                    key='api'
+                                    id='api'
+                                >
+                                    <Label>{t(`services.translate.deepl.api`)}</Label>
+                                </Dropdown.Item>
+                                <Dropdown.Item
+                                    key='deeplx'
+                                    id='deeplx'
+                                >
+                                    <Label>{t(`services.translate.deepl.deeplx`)}</Label>
+                                </Dropdown.Item>
+                            </Dropdown.Menu>
+                        </Dropdown.Popover>
                     </Dropdown>
                 </div>
                 <div className={`config-item ${deeplConfig.type !== 'api' ? 'hidden' : ''}`}>
-                    <Input
-                        label={t('services.translate.deepl.auth_key')}
-                        labelPlacement='outside-left'
-                        type='password'
+                    <TextField
+                        className='flex w-full flex-row items-center justify-between'
                         value={deeplConfig['authKey']}
-                        variant='bordered'
-                        classNames={{
-                            base: 'justify-between',
-                            label: 'text-(length:--heroui-font-size-medium)',
-                            mainWrapper: 'max-w-[50%]',
-                        }}
-                        onValueChange={(value) => {
+                        onChange={(value) => {
                             setDeeplConfig({
                                 ...deeplConfig,
                                 authKey: value,
                             });
                         }}
-                    />
+                    >
+                        <Label className='text-base my-auto'>{t('services.translate.deepl.auth_key')}</Label>
+                        <Input
+                            type='password'
+                            className='max-w-[50%]'
+                        />
+                    </TextField>
                 </div>
                 <div className={`config-item ${deeplConfig.type !== 'deeplx' ? 'hidden' : ''}`}>
-                    <Input
-                        label={t('services.translate.deepl.custom_url')}
-                        labelPlacement='outside-left'
+                    <TextField
+                        className='flex w-full flex-row items-center justify-between'
                         value={deeplConfig.customUrl}
-                        variant='bordered'
-                        classNames={{
-                            base: 'justify-between',
-                            label: 'text-(length:--heroui-font-size-medium)',
-                            mainWrapper: 'max-w-[50%]',
-                        }}
-                        onValueChange={(value) => {
+                        onChange={(value) => {
                             setDeeplConfig({
                                 ...deeplConfig,
                                 customUrl: value,
                             });
                         }}
-                    />
+                    >
+                        <Label className='text-base my-auto'>{t('services.translate.deepl.custom_url')}</Label>
+                        <Input className='max-w-[50%]' />
+                    </TextField>
                 </div>
                 <Button
+                    variant='primary'
                     type='submit'
-                    isLoading={isLoading}
-                    color='primary'
+                    isPending={isLoading}
                     fullWidth
                 >
                     {t('common.save')}

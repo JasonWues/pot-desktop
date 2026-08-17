@@ -2,6 +2,10 @@ import { appCacheDir, appConfigDir, join } from "@tauri-apps/api/path";
 import { readFile, readTextFile } from "@tauri-apps/plugin-fs";
 import { invoke } from "@tauri-apps/api/core";
 import Database from "@tauri-apps/plugin-sql";
+// The last crypto-js in the app, and the reason it is still a dependency at all.
+// It is handed to every `.potext` plugin below, so it is a published API and not
+// this repo's to withdraw -- the same reasoning that keeps the Tauri 1 shapes in
+// `http.js` and `env.js`. The app's own signing code uses `utils/crypto.js`.
 import CryptoJS from "crypto-js";
 import { http } from "./http";
 import { osType } from "./env";

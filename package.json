@@ -14,8 +14,9 @@
     },
     "dependencies": {
         "@hello-pangea/dnd": "^18.0.1",
-        "@heroui/react": "^2.8.10",
-        "@heroui/theme": "^2.4.26",
+        "@heroui/react": "^3.2.4",
+        "@heroui/styles": "^3.2.4",
+        "@noble/hashes": "^2.3.0",
         "@tauri-apps/api": "^2.1.1",
         "@tauri-apps/plugin-autostart": "^2.0.1",
         "@tauri-apps/plugin-clipboard-manager": "^2.0.1",
@@ -35,7 +36,6 @@
         "flag-icons": "^7.5.0",
         "framer-motion": "^13.1.0",
         "i18next": "^26.3.6",
-        "jose": "^6.2.8",
         "jotai": "^2.10.1",
         "jsqr": "^1.4.0",
         "nanoid": "^6.0.1",
@@ -48,7 +48,6 @@
         "react-icons": "^5.3.0",
         "react-markdown": "^10.1.0",
         "react-router-dom": "^7.18.2",
-        "react-spinners": "^0.17.0",
         "tesseract.js": "^5.1.1"
     },
     "devDependencies": {

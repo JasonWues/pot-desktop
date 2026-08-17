@@ -3,6 +3,10 @@
         "tauri": {
             "command": "npx",
             "args": ["-y", "@hypothesi/tauri-mcp-server@0.12.0"]
+        },
+        "heroui": {
+            "command": "npx",
+            "args": ["-y", "@heroui/mcp"]
         }
     }
 }

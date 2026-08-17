@@ -1,9 +1,13 @@
 #!/bin/bash
 
-wget https://nodejs.org/dist/v19.8.1/node-v19.8.1-linux-x64.tar.xz
-tar -Jxvf ./node-v19.8.1-linux-x64.tar.xz
-export PATH=$(pwd)/node-v19.8.1-linux-x64/bin:$PATH
-npm install pnpm -g
+# Node 22, not 19.8.1. `npm install pnpm -g` takes the latest pnpm, and pnpm 11
+# refuses to start on anything below Node 22.13 -- so this pairing broke on its
+# own the day pnpm 11 shipped, without the file changing.
+NODE_VERSION=v22.20.0
+wget "https://nodejs.org/dist/${NODE_VERSION}/node-${NODE_VERSION}-linux-x64.tar.xz"
+tar -Jxvf "./node-${NODE_VERSION}-linux-x64.tar.xz"
+export PATH=$(pwd)/node-${NODE_VERSION}-linux-x64/bin:$PATH
+npm install pnpm@11 -g
 
 rustup target add "$INPUT_TARGET"
 rustup toolchain install --force-non-host "$INPUT_TOOLCHAIN"

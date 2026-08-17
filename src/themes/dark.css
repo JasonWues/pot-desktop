@@ -1,0 +1,52 @@
+/*
+  The dark theme, carried over from the v2 config with the same hex values. See
+  light.css for how the v2 scale maps onto v3's named tokens.
+
+  Note the v2 `default` scale here runs darkest -> lightest (50 is #282828, 900
+  is #e7e7e7), the reverse of the light theme, which is why `muted` takes the
+  500 value from that direction and `border` the 100.
+*/
+@layer base {
+    [data-theme='dark'] {
+        color-scheme: dark;
+
+        --background: #202020;
+        --background-secondary: #282828;
+        --background-tertiary: #404040;
+        --foreground: #e7e7e7;
+
+        --surface: #282828;
+        --surface-foreground: #e7e7e7;
+        --surface-secondary: #303030;
+        --surface-secondary-foreground: #e7e7e7;
+        --surface-tertiary: #383838;
+        --surface-tertiary-foreground: #e7e7e7;
+        --surface-hover: #303030;
+
+        --overlay: #282828;
+        --overlay-foreground: #e7e7e7;
+
+        --default: #484848;
+        --default-foreground: #e7e7e7;
+        --default-hover: #585858;
+        --default-soft: #383838;
+        --default-soft-foreground: #e7e7e7;
+
+        --muted: #a7a7a7;
+
+        --border: #383838;
+        --border-secondary: #484848;
+        --separator: #383838;
+
+        --accent: #49cee9;
+        --accent-foreground: #181818;
+        --accent-hover: #5fd8f0;
+        --focus: #49cee9;
+        --link: #49cee9;
+
+        --field-background: #282828;
+        --field-foreground: #e7e7e7;
+        --field-placeholder: #a7a7a7;
+        --field-border: #383838;
+    }
+}

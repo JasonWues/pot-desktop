@@ -1,7 +1,7 @@
 import { useLocation, useRoutes } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
-import { Card, Divider } from '@heroui/react';
+import { Card, Separator } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 
 import WindowControl from '../../components/WindowControl';
@@ -30,8 +30,8 @@ export default function Config() {
             <Card
                 shadow='none'
                 className={`${
-                    transparent ? 'bg-background/90' : 'bg-content1'
-                } float-left w-[230px] h-screen rounded-none ${osType === 'Linux' ? 'rounded-l-[10px] border-1' : ''} border-r-1 border-default-100 select-none cursor-default`}
+                    transparent ? 'bg-background/90' : 'bg-surface'
+                } float-left w-[230px] h-screen rounded-none ${osType === 'Linux' ? 'rounded-l-[10px] border-1' : ''} border-r-1 border-border select-none cursor-default`}
             >
                 <div className='h-[35px] p-[5px]'>
                     <div
@@ -52,7 +52,7 @@ export default function Config() {
                 <SideBar />
             </Card>
             <div
-                className={`bg-background ml-[230px] h-screen select-none cursor-default ${osType === 'Linux' ? 'rounded-r-[10px] border-1 border-l-0 border-default-100' : ''}`}
+                className={`bg-background ml-[230px] h-screen select-none cursor-default ${osType === 'Linux' ? 'rounded-r-[10px] border-1 border-l-0 border-border' : ''}`}
             >
                 <div
                     data-tauri-drag-region='true'
@@ -65,7 +65,7 @@ export default function Config() {
 
                     <div className='flex'>{osType !== 'Darwin' && <WindowControl />}</div>
                 </div>
-                <Divider />
+                <Separator />
                 <div
                     className={`p-[10px] overflow-y-auto ${
                         osType === 'Linux' ? 'h-[calc(100vh-38px)]' : 'h-[calc(100vh-36px)]'

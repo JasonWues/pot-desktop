@@ -27,7 +27,7 @@ use edge_tts::{edge_tts, edge_tts_voices};
 use hotkey::*;
 use lang_detect::*;
 use ocr_layout::system_ocr_layout;
-use log::{info, warn};
+use log::{error, info, warn};
 use proxy::{apply_proxy, get_system_proxy};
 use screenshot::screenshot;
 use server::*;
@@ -48,6 +48,36 @@ pub static APP: OnceLock<tauri::AppHandle> = OnceLock::new();
 
 // Text to be translated
 pub struct StringWrapper(pub Mutex<String>);
+
+// A panic in a background thread -- the http server, the clipboard monitor, a
+// hotkey callback -- writes to stderr and nowhere else. Release builds are
+// `windows_subsystem = "windows"` and so have no stderr at all, which is how the
+// http server could die on its first request with the log file showing only that
+// the request arrived. Everything user-facing is diagnosed from the log dir
+// (tray -> View Log), so panics have to arrive there too.
+fn log_panics() {
+    let previous = std::panic::take_hook();
+    std::panic::set_hook(Box::new(move |info| {
+        let location = match info.location() {
+            Some(l) => format!("{}:{}:{}", l.file(), l.line(), l.column()),
+            None => "unknown location".to_string(),
+        };
+        // The payload is pulled out rather than logging `info` directly, whose
+        // Display repeats the location and then breaks the message onto a second
+        // line -- which in a log file full of other threads is a line that no
+        // longer says what it belongs to.
+        let payload = info.payload();
+        let message = payload
+            .downcast_ref::<&str>()
+            .map(|s| s.to_string())
+            .or_else(|| payload.downcast_ref::<String>().cloned())
+            .unwrap_or_else(|| "<non-string panic payload>".to_string());
+        let thread = std::thread::current();
+        let name = thread.name().unwrap_or("unnamed");
+        error!("Panic on thread '{name}' at {location}: {message}");
+        previous(info);
+    }));
+}
 
 fn main() {
     // Before anything can overwrite them: on Linux the inherited proxy variables
@@ -102,6 +132,8 @@ fn main() {
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .plugin(tauri_plugin_updater::Builder::new().build())
         .setup(|app| {
+            // After the log plugin, so the hook has a logger to write to.
+            log_panics();
             info!("============== Start App ==============");
             #[cfg(target_os = "macos")]
             {

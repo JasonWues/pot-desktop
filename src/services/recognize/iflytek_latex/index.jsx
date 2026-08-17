@@ -1,7 +1,5 @@
+import { hmacSha256, sha256, toBase64 } from '../../../utils/crypto';
 import { fetch } from '../../../utils/http';
-import hmacSHA256 from 'crypto-js/hmac-sha256';
-import hashSHA256 from 'crypto-js/sha256';
-import Base64 from 'crypto-js/enc-base64';
 
 export async function recognize(base64, language, options = {}) {
     const { config } = options;
@@ -25,10 +23,10 @@ export async function recognize(base64, language, options = {}) {
     const host = 'rest-api.xfyun.cn';
     const date = new Date().toUTCString();
     const request_line = 'POST /v2/itr HTTP/1.1';
-    const digest = 'SHA-256=' + Base64.stringify(hashSHA256(JSON.stringify(body)));
+    const digest = 'SHA-256=' + toBase64(sha256(JSON.stringify(body)));
     const signature_origin = `host: ${host}\ndate: ${date}\n${request_line}\ndigest: ${digest}`;
-    const signature_sha = hmacSHA256(signature_origin, apisecret);
-    const signature = Base64.stringify(signature_sha);
+    // Key first, message second -- the reverse of crypto-js's HmacSHA256.
+    const signature = toBase64(hmacSha256(apisecret, signature_origin));
     const authorization = `api_key="${apikey}", algorithm="hmac-sha256", headers="host date request-line digest", signature="${signature}"`;
     const headers = {
         'Content-Type': 'application/json',

@@ -1,6 +1,6 @@
 import { INSTANCE_NAME_CONFIG_KEY } from '../../../utils/service_instance';
 import InstanceNameInput from '../../../components/InstanceNameInput';
-import { Input, Button, Switch } from '@heroui/react';
+import { Input, Button, Switch, Label, TextField } from '@heroui/react';
 import toast, { Toaster } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { open } from '@tauri-apps/plugin-shell';
@@ -65,39 +65,38 @@ export function Config(props) {
                 <div className={'config-item'}>
                     <Switch
                         isSelected={config['https'] ?? true}
-                        onValueChange={(v) => {
+                        onChange={(v) => {
                             setConfig({ ...config, https: v });
                         }}
-                        classNames={{
-                            base: 'flex flex-row-reverse justify-between w-full max-w-full',
-                        }}
+                        className='w-full max-w-full'
                     >
-                        {t('services.translate.niutrans.https')}
+                        <Switch.Content className='flex w-full flex-row-reverse items-center justify-between'>
+                            <Switch.Control>
+                                <Switch.Thumb />
+                            </Switch.Control>
+                            {t('services.translate.niutrans.https')}
+                        </Switch.Content>
                     </Switch>
                 </div>
                 <div className={'config-item'}>
-                    <Input
-                        label={t('services.translate.niutrans.apikey')}
-                        labelPlacement='outside-left'
+                    <TextField
+                        className='flex w-full flex-row items-center justify-between'
                         value={config['apikey']}
-                        variant='bordered'
-                        classNames={{
-                            base: 'justify-between',
-                            label: 'text-(length:--heroui-font-size-medium)',
-                            mainWrapper: 'max-w-[50%]',
-                        }}
-                        onValueChange={(value) => {
+                        onChange={(value) => {
                             setConfig({
                                 ...config,
                                 apikey: value,
                             });
                         }}
-                    />
+                    >
+                        <Label className='text-base my-auto'>{t('services.translate.niutrans.apikey')}</Label>
+                        <Input className='max-w-[50%]' />
+                    </TextField>
                 </div>
                 <Button
+                    variant='primary'
                     type='submit'
-                    isLoading={isLoading}
-                    color='primary'
+                    isPending={isLoading}
                     fullWidth
                 >
                     {t('common.save')}

@@ -26,7 +26,7 @@ export default function WindowControl() {
         <div>
             <Button
                 isIconOnly
-                variant='light'
+                variant='tertiary'
                 className='w-[35px] h-[35px] rounded-none'
                 onPress={() => appWindow.minimize()}
             >
@@ -34,7 +34,7 @@ export default function WindowControl() {
             </Button>
             <Button
                 isIconOnly
-                variant='light'
+                variant='tertiary'
                 className='w-[35px] h-[35px] rounded-none'
                 onPress={() => {
                     if (isMax) {
@@ -48,7 +48,7 @@ export default function WindowControl() {
             </Button>
             <Button
                 isIconOnly
-                variant='light'
+                variant='tertiary'
                 className={`w-[35px] h-[35px] rounded-none close-button ${osType === 'Linux' ? 'rounded-tr-[10px]' : ''}`}
                 onPress={() => appWindow.close()}
             >

@@ -1,20 +1,12 @@
 import { readTextFile, BaseDirectory } from '@tauri-apps/plugin-fs';
-import { DropdownTrigger } from '@heroui/react';
-import { useDisclosure } from '@heroui/react';
+import { CardContent, Dropdown, Button, Input, Card, Avatar, Tooltip, Label, TextField } from '@heroui/react';
+
 import toast, { Toaster } from 'react-hot-toast';
-import { DropdownMenu } from '@heroui/react';
-import { DropdownItem } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
-import { CardBody } from '@heroui/react';
-import { Dropdown } from '@heroui/react';
 import { warn } from '@tauri-apps/plugin-log';
-import { Button } from '@heroui/react';
-import { Input } from '@heroui/react';
-import { Card } from '@heroui/react';
-import { Avatar, Tooltip } from '@heroui/react';
 import React, { useEffect, useState } from 'react';
 
-import { useConfig, useToastStyle } from '../../../../hooks';
+import { useConfig, useToastStyle, useDisclosure } from '../../../../hooks';
 import { osType } from '../../../../utils/env';
 import * as webdav from './utils/webdav';
 import WebDavModal from './WebDavModal';
@@ -181,69 +173,93 @@ export default function Backup() {
     return (
         <Card className='mb-[10px]'>
             <Toaster />
-            <CardBody>
+            <CardContent>
                 <div className='config-item'>
                     <h3 className='my-auto'>{t('config.backup.type')}</h3>
                     {backupType !== null && (
                         <Dropdown>
-                            <DropdownTrigger>
-                                <Button variant='bordered'>{t(`config.backup.${backupType}`)}</Button>
-                            </DropdownTrigger>
-                            <DropdownMenu
-                                aria-label='backup type'
-                                onAction={(key) => {
-                                    setBackupType(key);
-                                }}
-                            >
-                                <DropdownItem key='webdav'>{t('config.backup.webdav')}</DropdownItem>
-                                <DropdownItem key='aliyun'>{t('config.backup.aliyun')}</DropdownItem>
-                                <DropdownItem key='local'>{t('config.backup.local')}</DropdownItem>
-                            </DropdownMenu>
+                            <Button variant='outline'>{t(`config.backup.${backupType}`)}</Button>
+                            <Dropdown.Popover>
+                                <Dropdown.Menu
+                                    aria-label='backup type'
+                                    onAction={(key) => {
+                                        setBackupType(key);
+                                    }}
+                                >
+                                    <Dropdown.Item
+                                        key='webdav'
+                                        id='webdav'
+                                    >
+                                        <Label>{t('config.backup.webdav')}</Label>
+                                    </Dropdown.Item>
+                                    <Dropdown.Item
+                                        key='aliyun'
+                                        id='aliyun'
+                                    >
+                                        <Label>{t('config.backup.aliyun')}</Label>
+                                    </Dropdown.Item>
+                                    <Dropdown.Item
+                                        key='local'
+                                        id='local'
+                                    >
+                                        <Label>{t('config.backup.local')}</Label>
+                                    </Dropdown.Item>
+                                </Dropdown.Menu>
+                            </Dropdown.Popover>
                         </Dropdown>
                     )}
                 </div>
                 <div className={backupType !== 'webdav' ? 'hidden' : ''}>
+                    {/* aria-label rather than a <Label> child, for all three rows below.
+                        These already name themselves with the <h3> to their left; v2 named
+                        them twice too, but its `label` prop defaulted to `labelPlacement:
+                        'inside'`, so the second copy floated inside the empty field as a
+                        placeholder and vanished on input. v3's Label is a real sibling
+                        element, which put a second full-size label between the heading and
+                        the box. */}
                     <div className='config-item'>
                         <h3 className='my-auto'>{t('config.backup.webdav_url')}</h3>
                         {davUrl !== null && (
-                            <Input
-                                variant='bordered'
+                            <TextField
+                                aria-label={t('config.backup.webdav_url')}
+                                className='flex w-full flex-row items-center justify-end max-w-[300px]'
                                 value={davUrl}
-                                label={t('config.backup.webdav_url')}
-                                onValueChange={(v) => {
+                                onChange={(v) => {
                                     setDavUrl(v);
                                 }}
-                                className='max-w-[300px]'
-                            />
+                            >
+                                <Input />
+                            </TextField>
                         )}
                     </div>
                     <div className='config-item'>
                         <h3 className='my-auto'>{t('config.backup.username')}</h3>
                         {davUserName !== null && (
-                            <Input
-                                variant='bordered'
+                            <TextField
+                                aria-label={t('config.backup.username')}
+                                className='flex w-full flex-row items-center justify-end max-w-[300px]'
                                 value={davUserName}
-                                label={t('config.backup.username')}
-                                onValueChange={(v) => {
+                                onChange={(v) => {
                                     setDavUserName(v);
                                 }}
-                                className='max-w-[300px]'
-                            />
+                            >
+                                <Input />
+                            </TextField>
                         )}
                     </div>
                     <div className='config-item'>
                         <h3 className='my-auto'>{t('config.backup.password')}</h3>
                         {davPassword !== null && (
-                            <Input
-                                type='password'
-                                variant='bordered'
+                            <TextField
+                                aria-label={t('config.backup.password')}
+                                className='flex w-full flex-row items-center justify-end max-w-[300px]'
                                 value={davPassword}
-                                label={t('config.backup.password')}
-                                onValueChange={(v) => {
+                                onChange={(v) => {
                                     setDavPassword(v);
                                 }}
-                                className='max-w-[300px]'
-                            />
+                            >
+                                <Input type='password' />
+                            </TextField>
                         )}
                     </div>
                 </div>
@@ -258,47 +274,45 @@ export default function Backup() {
                         <>
                             <h3 className='my-auto'>{t('config.backup.username')}</h3>
 
-                            <Tooltip
-                                content={t('config.backup.logout')}
-                                placement='bottom-end'
-                            >
-                                <Button
-                                    variant='light'
-                                    onClick={() => {
-                                        setAliyunAccessToken('');
-                                        // setAliyunRefreshToken('');
-                                        setAliyunUserInfo(null);
-                                        refreshQrCode();
-                                    }}
-                                >
-                                    <Avatar
-                                        src={aliyunUserInfo.avatar}
-                                        size='sm'
-                                    />
-                                    <h3 className='my-auto'>{aliyunUserInfo.name}</h3>
-                                </Button>
+                            <Tooltip>
+                                <Tooltip.Trigger>
+                                    <Button
+                                        variant='tertiary'
+                                        onClick={() => {
+                                            setAliyunAccessToken('');
+                                            // setAliyunRefreshToken('');
+                                            setAliyunUserInfo(null);
+                                            refreshQrCode();
+                                        }}
+                                    >
+                                        <Avatar
+                                            src={aliyunUserInfo.avatar}
+                                            size='sm'
+                                        />
+                                        <h3 className='my-auto'>{aliyunUserInfo.name}</h3>
+                                    </Button>
+                                </Tooltip.Trigger>
+                                <Tooltip.Content placement='bottom-end'>{t('config.backup.logout')}</Tooltip.Content>
                             </Tooltip>
                         </>
                     )}
                 </div>
                 <div className='flex justify-around'>
                     <Button
-                        color='success'
-                        variant='flat'
-                        isLoading={uploading}
+                        variant='tertiary'
+                        isPending={uploading}
                         onPress={onBackup}
                     >
                         {t('config.backup.backup')}
                     </Button>
                     <Button
-                        color='secondary'
-                        variant='flat'
+                        variant='tertiary'
                         onPress={onBackupListOpen}
                     >
                         {t('config.backup.restore')}
                     </Button>
                 </div>
-            </CardBody>
+            </CardContent>
             <WebDavModal
                 isOpen={isWebDavListOpen}
                 onOpenChange={onWebDavListOpenChange}

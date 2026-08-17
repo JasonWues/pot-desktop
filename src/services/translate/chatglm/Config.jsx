@@ -1,13 +1,9 @@
 import { INSTANCE_NAME_CONFIG_KEY } from '../../../utils/service_instance';
 import InstanceNameInput from '../../../components/InstanceNameInput';
-import { Input, Button, Textarea } from '@heroui/react';
-import { DropdownTrigger } from '@heroui/react';
+import { Input, Button, TextArea, Dropdown, Label, TextField } from '@heroui/react';
 import { MdDeleteOutline } from 'react-icons/md';
-import { DropdownMenu } from '@heroui/react';
-import { DropdownItem } from '@heroui/react';
 import toast, { Toaster } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { Dropdown } from '@heroui/react';
 import { open } from '@tauri-apps/plugin-shell';
 import React, { useState } from 'react';
 
@@ -17,7 +13,23 @@ import { translate } from './index';
 import { Language } from './index';
 
 // https://docs.bigmodel.cn/cn/guide/start/model-overview#%E6%96%87%E6%9C%AC%E6%A8%A1%E5%9E%8B
-const availableModels = ['glm-4.5', 'glm-4.5-x', 'glm-4.5-air', 'glm-4.5-airx', 'glm-4-plus', 'glm-4-air-250414', 'glm-4-long', 'glm-4-airx', 'glm-4-flashx-250414', 'glm-z1-air', 'glm-z1-airx', 'glm-z1-flashx', 'glm-4.5-flash', 'glm-4-flash-250414', 'glm-z1-flash']
+const availableModels = [
+    'glm-4.5',
+    'glm-4.5-x',
+    'glm-4.5-air',
+    'glm-4.5-airx',
+    'glm-4-plus',
+    'glm-4-air-250414',
+    'glm-4-long',
+    'glm-4-airx',
+    'glm-4-flashx-250414',
+    'glm-z1-air',
+    'glm-z1-airx',
+    'glm-z1-flashx',
+    'glm-4.5-flash',
+    'glm-4-flash-250414',
+    'glm-z1-flash',
+];
 
 export function Config(props) {
     const { instanceKey, updateServiceList, onClose } = props;
@@ -84,63 +96,61 @@ export function Config(props) {
                 <div className='config-item'>
                     <h3 className='my-auto'>{t('services.translate.chatglm.model')}</h3>
                     <Dropdown>
-                        <DropdownTrigger>
-                            <Button variant='bordered'>{serviceConfig.model}</Button>
-                        </DropdownTrigger>
-                        <DropdownMenu
-                            autoFocus='first'
-                            aria-label='model'
-                            onAction={(key) => {
-                                setServiceConfig({
-                                    ...serviceConfig,
-                                    model: key,
-                                });
-                            }}
-                        >
-                            {availableModels.map(it => (
-                                <DropdownItem key={it}>
-                                    {it}
-                                </DropdownItem>
-                            ))}
-                        </DropdownMenu>
+                        <Button variant='outline'>{serviceConfig.model}</Button>
+                        <Dropdown.Popover>
+                            <Dropdown.Menu
+                                autoFocus='first'
+                                aria-label='model'
+                                onAction={(key) => {
+                                    setServiceConfig({
+                                        ...serviceConfig,
+                                        model: key,
+                                    });
+                                }}
+                            >
+                                {availableModels.map((it) => (
+                                    <Dropdown.Item
+                                        key={it}
+                                        id={it}
+                                    >
+                                        {it}
+                                    </Dropdown.Item>
+                                ))}
+                            </Dropdown.Menu>
+                        </Dropdown.Popover>
                     </Dropdown>
                 </div>
                 <div className='config-item'>
-                    <Input
-                        label={t('services.translate.chatglm.api_key')}
-                        labelPlacement='outside-left'
-                        type='password'
+                    <TextField
+                        className='flex w-full flex-row items-center justify-between'
                         value={serviceConfig['apiKey']}
-                        variant='bordered'
-                        classNames={{
-                            base: 'justify-between',
-                            label: 'text-(length:--heroui-font-size-medium)',
-                            mainWrapper: 'max-w-[50%]',
-                        }}
-                        onValueChange={(value) => {
+                        onChange={(value) => {
                             setServiceConfig({
                                 ...serviceConfig,
                                 apiKey: value,
                             });
                         }}
-                    />
+                    >
+                        <Label className='text-base my-auto'>{t('services.translate.chatglm.api_key')}</Label>
+                        <Input
+                            type='password'
+                            className='max-w-[50%]'
+                        />
+                    </TextField>
                 </div>
 
                 <h3 className='my-auto'>Prompt List</h3>
-                <p className='text-[10px] text-default-700'>{t('services.translate.chatglm.prompt_description')}</p>
+                <p className='text-[10px] text-foreground'>{t('services.translate.chatglm.prompt_description')}</p>
 
-                <div className='bg-content2 rounded-[10px] p-3'>
+                <div className='bg-surface-secondary rounded-[10px] p-3'>
                     {serviceConfig.promptList &&
                         serviceConfig.promptList.map((prompt, index) => {
                             return (
                                 <div className='config-item'>
-                                    <Textarea
-                                        label={prompt.role}
-                                        labelPlacement='outside'
-                                        variant='faded'
+                                    <TextField
+                                        className='w-full'
                                         value={prompt.content}
-                                        placeholder={`Input Some ${prompt.role} Prompt`}
-                                        onValueChange={(value) => {
+                                        onChange={(value) => {
                                             setServiceConfig({
                                                 ...serviceConfig,
                                                 promptList: serviceConfig.promptList.map((p, i) => {
@@ -155,12 +165,18 @@ export function Config(props) {
                                                 }),
                                             });
                                         }}
-                                    />
+                                    >
+                                        <Label>{prompt.role}</Label>
+                                        <TextArea
+                                            fullWidth
+                                            rows={3}
+                                            placeholder={`Input Some ${prompt.role} Prompt`}
+                                        />
+                                    </TextField>
                                     <Button
                                         isIconOnly
-                                        color='danger'
                                         className='my-auto mx-1'
-                                        variant='flat'
+                                        variant='danger-soft'
                                         onPress={() => {
                                             setServiceConfig({
                                                 ...serviceConfig,
@@ -193,10 +209,10 @@ export function Config(props) {
                 </div>
                 <br />
                 <Button
+                    variant='primary'
                     type='submit'
-                    isLoading={isLoading}
+                    isPending={isLoading}
                     fullWidth
-                    color='primary'
                 >
                     {t('common.save')}
                 </Button>

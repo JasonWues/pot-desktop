@@ -1,4 +1,4 @@
-import { Button, Input, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@heroui/react';
+import { Button, Input, Dropdown, Label, TextField } from '@heroui/react';
 import toast, { Toaster } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { open } from '@tauri-apps/plugin-shell';
@@ -50,110 +50,108 @@ export function Config(props) {
                     </Button>
                 </div>
                 <div className='config-item'>
-                    <Input
-                        label={t('services.tts.openai_tts.request_path')}
-                        labelPlacement='outside-left'
+                    <TextField
+                        className='flex w-full flex-row items-center justify-between'
                         value={openaiTtsConfig['requestPath']}
-                        variant='bordered'
-                        classNames={{
-                            base: 'justify-between',
-                            label: 'text-(length:--heroui-font-size-medium)',
-                            mainWrapper: 'max-w-[50%]',
-                        }}
-                        onValueChange={(value) => {
+                        onChange={(value) => {
                             setOpenaiTtsConfig({
                                 ...openaiTtsConfig,
                                 requestPath: value,
                             });
                         }}
-                    />
+                    >
+                        <Label className='text-base my-auto'>{t('services.tts.openai_tts.request_path')}</Label>
+                        <Input className='max-w-[50%]' />
+                    </TextField>
                 </div>
                 <div className='config-item'>
-                    <Input
-                        label={t('services.tts.openai_tts.api_key')}
-                        labelPlacement='outside-left'
-                        type='password'
+                    <TextField
+                        className='flex w-full flex-row items-center justify-between'
                         value={openaiTtsConfig['apiKey']}
-                        variant='bordered'
-                        classNames={{
-                            base: 'justify-between',
-                            label: 'text-(length:--heroui-font-size-medium)',
-                            mainWrapper: 'max-w-[50%]',
-                        }}
-                        onValueChange={(value) => {
+                        onChange={(value) => {
                             setOpenaiTtsConfig({
                                 ...openaiTtsConfig,
                                 apiKey: value,
                             });
                         }}
-                    />
+                    >
+                        <Label className='text-base my-auto'>{t('services.tts.openai_tts.api_key')}</Label>
+                        <Input
+                            type='password'
+                            className='max-w-[50%]'
+                        />
+                    </TextField>
                 </div>
                 <div className='config-item'>
-                    <Input
-                        label={t('services.tts.openai_tts.model')}
-                        labelPlacement='outside-left'
+                    <TextField
+                        className='flex w-full flex-row items-center justify-between'
                         value={openaiTtsConfig['model']}
-                        variant='bordered'
-                        classNames={{
-                            base: 'justify-between',
-                            label: 'text-(length:--heroui-font-size-medium)',
-                            mainWrapper: 'max-w-[50%]',
-                        }}
-                        onValueChange={(value) => {
+                        onChange={(value) => {
                             setOpenaiTtsConfig({
                                 ...openaiTtsConfig,
                                 model: value,
                             });
                         }}
-                    />
+                    >
+                        <Label className='text-base my-auto'>{t('services.tts.openai_tts.model')}</Label>
+                        <Input className='max-w-[50%]' />
+                    </TextField>
                 </div>
                 <div className='config-item'>
                     <h3 className='my-auto'>{t('services.tts.openai_tts.voice')}</h3>
                     <Dropdown>
-                        <DropdownTrigger>
-                            <Button variant='bordered'>{openaiTtsConfig['voice']}</Button>
-                        </DropdownTrigger>
-                        <DropdownMenu
-                            aria-label='openai tts voice'
-                            onAction={(key) => {
-                                setOpenaiTtsConfig({
-                                    ...openaiTtsConfig,
-                                    voice: key,
-                                });
-                            }}
-                        >
-                            {VOICE_OPTIONS.map((voice) => (
-                                <DropdownItem key={voice}>{voice}</DropdownItem>
-                            ))}
-                        </DropdownMenu>
+                        <Button variant='outline'>{openaiTtsConfig['voice']}</Button>
+                        <Dropdown.Popover>
+                            <Dropdown.Menu
+                                aria-label='openai tts voice'
+                                onAction={(key) => {
+                                    setOpenaiTtsConfig({
+                                        ...openaiTtsConfig,
+                                        voice: key,
+                                    });
+                                }}
+                            >
+                                {VOICE_OPTIONS.map((voice) => (
+                                    <Dropdown.Item
+                                        key={voice}
+                                        id={voice}
+                                    >
+                                        <Label>{voice}</Label>
+                                    </Dropdown.Item>
+                                ))}
+                            </Dropdown.Menu>
+                        </Dropdown.Popover>
                     </Dropdown>
                 </div>
                 <div className='config-item'>
                     <h3 className='my-auto'>{t('services.tts.openai_tts.speed')}</h3>
                     <Dropdown>
-                        <DropdownTrigger>
-                            <Button variant='bordered'>{`${openaiTtsConfig['speed'] ?? 1}x`}</Button>
-                        </DropdownTrigger>
-                        <DropdownMenu
-                            aria-label='openai tts speed'
-                            onAction={(key) => {
-                                setOpenaiTtsConfig({
-                                    ...openaiTtsConfig,
-                                    speed: Number(key),
-                                });
-                            }}
-                        >
-                            {SPEED_OPTIONS.map((speed) => (
-                                <DropdownItem key={speed}>{`${speed}x`}</DropdownItem>
-                            ))}
-                        </DropdownMenu>
+                        <Button variant='outline'>{`${openaiTtsConfig['speed'] ?? 1}x`}</Button>
+                        <Dropdown.Popover>
+                            <Dropdown.Menu
+                                aria-label='openai tts speed'
+                                onAction={(key) => {
+                                    setOpenaiTtsConfig({
+                                        ...openaiTtsConfig,
+                                        speed: Number(key),
+                                    });
+                                }}
+                            >
+                                {SPEED_OPTIONS.map((speed) => (
+                                    <Dropdown.Item
+                                        key={speed}
+                                        id={speed}
+                                    >{`${speed}x`}</Dropdown.Item>
+                                ))}
+                            </Dropdown.Menu>
+                        </Dropdown.Popover>
                     </Dropdown>
                 </div>
                 <div>
                     <Button
-                        isLoading={isLoading}
+                        variant='primary'
+                        isPending={isLoading}
                         fullWidth
-                        color='primary'
                         onPress={() => {
                             setIsLoading(true);
                             tts('hello', Language.en, { config: openaiTtsConfig }).then(

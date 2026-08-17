@@ -1,4 +1,4 @@
-import { Input } from '@heroui/react';
+import { Input, Label, TextField } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
 
@@ -16,20 +16,16 @@ export default function InstanceNameInput({ config, onChange }) {
 
     return (
         <div className='config-item'>
-            <Input
-                label={t('services.instance_name')}
-                labelPlacement='outside-left'
+            <TextField
+                className='flex w-full flex-row items-center justify-between'
                 value={config[INSTANCE_NAME_CONFIG_KEY]}
-                variant='bordered'
-                classNames={{
-                    base: 'justify-between',
-                    label: 'text-(length:--heroui-font-size-medium)',
-                    mainWrapper: 'max-w-[50%]',
-                }}
-                onValueChange={(value) => {
+                onChange={(value) => {
                     onChange({ ...config, [INSTANCE_NAME_CONFIG_KEY]: value });
                 }}
-            />
+            >
+                <Label className='text-base my-auto'>{t('services.instance_name')}</Label>
+                <Input className='max-w-[50%]' />
+            </TextField>
         </div>
     );
 }

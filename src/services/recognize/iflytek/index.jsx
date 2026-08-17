@@ -1,5 +1,5 @@
+import { base64ToUtf8, hmacSha256, toBase64 } from '../../../utils/crypto';
 import { fetch } from '../../../utils/http';
-import CryptoJS from 'crypto-js';
 
 export async function recognize(base64, language, options = {}) {
     const { config } = options;
@@ -62,8 +62,7 @@ export async function recognize(base64, language, options = {}) {
         throw `Result payload not found\nResult:\n${JSON.stringify(res)}`;
     }
 
-    let text = CryptoJS.enc.Base64.parse(res_payload['result']['text']); // Base64解码
-    let text_string = CryptoJS.enc.Utf8.stringify(text);
+    let text_string = base64ToUtf8(res_payload['result']['text']); // Base64解码
     let text_json = JSON.parse(text_string);
     let return_content = ''; // 最终结果
 
@@ -94,8 +93,8 @@ export async function recognize(base64, language, options = {}) {
 
 export function iflytek_auth(api_key, api_secret, host, date, request_line) {
     const signature_origin = 'host: ' + host + '\n' + 'date: ' + date + '\n' + request_line;
-    let signature_sha = CryptoJS.HmacSHA256(signature_origin, api_secret);
-    let signature = CryptoJS.enc.Base64.stringify(signature_sha);
+    // Key first, message second -- the reverse of crypto-js's HmacSHA256.
+    let signature = toBase64(hmacSha256(api_secret, signature_origin));
     let authorization_origin =
         'api_key="' +
         api_key +

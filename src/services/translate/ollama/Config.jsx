@@ -1,4 +1,17 @@
-import { Input, Button, Switch, Textarea, Card, CardBody, Link, Tooltip, Progress } from '@heroui/react';
+import {
+    Input,
+    Button,
+    Switch,
+    TextArea,
+    Card,
+    CardContent,
+    Link,
+    Tooltip,
+    ProgressBar,
+    Label,
+    TextField,
+    InputGroup,
+} from '@heroui/react';
 import { INSTANCE_NAME_CONFIG_KEY } from '../../../utils/service_instance';
 import InstanceNameInput from '../../../components/InstanceNameInput';
 import { MdDeleteOutline } from 'react-icons/md';
@@ -112,7 +125,7 @@ export function Config(props) {
                         className='border-none bg-danger/20 dark:bg-danger/10'
                         shadow='sm'
                     >
-                        <CardBody>
+                        <CardContent>
                             <div>
                                 {t('services.translate.ollama.install_ollama')}
                                 <br />
@@ -124,7 +137,7 @@ export function Config(props) {
                                     {t('services.translate.ollama.install_ollama_link')}
                                 </Link>
                             </div>
-                        </CardBody>
+                        </CardContent>
                     </Card>
                 )}
                 <div className='config-item'>
@@ -140,107 +153,113 @@ export function Config(props) {
                 <div className='config-item'>
                     <Switch
                         isSelected={serviceConfig['stream']}
-                        onValueChange={(value) => {
+                        onChange={(value) => {
                             setServiceConfig({
                                 ...serviceConfig,
                                 stream: value,
                             });
                         }}
-                        classNames={{
-                            base: 'flex flex-row-reverse justify-between w-full max-w-full',
-                        }}
+                        className='w-full max-w-full'
                     >
-                        {t('services.translate.ollama.stream')}
+                        <Switch.Content className='flex w-full flex-row-reverse items-center justify-between'>
+                            <Switch.Control>
+                                <Switch.Thumb />
+                            </Switch.Control>
+                            {t('services.translate.ollama.stream')}
+                        </Switch.Content>
                     </Switch>
                 </div>
                 <div className='config-item'>
-                    <Input
-                        label={t('services.translate.ollama.request_path')}
-                        labelPlacement='outside-left'
+                    <TextField
+                        className='flex w-full flex-row items-center justify-between'
                         value={serviceConfig['requestPath']}
-                        variant='bordered'
-                        classNames={{
-                            base: 'justify-between',
-                            label: 'text-(length:--heroui-font-size-medium)',
-                            mainWrapper: 'max-w-[50%]',
-                        }}
-                        onValueChange={(value) => {
+                        onChange={(value) => {
                             setServiceConfig({
                                 ...serviceConfig,
                                 requestPath: value,
                             });
                         }}
-                    />
+                    >
+                        <Label className='text-base my-auto'>{t('services.translate.ollama.request_path')}</Label>
+                        <Input className='max-w-[50%]' />
+                    </TextField>
                 </div>
                 <div className='config-item'>
-                    <Input
-                        label={t('services.translate.ollama.model')}
-                        labelPlacement='outside-left'
+                    <TextField
+                        className='flex w-full flex-row items-center justify-between'
                         value={serviceConfig['model']}
-                        variant='bordered'
-                        classNames={{
-                            base: 'justify-between',
-                            label: 'text-(length:--heroui-font-size-medium)',
-                            mainWrapper: 'max-w-[50%]',
-                        }}
-                        onValueChange={(value) => {
+                        onChange={(value) => {
                             setServiceConfig({
                                 ...serviceConfig,
                                 model: value,
                             });
                         }}
-                        endContent={
-                            installedModels &&
-                            !installedModels.models
-                                .map((model) => {
-                                    return model.name;
-                                })
-                                .includes(serviceConfig['model']) ? (
-                                <Tooltip content={t('services.translate.ollama.not_installed')}>
+                    >
+                        <Label className='text-base my-auto'>{t('services.translate.ollama.model')}</Label>
+                        {/* InputGroup, not a child of Input: v3's Input renders a
+                            real <input>, which is a void element. The pull button
+                            is a Suffix, which is what v2's `endContent` meant. */}
+                        <InputGroup className='max-w-[50%]'>
+                            <InputGroup.Input />
+                            <InputGroup.Suffix>
+                                {installedModels &&
+                                !installedModels.models
+                                    .map((model) => {
+                                        return model.name;
+                                    })
+                                    .includes(serviceConfig['model']) ? (
+                                    <Tooltip>
+                                        <Tooltip.Trigger>
+                                            <Button
+                                                size='sm'
+                                                variant='tertiary'
+                                                isPending={isPulling}
+                                                onPress={pullModel}
+                                            >
+                                                {t('services.translate.ollama.install_model')}
+                                            </Button>
+                                        </Tooltip.Trigger>
+                                        <Tooltip.Content>
+                                            {t('services.translate.ollama.not_installed')}
+                                        </Tooltip.Content>
+                                    </Tooltip>
+                                ) : (
                                     <Button
                                         size='sm'
-                                        variant='flat'
-                                        color='warning'
-                                        isLoading={isPulling}
-                                        onPress={pullModel}
+                                        variant='tertiary'
+                                        disabled
                                     >
-                                        {t('services.translate.ollama.install_model')}
+                                        {t('services.translate.ollama.ready')}
                                     </Button>
-                                </Tooltip>
-                            ) : (
-                                <Button
-                                    size='sm'
-                                    variant='flat'
-                                    color='success'
-                                    disabled
-                                >
-                                    {t('services.translate.ollama.ready')}
-                                </Button>
-                            )
-                        }
-                    />
+                                )}
+                            </InputGroup.Suffix>
+                        </InputGroup>
+                    </TextField>
                 </div>
                 <Card
                     isBlurred
                     className='border-none bg-success/20 dark:bg-success/10'
                     shadow='sm'
                 >
-                    <CardBody>
+                    <CardContent>
+                        {/* See the Updater window for the same shape: v3 drops
+                            `label`, `showValueLabel` and `classNames`, so the
+                            status line is markup and each slot becomes a className
+                            on the part it named. */}
                         {isPulling && (
-                            <Progress
-                                size='sm'
-                                radius='sm'
-                                classNames={{
-                                    base: 'max-w-md',
-                                    track: 'drop-shadow-md border border-default',
-                                    indicator: 'bg-linear-to-r from-pink-500 to-yellow-500',
-                                    label: 'tracking-wider font-medium text-default-600',
-                                    value: 'text-foreground/60',
-                                }}
-                                label={pullingStatus}
+                            <ProgressBar
+                                aria-label={pullingStatus}
                                 value={progress}
-                                showValueLabel={true}
-                            />
+                                className='max-w-md'
+                            >
+                                <div className='flex justify-between'>
+                                    <span className='tracking-wider font-medium text-muted'>{pullingStatus}</span>
+                                    <ProgressBar.Output className='text-foreground/60' />
+                                </div>
+                                <ProgressBar.Track className='drop-shadow-md border border-default'>
+                                    <ProgressBar.Fill className='bg-linear-to-r from-pink-500 to-yellow-500' />
+                                </ProgressBar.Track>
+                            </ProgressBar>
                         )}
                         <div className='flex justify-center'>
                             <Link
@@ -251,23 +270,20 @@ export function Config(props) {
                                 {t('services.translate.ollama.supported_models')}
                             </Link>
                         </div>
-                    </CardBody>
+                    </CardContent>
                 </Card>
                 <h3 className='my-auto'>Prompt List</h3>
-                <p className='text-[10px] text-default-700'>{t('services.translate.ollama.prompt_description')}</p>
+                <p className='text-[10px] text-foreground'>{t('services.translate.ollama.prompt_description')}</p>
 
-                <div className='bg-content2 rounded-[10px] p-3'>
+                <div className='bg-surface-secondary rounded-[10px] p-3'>
                     {serviceConfig.promptList &&
                         serviceConfig.promptList.map((prompt, index) => {
                             return (
                                 <div className='config-item'>
-                                    <Textarea
-                                        label={prompt.role}
-                                        labelPlacement='outside'
-                                        variant='faded'
+                                    <TextField
+                                        className='w-full'
                                         value={prompt.content}
-                                        placeholder={`Input Some ${prompt.role} Prompt`}
-                                        onValueChange={(value) => {
+                                        onChange={(value) => {
                                             setServiceConfig({
                                                 ...serviceConfig,
                                                 promptList: serviceConfig.promptList.map((p, i) => {
@@ -289,12 +305,18 @@ export function Config(props) {
                                                 }),
                                             });
                                         }}
-                                    />
+                                    >
+                                        <Label>{prompt.role}</Label>
+                                        <TextArea
+                                            fullWidth
+                                            rows={3}
+                                            placeholder={`Input Some ${prompt.role} Prompt`}
+                                        />
+                                    </TextField>
                                     <Button
                                         isIconOnly
-                                        color='danger'
                                         className='my-auto mx-1'
-                                        variant='flat'
+                                        variant='danger-soft'
                                         onPress={() => {
                                             setServiceConfig({
                                                 ...serviceConfig,
@@ -332,10 +354,10 @@ export function Config(props) {
                 </div>
                 <br />
                 <Button
+                    variant='primary'
                     type='submit'
-                    isLoading={isLoading}
+                    isPending={isLoading}
                     fullWidth
-                    color='primary'
                 >
                     {t('common.save')}
                 </Button>
