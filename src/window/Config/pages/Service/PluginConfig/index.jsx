@@ -36,10 +36,7 @@ export function PluginConfig(props) {
                         }}
                     >
                         <Label className='text-base my-auto'>{t('services.instance_name')}</Label>
-                        <Input
-                            variant='secondary'
-                            className='max-w-[50%]'
-                        />
+                        <Input className='max-w-[50%]' />
                     </TextField>
                 </div>
             )}
@@ -68,13 +65,13 @@ export function PluginConfig(props) {
                                         }}
                                         aria-label={x.display}
                                     >
-                                        <Input variant='secondary' />
+                                        <Input />
                                     </TextField>
                                 )}
                                 {x.type === 'select' && (
                                     <Dropdown>
                                         <Button
-                                            variant='secondary'
+                                            variant='outline'
                                             className='max-w-[50%]'
                                         >
                                             {
@@ -128,7 +125,7 @@ export function PluginConfig(props) {
                                     }}
                                     aria-label={x.display}
                                 >
-                                    <Input variant='secondary' />
+                                    <Input />
                                 </TextField>
                             </div>
                         ))

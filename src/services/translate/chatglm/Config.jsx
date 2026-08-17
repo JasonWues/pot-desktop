@@ -96,7 +96,7 @@ export function Config(props) {
                 <div className='config-item'>
                     <h3 className='my-auto'>{t('services.translate.chatglm.model')}</h3>
                     <Dropdown>
-                        <Button variant='secondary'>{serviceConfig.model}</Button>
+                        <Button variant='outline'>{serviceConfig.model}</Button>
                         <Dropdown.Popover>
                             <Dropdown.Menu
                                 autoFocus='first'
@@ -134,7 +134,6 @@ export function Config(props) {
                         <Label className='text-base my-auto'>{t('services.translate.chatglm.api_key')}</Label>
                         <Input
                             type='password'
-                            variant='secondary'
                             className='max-w-[50%]'
                         />
                     </TextField>
@@ -151,7 +150,6 @@ export function Config(props) {
                                     <TextArea
                                         label={prompt.role}
                                         labelPlacement='outside'
-                                        variant='secondary'
                                         value={prompt.content}
                                         placeholder={`Input Some ${prompt.role} Prompt`}
                                         onValueChange={(value) => {

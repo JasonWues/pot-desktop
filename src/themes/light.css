@@ -7,12 +7,21 @@
     content1 -> surface            content2 -> surface-secondary
     content3 -> surface-tertiary   content4 -> background-tertiary
     default-100 (borders)          -> border
-    default-200 (fills)            -> default / default-soft
     default-400,500 (muted text)   -> muted
     primary                        -> accent
   `overlay` is v3's surface for floating things -- dropdowns, popovers, modals --
   which in v2 were painted `content1`, so it takes that value rather than a new
   one.
+
+  `--default` is NOT v2's `default.DEFAULT`. In v3 it is the flat fill behind
+  `button--tertiary`, `button--secondary`, `input--secondary` and the hover state
+  of `outline`/`ghost` -- always at full opacity. v2 only ever used that colour
+  through `bg-default/40`, so taking its hex literally (#999999, or the #aaaaaa
+  of `default-200`) painted every one of those a mid grey slab. It has to be a
+  near-surface neutral instead; #dddddd is v2's `content2`, one step off the
+  #eeeeee cards, which is what `flat` actually looked like once composited.
+  The dark and nocturne themes did not have this problem: their `default` scale
+  runs darkest -> lightest, so the same index already landed near the surface.
 */
 @layer base {
     :root,
@@ -35,10 +44,10 @@
         --overlay: #eeeeee;
         --overlay-foreground: #181818;
 
-        --default: #aaaaaa;
+        --default: #dddddd;
         --default-foreground: #181818;
-        --default-hover: #999999;
-        --default-soft: #cccccc;
+        --default-hover: #cccccc;
+        --default-soft: #e6e6e6;
         --default-soft-foreground: #181818;
 
         --muted: #686868;

@@ -137,10 +137,7 @@ export function Config(props) {
                         }}
                     >
                         <Label className='text-base my-auto'>{t('services.translate.geminipro.request_path')}</Label>
-                        <Input
-                            variant='secondary'
-                            className='max-w-[50%]'
-                        />
+                        <Input className='max-w-[50%]' />
                     </TextField>
                 </div>
                 <div className='config-item'>
@@ -157,7 +154,6 @@ export function Config(props) {
                         <Label className='text-base my-auto'>{t('services.translate.geminipro.api_key')}</Label>
                         <Input
                             type='password'
-                            variant='secondary'
                             className='max-w-[50%]'
                         />
                     </TextField>
@@ -173,7 +169,6 @@ export function Config(props) {
                                     <TextArea
                                         label={prompt.role}
                                         labelPlacement='outside'
-                                        variant='secondary'
                                         value={prompt.parts[0].text}
                                         placeholder={`Input Some ${prompt.role} Prompt`}
                                         onValueChange={(value) => {

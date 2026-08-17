@@ -108,7 +108,7 @@ export function Config(props) {
                 <div className='config-item'>
                     <h3 className='my-auto'>{t('services.translate.openai.service')}</h3>
                     <Dropdown>
-                        <Button variant='secondary'>{t(`services.translate.openai.${openaiConfig.service}`)}</Button>
+                        <Button variant='outline'>{t(`services.translate.openai.${openaiConfig.service}`)}</Button>
                         <Dropdown.Popover>
                             <Dropdown.Menu
                                 autoFocus='first'
@@ -167,10 +167,7 @@ export function Config(props) {
                         }}
                     >
                         <Label className='text-base my-auto'>{t('services.translate.openai.request_path')}</Label>
-                        <Input
-                            variant='secondary'
-                            className='max-w-[50%]'
-                        />
+                        <Input className='max-w-[50%]' />
                     </TextField>
                 </div>
                 <div className='config-item'>
@@ -187,7 +184,6 @@ export function Config(props) {
                         <Label className='text-base my-auto'>{t('services.translate.openai.api_key')}</Label>
                         <Input
                             type='password'
-                            variant='secondary'
                             className='max-w-[50%]'
                         />
                     </TextField>
@@ -230,10 +226,7 @@ export function Config(props) {
                         }}
                     >
                         <Label className='text-base my-auto'>{t('services.translate.openai.model')}</Label>
-                        <Input
-                            variant='secondary'
-                            className='max-w-[50%]'
-                        />
+                        <Input className='max-w-[50%]' />
                     </TextField>
                 </div>
                 <h3 className='my-auto'>Prompt List</h3>
@@ -247,7 +240,6 @@ export function Config(props) {
                                     <TextArea
                                         label={prompt.role}
                                         labelPlacement='outside'
-                                        variant='secondary'
                                         value={prompt.content}
                                         placeholder={`Input Some ${prompt.role} Prompt`}
                                         onValueChange={(value) => {
@@ -319,7 +311,6 @@ export function Config(props) {
                     <TextArea
                         label=''
                         labelPlacement='outside'
-                        variant='secondary'
                         value={openaiConfig['requestArguments']}
                         placeholder={`Input API Request Arguments`}
                         onValueChange={(value) => {

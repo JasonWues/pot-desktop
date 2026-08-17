@@ -64,7 +64,7 @@ export function Config(props) {
         <div className='config-item'>
             <h3 className='my-auto'>{label}</h3>
             <Dropdown>
-                <Button variant='secondary'>{`${(edgeConfig[key] ?? 0) > 0 ? '+' : ''}${edgeConfig[key] ?? 0}${unit}`}</Button>
+                <Button variant='outline'>{`${(edgeConfig[key] ?? 0) > 0 ? '+' : ''}${edgeConfig[key] ?? 0}${unit}`}</Button>
                 <Dropdown.Popover>
                     <Dropdown.Menu
                         aria-label={key}
@@ -99,7 +99,7 @@ export function Config(props) {
                 <div className='config-item'>
                     <h3 className='my-auto'>{t('services.tts.edge_tts.language')}</h3>
                     <Dropdown>
-                        <Button variant='secondary'>{t(`languages.${editingLanguage}`)}</Button>
+                        <Button variant='outline'>{t(`languages.${editingLanguage}`)}</Button>
                         <Dropdown.Popover>
                             <Dropdown.Menu
                                 aria-label='tts language'
@@ -122,7 +122,7 @@ export function Config(props) {
                 <div className='config-item'>
                     <h3 className='my-auto'>{t('services.tts.edge_tts.voice')}</h3>
                     <Dropdown>
-                        <Button variant='secondary'>
+                        <Button variant='outline'>
                             {configuredVoice === ''
                                 ? `${t('services.tts.edge_tts.auto_voice')}${
                                       autoVoice === null ? '' : ` (${autoVoice.ShortName})`

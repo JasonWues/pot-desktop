@@ -79,7 +79,7 @@ export function Config(props) {
                 <div className='config-item'>
                     <h3 className='my-auto'>{t('services.translate.deepl.type')}</h3>
                     <Dropdown>
-                        <Button variant='secondary'>{t(`services.translate.baidu_field.${config.field}`)}</Button>
+                        <Button variant='outline'>{t(`services.translate.baidu_field.${config.field}`)}</Button>
                         <Dropdown.Popover>
                             <Dropdown.Menu
                                 autoFocus='first'
@@ -118,10 +118,7 @@ export function Config(props) {
                         }}
                     >
                         <Label className='text-base my-auto'>{t('services.translate.baidu.appid')}</Label>
-                        <Input
-                            variant='secondary'
-                            className='max-w-[50%]'
-                        />
+                        <Input className='max-w-[50%]' />
                     </TextField>
                 </div>
                 <div className={'config-item'}>
@@ -136,10 +133,7 @@ export function Config(props) {
                         }}
                     >
                         <Label className='text-base my-auto'>{t('services.translate.baidu.secret')}</Label>
-                        <Input
-                            variant='secondary'
-                            className='max-w-[50%]'
-                        />
+                        <Input className='max-w-[50%]' />
                     </TextField>
                 </div>
                 <Button

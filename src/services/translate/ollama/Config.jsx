@@ -181,10 +181,7 @@ export function Config(props) {
                         }}
                     >
                         <Label className='text-base my-auto'>{t('services.translate.ollama.request_path')}</Label>
-                        <Input
-                            variant='secondary'
-                            className='max-w-[50%]'
-                        />
+                        <Input className='max-w-[50%]' />
                     </TextField>
                 </div>
                 <div className='config-item'>
@@ -203,7 +200,7 @@ export function Config(props) {
                             real <input>, which is a void element. The pull button
                             is a Suffix, which is what v2's `endContent` meant. */}
                         <InputGroup className='max-w-[50%]'>
-                            <InputGroup.Input variant='secondary' />
+                            <InputGroup.Input />
                             <InputGroup.Suffix>
                                 {installedModels &&
                                 !installedModels.models
@@ -286,7 +283,6 @@ export function Config(props) {
                                     <TextArea
                                         label={prompt.role}
                                         labelPlacement='outside'
-                                        variant='secondary'
                                         value={prompt.content}
                                         placeholder={`Input Some ${prompt.role} Prompt`}
                                         onValueChange={(value) => {

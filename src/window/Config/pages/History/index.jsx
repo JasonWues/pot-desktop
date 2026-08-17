@@ -302,7 +302,7 @@ export default function History() {
                     <Dropdown>
                         <Button
                             size='sm'
-                            variant='secondary'
+                            variant='outline'
                             className='my-auto'
                         >
                             {serviceFilter === ALL ? t('config.history.all_services') : serviceLabel(serviceFilter)}
@@ -333,7 +333,7 @@ export default function History() {
                     <Dropdown>
                         <Button
                             size='sm'
-                            variant='secondary'
+                            variant='outline'
                             className='my-auto'
                         >
                             {targetFilter === ALL

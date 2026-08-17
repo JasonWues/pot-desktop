@@ -75,7 +75,6 @@ export function Config(props) {
                             <Label className='text-base my-auto'>{t('services.collection.anki.port')}</Label>
                             <Input
                                 type='number'
-                                variant='secondary'
                                 className='max-w-[50%]'
                             />
                         </TextField>

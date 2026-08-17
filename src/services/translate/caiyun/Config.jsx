@@ -73,10 +73,7 @@ export function Config(props) {
                         }}
                     >
                         <Label className='text-base my-auto'>{t('services.translate.caiyun.token')}</Label>
-                        <Input
-                            variant='secondary'
-                            className='max-w-[50%]'
-                        />
+                        <Input className='max-w-[50%]' />
                     </TextField>
                 </div>
                 <Button

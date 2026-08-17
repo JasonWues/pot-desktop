@@ -78,10 +78,7 @@ export function Config(props) {
                         }}
                     >
                         <Label className='text-base my-auto'>{t('services.recognize.tencent_img_ocr.secret_id')}</Label>
-                        <Input
-                            variant='secondary'
-                            className='max-w-[50%]'
-                        />
+                        <Input className='max-w-[50%]' />
                     </TextField>
                 </div>
                 <div className={'config-item'}>
@@ -98,10 +95,7 @@ export function Config(props) {
                         <Label className='text-base my-auto'>
                             {t('services.recognize.tencent_img_ocr.secret_key')}
                         </Label>
-                        <Input
-                            variant='secondary'
-                            className='max-w-[50%]'
-                        />
+                        <Input className='max-w-[50%]' />
                     </TextField>
                 </div>
                 <Button

@@ -91,10 +91,7 @@ export function Config(props) {
                         }}
                     >
                         <Label className='text-base my-auto'>{t('services.recognize.openai_ocr.request_path')}</Label>
-                        <Input
-                            variant='secondary'
-                            className='max-w-[50%]'
-                        />
+                        <Input className='max-w-[50%]' />
                     </TextField>
                 </div>
                 <div className={'config-item'}>
@@ -111,7 +108,6 @@ export function Config(props) {
                         <Label className='text-base my-auto'>{t('services.recognize.openai_ocr.api_key')}</Label>
                         <Input
                             type='password'
-                            variant='secondary'
                             className='max-w-[50%]'
                         />
                     </TextField>
@@ -128,10 +124,7 @@ export function Config(props) {
                         }}
                     >
                         <Label className='text-base my-auto'>{t('services.recognize.openai_ocr.model')}</Label>
-                        <Input
-                            variant='secondary'
-                            className='max-w-[50%]'
-                        />
+                        <Input className='max-w-[50%]' />
                     </TextField>
                 </div>
                 <h3 className='my-auto'>Prompt</h3>
@@ -140,7 +133,6 @@ export function Config(props) {
                     <TextArea
                         label='system'
                         labelPlacement='outside'
-                        variant='secondary'
                         value={config['systemPrompt']}
                         placeholder='Input Some System Prompt'
                         onValueChange={(value) => {
@@ -155,7 +147,6 @@ export function Config(props) {
                     <TextArea
                         label='user'
                         labelPlacement='outside'
-                        variant='secondary'
                         value={config['userPrompt']}
                         placeholder='Input Some User Prompt'
                         onValueChange={(value) => {
@@ -171,7 +162,6 @@ export function Config(props) {
                     <TextArea
                         label=''
                         labelPlacement='outside'
-                        variant='secondary'
                         value={config['requestArguments']}
                         placeholder='Input API Request Arguments'
                         onValueChange={(value) => {

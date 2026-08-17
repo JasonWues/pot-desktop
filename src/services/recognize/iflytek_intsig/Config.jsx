@@ -79,10 +79,7 @@ export function Config(props) {
                         }}
                     >
                         <Label className='text-base my-auto'>{t('services.recognize.iflytek_intsig_ocr.appid')}</Label>
-                        <Input
-                            variant='secondary'
-                            className='max-w-[50%]'
-                        />
+                        <Input className='max-w-[50%]' />
                     </TextField>
                 </div>
                 <div className={'config-item'}>
@@ -99,10 +96,7 @@ export function Config(props) {
                         <Label className='text-base my-auto'>
                             {t('services.recognize.iflytek_intsig_ocr.apisecret')}
                         </Label>
-                        <Input
-                            variant='secondary'
-                            className='max-w-[50%]'
-                        />
+                        <Input className='max-w-[50%]' />
                     </TextField>
                 </div>
                 <div className={'config-item'}>
@@ -117,10 +111,7 @@ export function Config(props) {
                         }}
                     >
                         <Label className='text-base my-auto'>{t('services.recognize.iflytek_intsig_ocr.apikey')}</Label>
-                        <Input
-                            variant='secondary'
-                            className='max-w-[50%]'
-                        />
+                        <Input className='max-w-[50%]' />
                     </TextField>
                 </div>
                 <Button

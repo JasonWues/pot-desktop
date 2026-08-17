@@ -55,7 +55,7 @@ export default function ControlArea(props) {
                 <Dropdown>
                     <Button
                         className='my-auto'
-                        variant='secondary'
+                        variant='outline'
                         size='sm'
                     >
                         <img
@@ -120,7 +120,7 @@ export default function ControlArea(props) {
                 <Dropdown>
                     <Button
                         className='my-auto'
-                        variant='secondary'
+                        variant='outline'
                         size='sm'
                     >
                         {t(`languages.${language}`)}

@@ -70,7 +70,7 @@ export function Config(props) {
                 <div className='config-item'>
                     <h3 className='my-auto'>{t('services.translate.deepl.type')}</h3>
                     <Dropdown>
-                        <Button variant='secondary'>{t(`services.translate.deepl.${deeplConfig.type}`)}</Button>
+                        <Button variant='outline'>{t(`services.translate.deepl.${deeplConfig.type}`)}</Button>
                         <Dropdown.Popover>
                             <Dropdown.Menu
                                 autoFocus='first'
@@ -118,7 +118,6 @@ export function Config(props) {
                         <Label className='text-base my-auto'>{t('services.translate.deepl.auth_key')}</Label>
                         <Input
                             type='password'
-                            variant='secondary'
                             className='max-w-[50%]'
                         />
                     </TextField>
@@ -135,10 +134,7 @@ export function Config(props) {
                         }}
                     >
                         <Label className='text-base my-auto'>{t('services.translate.deepl.custom_url')}</Label>
-                        <Input
-                            variant='secondary'
-                            className='max-w-[50%]'
-                        />
+                        <Input className='max-w-[50%]' />
                     </TextField>
                 </div>
                 <Button

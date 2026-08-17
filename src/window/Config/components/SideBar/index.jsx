@@ -16,8 +16,12 @@ export default function SideBar() {
     const navigate = useNavigate();
     const location = useLocation();
 
+    // v2 names. The variant remap was a search-and-replace over literal props, so
+    // it never saw these -- and an unknown variant is not an error in v3, it just
+    // emits no `button--*` class at all, which left every entry drawn the same
+    // and the sidebar with no current-page marker.
     function setStyle(pathname) {
-        return location.pathname.includes(pathname) ? 'flat' : 'light';
+        return location.pathname.includes(pathname) ? 'tertiary' : 'ghost';
     }
 
     return (

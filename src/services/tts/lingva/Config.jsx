@@ -57,7 +57,7 @@ export function Config(props) {
                         }}
                         aria-label={t('services.tts.lingva_tts.request_path')}
                     >
-                        <Input variant='secondary' />
+                        <Input />
                     </TextField>
                 </div>
                 <div>

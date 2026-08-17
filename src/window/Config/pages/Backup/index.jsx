@@ -178,7 +178,7 @@ export default function Backup() {
                     <h3 className='my-auto'>{t('config.backup.type')}</h3>
                     {backupType !== null && (
                         <Dropdown>
-                            <Button variant='secondary'>{t(`config.backup.${backupType}`)}</Button>
+                            <Button variant='outline'>{t(`config.backup.${backupType}`)}</Button>
                             <Dropdown.Popover>
                                 <Dropdown.Menu
                                     aria-label='backup type'
@@ -221,7 +221,7 @@ export default function Backup() {
                                 }}
                             >
                                 <Label className='text-base my-auto'>{t('config.backup.webdav_url')}</Label>
-                                <Input variant='secondary' />
+                                <Input />
                             </TextField>
                         )}
                     </div>
@@ -236,7 +236,7 @@ export default function Backup() {
                                 }}
                             >
                                 <Label className='text-base my-auto'>{t('config.backup.username')}</Label>
-                                <Input variant='secondary' />
+                                <Input />
                             </TextField>
                         )}
                     </div>
@@ -251,10 +251,7 @@ export default function Backup() {
                                 }}
                             >
                                 <Label className='text-base my-auto'>{t('config.backup.password')}</Label>
-                                <Input
-                                    type='password'
-                                    variant='secondary'
-                                />
+                                <Input type='password' />
                             </TextField>
                         )}
                     </div>
