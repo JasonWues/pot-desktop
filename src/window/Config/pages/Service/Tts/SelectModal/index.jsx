@@ -31,17 +31,15 @@ export default function SelectModal(props) {
                                                         setCurrentConfigKey(createServiceInstanceKey(x));
                                                         onConfigOpen();
                                                     }}
-                                                    startContent={
-                                                        <img
-                                                            src={
-                                                                x === 'system_tts'
-                                                                    ? `logo/${osType}.svg`
-                                                                    : builtinServices[x].info.icon
-                                                            }
-                                                            className='h-[24px] w-[24px] my-auto'
-                                                        />
-                                                    }
                                                 >
+                                                    <img
+                                                        src={
+                                                            x === 'system_tts'
+                                                                ? `logo/${osType}.svg`
+                                                                : builtinServices[x].info.icon
+                                                        }
+                                                        className='h-[24px] w-[24px] my-auto'
+                                                    />
                                                     <div className='w-full'>
                                                         {t(`services.tts.${builtinServices[x].info.name}.title`)}
                                                     </div>

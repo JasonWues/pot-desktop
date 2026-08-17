@@ -173,10 +173,8 @@ export default function General() {
                         {appLanguage !== null && (
                             <Dropdown>
                                 <Dropdown.Trigger>
-                                    <Button
-                                        variant='bordered'
-                                        startContent={<Flag code={LanguageFlag[appLanguage]} />}
-                                    >
+                                    <Button variant='bordered'>
+                                        <Flag code={LanguageFlag[appLanguage]} />
                                         {languageName[appLanguage]}
                                     </Button>
                                 </Dropdown.Trigger>
@@ -193,134 +191,134 @@ export default function General() {
                                         <Dropdown.Item
                                             key='zh_cn'
                                             id='zh_cn'
-                                            startContent={<Flag code={LanguageFlag.zh_cn} />}
                                         >
+                                            <Flag code={LanguageFlag.zh_cn} />
                                             简体中文
                                         </Dropdown.Item>
                                         <Dropdown.Item
                                             key='zh_tw'
                                             id='zh_tw'
-                                            startContent={<Flag code={LanguageFlag.zh_cn} />}
                                         >
+                                            <Flag code={LanguageFlag.zh_cn} />
                                             繁體中文
                                         </Dropdown.Item>
                                         <Dropdown.Item
                                             key='en'
                                             id='en'
-                                            startContent={<Flag code={LanguageFlag.en} />}
                                         >
+                                            <Flag code={LanguageFlag.en} />
                                             English
                                         </Dropdown.Item>
                                         <Dropdown.Item
                                             key='ja'
                                             id='ja'
-                                            startContent={<Flag code={LanguageFlag.ja} />}
                                         >
+                                            <Flag code={LanguageFlag.ja} />
                                             日本語
                                         </Dropdown.Item>
                                         <Dropdown.Item
                                             key='ko'
                                             id='ko'
-                                            startContent={<Flag code={LanguageFlag.ko} />}
                                         >
+                                            <Flag code={LanguageFlag.ko} />
                                             한국어
                                         </Dropdown.Item>
                                         <Dropdown.Item
                                             key='fr'
                                             id='fr'
-                                            startContent={<Flag code={LanguageFlag.fr} />}
                                         >
+                                            <Flag code={LanguageFlag.fr} />
                                             Français
                                         </Dropdown.Item>
                                         <Dropdown.Item
                                             key='de'
                                             id='de'
-                                            startContent={<Flag code={LanguageFlag.de} />}
                                         >
+                                            <Flag code={LanguageFlag.de} />
                                             Deutsch
                                         </Dropdown.Item>
                                         <Dropdown.Item
                                             key='es'
                                             id='es'
-                                            startContent={<Flag code={LanguageFlag.es} />}
                                         >
+                                            <Flag code={LanguageFlag.es} />
                                             Español
                                         </Dropdown.Item>
                                         <Dropdown.Item
                                             key='ru'
                                             id='ru'
-                                            startContent={<Flag code={LanguageFlag.ru} />}
                                         >
+                                            <Flag code={LanguageFlag.ru} />
                                             Русский
                                         </Dropdown.Item>
                                         <Dropdown.Item
                                             key='it'
                                             id='it'
-                                            startContent={<Flag code={LanguageFlag.it} />}
                                         >
+                                            <Flag code={LanguageFlag.it} />
                                             Italiano
                                         </Dropdown.Item>
                                         <Dropdown.Item
                                             key='tr'
                                             id='tr'
-                                            startContent={<Flag code={LanguageFlag.tr} />}
                                         >
+                                            <Flag code={LanguageFlag.tr} />
                                             Türkçe
                                         </Dropdown.Item>
                                         <Dropdown.Item
                                             key='pt_pt'
                                             id='pt_pt'
-                                            startContent={<Flag code={LanguageFlag.pt_pt} />}
                                         >
+                                            <Flag code={LanguageFlag.pt_pt} />
                                             Português
                                         </Dropdown.Item>
                                         <Dropdown.Item
                                             key='pt_br'
                                             id='pt_br'
-                                            startContent={<Flag code={LanguageFlag.pt_br} />}
                                         >
+                                            <Flag code={LanguageFlag.pt_br} />
                                             Português (Brasil)
                                         </Dropdown.Item>
                                         <Dropdown.Item
                                             key='nb_no'
                                             id='nb_no'
-                                            startContent={<Flag code={LanguageFlag.nb_no} />}
                                         >
+                                            <Flag code={LanguageFlag.nb_no} />
                                             Norsk Bokmål
                                         </Dropdown.Item>
                                         <Dropdown.Item
                                             key='nn_no'
                                             id='nn_no'
-                                            startContent={<Flag code={LanguageFlag.nn_no} />}
                                         >
+                                            <Flag code={LanguageFlag.nn_no} />
                                             Norsk Nynorsk
                                         </Dropdown.Item>
                                         <Dropdown.Item
                                             key='fa'
                                             id='fa'
-                                            startContent={<Flag code={LanguageFlag.fa} />}
                                         >
+                                            <Flag code={LanguageFlag.fa} />
                                             فارسی
                                         </Dropdown.Item>
                                         <Dropdown.Item
                                             key='uk'
                                             id='uk'
-                                            startContent={<Flag code={LanguageFlag.uk} />}
                                         >
+                                            <Flag code={LanguageFlag.uk} />
                                             Українська
                                         </Dropdown.Item>
                                         <Dropdown.Item
                                             key='ar'
                                             id='ar'
-                                            startContent={<Flag code={LanguageFlag.ar} />}
                                         >
+                                            <Flag code={LanguageFlag.ar} />
                                             العربية
                                         </Dropdown.Item>
                                         <Dropdown.Item
                                             key='he'
                                             id='he'
-                                            startContent={<Flag code={LanguageFlag.he} />}
                                         >
+                                            <Flag code={LanguageFlag.he} />
                                             עִבְרִית
                                         </Dropdown.Item>
                                     </Dropdown.Menu>
@@ -333,10 +331,8 @@ export default function General() {
                         {appTheme !== null && (
                             <Dropdown>
                                 <Dropdown.Trigger>
-                                    <Button
-                                        variant='bordered'
-                                        startContent={<ThemeIcon name={appTheme} />}
-                                    >
+                                    <Button variant='bordered'>
+                                        <ThemeIcon name={appTheme} />
                                         {t(`config.general.theme.${appTheme}`)}
                                     </Button>
                                 </Dropdown.Trigger>
@@ -369,8 +365,8 @@ export default function General() {
                                             <Dropdown.Item
                                                 key={name}
                                                 id={name}
-                                                startContent={<ThemeIcon name={name} />}
                                             >
+                                                <ThemeIcon name={name} />
                                                 {t(`config.general.theme.${name}`)}
                                             </Dropdown.Item>
                                         ))}
@@ -683,13 +679,14 @@ export default function General() {
                                 variant='bordered'
                                 isRequired
                                 label={t('config.general.proxy.host')}
-                                startContent={<span>http://</span>}
                                 value={proxyHost}
                                 onValueChange={(v) => {
                                     setProxyHost(v);
                                 }}
                                 className='mr-2'
-                            />
+                            >
+                                <span>http://</span>
+                            </Input>
                         )}
                         {proxyPort !== null && (
                             <Input

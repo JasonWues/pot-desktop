@@ -117,11 +117,11 @@ export default function ImageArea() {
                 <Button
                     size='sm'
                     variant='light'
-                    startContent={<HiTranslate className='text-[16px]' />}
                     isLoading={inPlace.state === 'ocr' || inPlace.state === 'translating'}
                     isDisabled={base64 === ''}
                     onPress={toggleInPlace}
                 >
+                    <HiTranslate className='text-[16px]' />
                     {inPlaceLabel}
                 </Button>
                 {inPlace.state === 'error' && (

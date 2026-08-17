@@ -359,27 +359,20 @@ export default function TargetArea(props) {
                                 size='sm'
                                 variant='solid'
                                 className='bg-transparent'
-                                startContent={
-                                    whetherPluginService(currentTranslateServiceInstanceKey) ? (
-                                        <img
-                                            src={
-                                                pluginList['translate'][
-                                                    getServiceName(currentTranslateServiceInstanceKey)
-                                                ].icon
-                                            }
-                                            className='h-[20px] my-auto'
-                                        />
-                                    ) : (
-                                        <img
-                                            src={
-                                                builtinServices[getServiceName(currentTranslateServiceInstanceKey)].info
-                                                    .icon
-                                            }
-                                            className='h-[20px] my-auto'
-                                        />
-                                    )
-                                }
                             >
+                                whetherPluginService(currentTranslateServiceInstanceKey) ? (
+                                <img
+                                    src={
+                                        pluginList['translate'][getServiceName(currentTranslateServiceInstanceKey)].icon
+                                    }
+                                    className='h-[20px] my-auto'
+                                />
+                                ) : (
+                                <img
+                                    src={builtinServices[getServiceName(currentTranslateServiceInstanceKey)].info.icon}
+                                    className='h-[20px] my-auto'
+                                />
+                                )
                                 {whetherPluginService(currentTranslateServiceInstanceKey) ? (
                                     <div className='my-auto'>{`${getInstanceName(currentTranslateServiceInstanceKey, () => pluginList['translate'][getServiceName(currentTranslateServiceInstanceKey)].display)} `}</div>
                                 ) : (
@@ -406,20 +399,18 @@ export default function TargetArea(props) {
                                         <Dropdown.Item
                                             key={instanceKey}
                                             id={instanceKey}
-                                            startContent={
-                                                whetherPluginService(instanceKey) ? (
-                                                    <img
-                                                        src={pluginList['translate'][getServiceName(instanceKey)].icon}
-                                                        className='h-[20px] my-auto'
-                                                    />
-                                                ) : (
-                                                    <img
-                                                        src={builtinServices[getServiceName(instanceKey)].info.icon}
-                                                        className='h-[20px] my-auto'
-                                                    />
-                                                )
-                                            }
                                         >
+                                            whetherPluginService(instanceKey) ? (
+                                            <img
+                                                src={pluginList['translate'][getServiceName(instanceKey)].icon}
+                                                className='h-[20px] my-auto'
+                                            />
+                                            ) : (
+                                            <img
+                                                src={builtinServices[getServiceName(instanceKey)].info.icon}
+                                                className='h-[20px] my-auto'
+                                            />
+                                            )
                                             {whetherPluginService(instanceKey) ? (
                                                 <div className='my-auto'>{`${getInstanceName(instanceKey, () => pluginList['translate'][getServiceName(instanceKey)].display)} `}</div>
                                             ) : (

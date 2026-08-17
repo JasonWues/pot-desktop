@@ -524,13 +524,14 @@ export default function SourceArea(props) {
                             variant='light'
                             isIconOnly
                             className='text-[14px] font-bold'
-                            startContent={<HiTranslate className='text-[16px]' />}
                             onPress={() => {
                                 detect_language(sourceText).then(() => {
                                     syncSourceText();
                                 });
                             }}
-                        />
+                        >
+                            <HiTranslate className='text-[16px]' />
+                        </Button>
                         <Tooltip.Content>{t('translate.translate')}</Tooltip.Content>
                     </Tooltip>
                 </CardFooter>

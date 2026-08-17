@@ -130,19 +130,18 @@ export default function Hotkey() {
                                 unregister(selectionTranslate);
                                 setSelectionTranslate('');
                             }}
-                            endContent={
-                                <Button
-                                    size='sm'
-                                    variant='flat'
-                                    className={`${selectionTranslate === '' ? 'hidden' : ''}`}
-                                    onPress={() => {
-                                        registerHandler('hotkey_selection_translate', selectionTranslate);
-                                    }}
-                                >
-                                    {t('common.ok')}
-                                </Button>
-                            }
-                        />
+                        >
+                            <Button
+                                size='sm'
+                                variant='flat'
+                                className={`${selectionTranslate === '' ? 'hidden' : ''}`}
+                                onPress={() => {
+                                    registerHandler('hotkey_selection_translate', selectionTranslate);
+                                }}
+                            >
+                                {t('common.ok')}
+                            </Button>
+                        </Input>
                     )}
                 </div>
                 <div className='config-item'>
@@ -161,19 +160,18 @@ export default function Hotkey() {
                                 unregister(inputTranslate);
                                 setInputTranslate('');
                             }}
-                            endContent={
-                                <Button
-                                    size='sm'
-                                    variant='flat'
-                                    className={`${inputTranslate === '' ? 'hidden' : ''}`}
-                                    onPress={() => {
-                                        registerHandler('hotkey_input_translate', inputTranslate);
-                                    }}
-                                >
-                                    {t('common.ok')}
-                                </Button>
-                            }
-                        />
+                        >
+                            <Button
+                                size='sm'
+                                variant='flat'
+                                className={`${inputTranslate === '' ? 'hidden' : ''}`}
+                                onPress={() => {
+                                    registerHandler('hotkey_input_translate', inputTranslate);
+                                }}
+                            >
+                                {t('common.ok')}
+                            </Button>
+                        </Input>
                     )}
                 </div>
                 <div className='config-item'>
@@ -192,19 +190,18 @@ export default function Hotkey() {
                                 unregister(ocrRecognize);
                                 setOcrRecognize('');
                             }}
-                            endContent={
-                                <Button
-                                    size='sm'
-                                    variant='flat'
-                                    className={`${ocrRecognize === '' ? 'hidden' : ''}`}
-                                    onPress={() => {
-                                        registerHandler('hotkey_ocr_recognize', ocrRecognize);
-                                    }}
-                                >
-                                    {t('common.ok')}
-                                </Button>
-                            }
-                        />
+                        >
+                            <Button
+                                size='sm'
+                                variant='flat'
+                                className={`${ocrRecognize === '' ? 'hidden' : ''}`}
+                                onPress={() => {
+                                    registerHandler('hotkey_ocr_recognize', ocrRecognize);
+                                }}
+                            >
+                                {t('common.ok')}
+                            </Button>
+                        </Input>
                     )}
                 </div>
                 <div className='config-item'>
@@ -223,19 +220,18 @@ export default function Hotkey() {
                                 unregister(ocrTranslate);
                                 setOcrTranslate('');
                             }}
-                            endContent={
-                                <Button
-                                    size='sm'
-                                    variant='flat'
-                                    className={`${ocrTranslate === '' ? 'hidden' : ''}`}
-                                    onPress={() => {
-                                        registerHandler('hotkey_ocr_translate', ocrTranslate);
-                                    }}
-                                >
-                                    {t('common.ok')}
-                                </Button>
-                            }
-                        />
+                        >
+                            <Button
+                                size='sm'
+                                variant='flat'
+                                className={`${ocrTranslate === '' ? 'hidden' : ''}`}
+                                onPress={() => {
+                                    registerHandler('hotkey_ocr_translate', ocrTranslate);
+                                }}
+                            >
+                                {t('common.ok')}
+                            </Button>
+                        </Input>
                     )}
                 </div>
             </CardContent>

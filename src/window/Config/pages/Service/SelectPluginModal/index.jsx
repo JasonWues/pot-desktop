@@ -56,13 +56,11 @@ export default function SelectPluginModal(props) {
                                                         setCurrentConfigKey(createServiceInstanceKey(x));
                                                         onConfigOpen();
                                                     }}
-                                                    startContent={
-                                                        <img
-                                                            src={pluginList[x].icon}
-                                                            className='h-[24px] w-[24px] my-auto'
-                                                        />
-                                                    }
                                                 >
+                                                    <img
+                                                        src={pluginList[x].icon}
+                                                        className='h-[24px] w-[24px] my-auto'
+                                                    />
                                                     <div className='w-full'>{pluginList[x].display}</div>
                                                 </Button>
                                                 <Button

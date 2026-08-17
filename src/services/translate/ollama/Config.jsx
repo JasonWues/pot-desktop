@@ -189,37 +189,38 @@ export function Config(props) {
                                 model: value,
                             });
                         }}
-                        endContent={
-                            installedModels &&
-                            !installedModels.models
-                                .map((model) => {
-                                    return model.name;
-                                })
-                                .includes(serviceConfig['model']) ? (
-                                <Tooltip>
-                                    <Button
-                                        size='sm'
-                                        variant='flat'
-                                        color='warning'
-                                        isLoading={isPulling}
-                                        onPress={pullModel}
-                                    >
-                                        {t('services.translate.ollama.install_model')}
-                                    </Button>
-                                    <Tooltip.Content>{t('services.translate.ollama.not_installed')}</Tooltip.Content>
-                                </Tooltip>
-                            ) : (
+                    >
+                        {/* v3 has no `endContent`, so the pull button is an
+                            ordinary trailing child of the field. */}
+                        {installedModels &&
+                        !installedModels.models
+                            .map((model) => {
+                                return model.name;
+                            })
+                            .includes(serviceConfig['model']) ? (
+                            <Tooltip>
                                 <Button
                                     size='sm'
                                     variant='flat'
-                                    color='success'
-                                    disabled
+                                    color='warning'
+                                    isLoading={isPulling}
+                                    onPress={pullModel}
                                 >
-                                    {t('services.translate.ollama.ready')}
+                                    {t('services.translate.ollama.install_model')}
                                 </Button>
-                            )
-                        }
-                    />
+                                <Tooltip.Content>{t('services.translate.ollama.not_installed')}</Tooltip.Content>
+                            </Tooltip>
+                        ) : (
+                            <Button
+                                size='sm'
+                                variant='flat'
+                                color='success'
+                                disabled
+                            >
+                                {t('services.translate.ollama.ready')}
+                            </Button>
+                        )}
+                    </Input>
                 </div>
                 <Card
                     isBlurred

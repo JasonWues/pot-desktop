@@ -58,20 +58,18 @@ export default function ControlArea(props) {
                             className='my-auto'
                             variant='bordered'
                             size='sm'
-                            startContent={
-                                <img
-                                    className='h-[16px] w-[16px] my-auto'
-                                    src={
-                                        getServiceSouceType(currentServiceInstanceKey) === ServiceSourceType.PLUGIN
-                                            ? pluginList[getServiceName(currentServiceInstanceKey)].icon
-                                            : builtinService[getServiceName(currentServiceInstanceKey)].info.icon ===
-                                                'system'
-                                              ? `logo/${osType}.svg`
-                                              : builtinService[getServiceName(currentServiceInstanceKey)].info.icon
-                                    }
-                                />
-                            }
                         >
+                            <img
+                                className='h-[16px] w-[16px] my-auto'
+                                src={
+                                    getServiceSouceType(currentServiceInstanceKey) === ServiceSourceType.PLUGIN
+                                        ? pluginList[getServiceName(currentServiceInstanceKey)].icon
+                                        : builtinService[getServiceName(currentServiceInstanceKey)].info.icon ===
+                                            'system'
+                                          ? `logo/${osType}.svg`
+                                          : builtinService[getServiceName(currentServiceInstanceKey)].info.icon
+                                }
+                            />
                             {getServiceSouceType(currentServiceInstanceKey) === ServiceSourceType.PLUGIN
                                 ? getInstanceName(
                                       currentServiceInstanceKey,
@@ -95,20 +93,17 @@ export default function ControlArea(props) {
                                     <Dropdown.Item
                                         key={instanceKey}
                                         id={instanceKey}
-                                        startContent={
-                                            <img
-                                                className='h-[16px] w-[16px] my-auto'
-                                                src={
-                                                    getServiceSouceType(instanceKey) === ServiceSourceType.PLUGIN
-                                                        ? pluginList[getServiceName(instanceKey)].icon
-                                                        : builtinService[getServiceName(instanceKey)].info.icon ===
-                                                            'system'
-                                                          ? `logo/${osType}.svg`
-                                                          : builtinService[getServiceName(instanceKey)].info.icon
-                                                }
-                                            />
-                                        }
                                     >
+                                        <img
+                                            className='h-[16px] w-[16px] my-auto'
+                                            src={
+                                                getServiceSouceType(instanceKey) === ServiceSourceType.PLUGIN
+                                                    ? pluginList[getServiceName(instanceKey)].icon
+                                                    : builtinService[getServiceName(instanceKey)].info.icon === 'system'
+                                                      ? `logo/${osType}.svg`
+                                                      : builtinService[getServiceName(instanceKey)].info.icon
+                                            }
+                                        />
                                         {getServiceSouceType(instanceKey) === ServiceSourceType.PLUGIN
                                             ? getInstanceName(
                                                   instanceKey,
@@ -168,11 +163,11 @@ export default function ControlArea(props) {
                 color='secondary'
                 size='sm'
                 className='my-auto'
-                startContent={<GiCycle className='text-[16px]' />}
                 onPress={() => {
                     setRecognizeFlag(nanoid());
                 }}
             >
+                <GiCycle className='text-[16px]' />
                 {t('recognize.recognize')}
             </Button>
             <Button
@@ -180,7 +175,6 @@ export default function ControlArea(props) {
                 color='primary'
                 size='sm'
                 className='my-auto'
-                startContent={<HiTranslate className='text-[16px]' />}
                 onPress={async () => {
                     if (text) {
                         void fetch(`http://127.0.0.1:${serverPort}/translate`, {
@@ -191,6 +185,7 @@ export default function ControlArea(props) {
                     }
                 }}
             >
+                <HiTranslate className='text-[16px]' />
                 {t('recognize.translate')}
             </Button>
         </div>

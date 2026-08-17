@@ -30,13 +30,11 @@ export default function SelectModal(props) {
                                                         setCurrentConfigKey(createServiceInstanceKey(x));
                                                         onConfigOpen();
                                                     }}
-                                                    startContent={
-                                                        <img
-                                                            src={builtinServices[x].info.icon}
-                                                            className='h-[24px] w-[24px] my-auto'
-                                                        />
-                                                    }
                                                 >
+                                                    <img
+                                                        src={builtinServices[x].info.icon}
+                                                        className='h-[24px] w-[24px] my-auto'
+                                                    />
                                                     <div className='w-full'>
                                                         {t(`services.collection.${builtinServices[x].info.name}.title`)}
                                                     </div>
