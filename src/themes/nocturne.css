@@ -69,6 +69,26 @@
         --field-placeholder: #8b88b8;
         --field-border: #242440;
 
+        /*
+          v3 sets these only inside its own `[data-theme='dark']` block, which
+          nocturne's selector does not match -- so every one of them fell back to
+          the LIGHT default. `--segment` was the visible one: the selected tab
+          drew as a solid white slab on the aurora. The three shadows were the
+          light theme's drop shadows and hairlines, on a theme that wants a
+          violet glow and no lift.
+
+          This does not apply to the derived tokens (`--accent-soft`,
+          `--danger-soft`, the hover pairs): those are `color-mix` over
+          `var(--accent)` etc., which resolve against whatever the theme sets, so
+          light's formula gives nocturne's colours. Only the literals break.
+        */
+        --segment: #282847;
+        --segment-foreground: #eae8fa;
+        --backdrop: rgba(8, 8, 15, 0.7);
+        --surface-shadow: 0 4px 16px -4px rgb(0 0 0 / 0.6), 0 0 28px -8px rgb(123 97 255 / 0.45);
+        --overlay-shadow: 0 0 1px 0 rgb(123 97 255 / 0.35) inset;
+        --field-shadow: 0 0 0 0 transparent inset;
+
         /* Sharp corners read as deliberate next to the soft aurora behind them. */
         --radius: 0.3rem;
         --field-radius: 0.3rem;
