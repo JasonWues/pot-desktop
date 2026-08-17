@@ -1,6 +1,6 @@
 import { INSTANCE_NAME_CONFIG_KEY } from '../../../utils/service_instance';
 import InstanceNameInput from '../../../components/InstanceNameInput';
-import { Input, Button, TextArea } from '@heroui/react';
+import { Input, Button, TextArea, Label, TextField } from '@heroui/react';
 import toast, { Toaster } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { open } from '@tauri-apps/plugin-shell';
@@ -80,62 +80,59 @@ export function Config(props) {
                     </Button>
                 </div>
                 <div className={'config-item'}>
-                    <Input
-                        label={t('services.recognize.openai_ocr.request_path')}
-                        labelPlacement='outside-left'
+                    <TextField
+                        className='flex w-full justify-between'
                         value={config['requestPath']}
-                        variant='bordered'
-                        classNames={{
-                            base: 'justify-between',
-                            label: 'text-(length:--heroui-font-size-medium)',
-                            mainWrapper: 'max-w-[50%]',
-                        }}
-                        onValueChange={(value) => {
+                        onChange={(value) => {
                             setConfig({
                                 ...config,
                                 requestPath: value,
                             });
                         }}
-                    />
+                    >
+                        <Label className='text-base my-auto'>{t('services.recognize.openai_ocr.request_path')}</Label>
+                        <Input
+                            variant='bordered'
+                            className='max-w-[50%]'
+                        />
+                    </TextField>
                 </div>
                 <div className={'config-item'}>
-                    <Input
-                        label={t('services.recognize.openai_ocr.api_key')}
-                        labelPlacement='outside-left'
-                        type='password'
+                    <TextField
+                        className='flex w-full justify-between'
                         value={config['apiKey']}
-                        variant='bordered'
-                        classNames={{
-                            base: 'justify-between',
-                            label: 'text-(length:--heroui-font-size-medium)',
-                            mainWrapper: 'max-w-[50%]',
-                        }}
-                        onValueChange={(value) => {
+                        onChange={(value) => {
                             setConfig({
                                 ...config,
                                 apiKey: value,
                             });
                         }}
-                    />
+                    >
+                        <Label className='text-base my-auto'>{t('services.recognize.openai_ocr.api_key')}</Label>
+                        <Input
+                            type='password'
+                            variant='bordered'
+                            className='max-w-[50%]'
+                        />
+                    </TextField>
                 </div>
                 <div className={'config-item'}>
-                    <Input
-                        label={t('services.recognize.openai_ocr.model')}
-                        labelPlacement='outside-left'
+                    <TextField
+                        className='flex w-full justify-between'
                         value={config['model']}
-                        variant='bordered'
-                        classNames={{
-                            base: 'justify-between',
-                            label: 'text-(length:--heroui-font-size-medium)',
-                            mainWrapper: 'max-w-[50%]',
-                        }}
-                        onValueChange={(value) => {
+                        onChange={(value) => {
                             setConfig({
                                 ...config,
                                 model: value,
                             });
                         }}
-                    />
+                    >
+                        <Label className='text-base my-auto'>{t('services.recognize.openai_ocr.model')}</Label>
+                        <Input
+                            variant='bordered'
+                            className='max-w-[50%]'
+                        />
+                    </TextField>
                 </div>
                 <h3 className='my-auto'>Prompt</h3>
                 <p className='text-[10px] text-foreground'>{t('services.recognize.openai_ocr.prompt_description')}</p>

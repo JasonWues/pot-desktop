@@ -1,4 +1,4 @@
-import { Input, Button, Switch, TextArea, Card, CardContent, Link, Dropdown, Label } from '@heroui/react';
+import { Input, Button, Switch, TextArea, Card, CardContent, Link, Dropdown, Label, TextField } from '@heroui/react';
 import { MdDeleteOutline } from 'react-icons/md';
 import toast, { Toaster } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -147,51 +147,47 @@ export function Config(props) {
                                 stream: value,
                             });
                         }}
-                        classNames={{
-                            base: 'flex flex-row-reverse justify-between w-full max-w-full',
-                        }}
+                        className='flex flex-row-reverse justify-between w-full max-w-full'
                     >
                         {t('services.translate.openai.stream')}
                     </Switch>
                 </div>
                 <div className='config-item'>
-                    <Input
-                        label={t('services.translate.openai.request_path')}
-                        labelPlacement='outside-left'
+                    <TextField
+                        className='flex w-full justify-between'
                         value={openaiConfig['requestPath']}
-                        variant='bordered'
-                        classNames={{
-                            base: 'justify-between',
-                            label: 'text-(length:--heroui-font-size-medium)',
-                            mainWrapper: 'max-w-[50%]',
-                        }}
-                        onValueChange={(value) => {
+                        onChange={(value) => {
                             setOpenaiConfig({
                                 ...openaiConfig,
                                 requestPath: value,
                             });
                         }}
-                    />
+                    >
+                        <Label className='text-base my-auto'>{t('services.translate.openai.request_path')}</Label>
+                        <Input
+                            variant='bordered'
+                            className='max-w-[50%]'
+                        />
+                    </TextField>
                 </div>
                 <div className='config-item'>
-                    <Input
-                        label={t('services.translate.openai.api_key')}
-                        labelPlacement='outside-left'
-                        type='password'
+                    <TextField
+                        className='flex w-full justify-between'
                         value={openaiConfig['apiKey']}
-                        variant='bordered'
-                        classNames={{
-                            base: 'justify-between',
-                            label: 'text-(length:--heroui-font-size-medium)',
-                            mainWrapper: 'max-w-[50%]',
-                        }}
-                        onValueChange={(value) => {
+                        onChange={(value) => {
                             setOpenaiConfig({
                                 ...openaiConfig,
                                 apiKey: value,
                             });
                         }}
-                    />
+                    >
+                        <Label className='text-base my-auto'>{t('services.translate.openai.api_key')}</Label>
+                        <Input
+                            type='password'
+                            variant='bordered'
+                            className='max-w-[50%]'
+                        />
+                    </TextField>
                 </div>
                 <Card
                     isBlurred
@@ -220,23 +216,22 @@ export function Config(props) {
                     </CardContent>
                 </Card>
                 <div className={`config-item ${openaiConfig.service === 'azure' ? 'hidden' : ''}`}>
-                    <Input
-                        label={t('services.translate.openai.model')}
-                        labelPlacement='outside-left'
+                    <TextField
+                        className='flex w-full justify-between'
                         value={openaiConfig['model']}
-                        variant='bordered'
-                        classNames={{
-                            base: 'justify-between',
-                            label: 'text-(length:--heroui-font-size-medium)',
-                            mainWrapper: 'max-w-[50%]',
-                        }}
-                        onValueChange={(value) => {
+                        onChange={(value) => {
                             setOpenaiConfig({
                                 ...openaiConfig,
                                 model: value,
                             });
                         }}
-                    />
+                    >
+                        <Label className='text-base my-auto'>{t('services.translate.openai.model')}</Label>
+                        <Input
+                            variant='bordered'
+                            className='max-w-[50%]'
+                        />
+                    </TextField>
                 </div>
                 <h3 className='my-auto'>Prompt List</h3>
                 <p className='text-[10px] text-foreground'>{t('services.translate.openai.prompt_description')}</p>

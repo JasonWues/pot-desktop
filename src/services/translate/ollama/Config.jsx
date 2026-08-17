@@ -1,4 +1,16 @@
-import { Input, Button, Switch, TextArea, Card, CardContent, Link, Tooltip, ProgressBar } from '@heroui/react';
+import {
+    Input,
+    Button,
+    Switch,
+    TextArea,
+    Card,
+    CardContent,
+    Link,
+    Tooltip,
+    ProgressBar,
+    Label,
+    TextField,
+} from '@heroui/react';
 import { INSTANCE_NAME_CONFIG_KEY } from '../../../utils/service_instance';
 import InstanceNameInput from '../../../components/InstanceNameInput';
 import { MdDeleteOutline } from 'react-icons/md';
@@ -146,81 +158,77 @@ export function Config(props) {
                                 stream: value,
                             });
                         }}
-                        classNames={{
-                            base: 'flex flex-row-reverse justify-between w-full max-w-full',
-                        }}
+                        className='flex flex-row-reverse justify-between w-full max-w-full'
                     >
                         {t('services.translate.ollama.stream')}
                     </Switch>
                 </div>
                 <div className='config-item'>
-                    <Input
-                        label={t('services.translate.ollama.request_path')}
-                        labelPlacement='outside-left'
+                    <TextField
+                        className='flex w-full justify-between'
                         value={serviceConfig['requestPath']}
-                        variant='bordered'
-                        classNames={{
-                            base: 'justify-between',
-                            label: 'text-(length:--heroui-font-size-medium)',
-                            mainWrapper: 'max-w-[50%]',
-                        }}
-                        onValueChange={(value) => {
+                        onChange={(value) => {
                             setServiceConfig({
                                 ...serviceConfig,
                                 requestPath: value,
                             });
                         }}
-                    />
+                    >
+                        <Label className='text-base my-auto'>{t('services.translate.ollama.request_path')}</Label>
+                        <Input
+                            variant='bordered'
+                            className='max-w-[50%]'
+                        />
+                    </TextField>
                 </div>
                 <div className='config-item'>
-                    <Input
-                        label={t('services.translate.ollama.model')}
-                        labelPlacement='outside-left'
+                    <TextField
+                        className='flex w-full justify-between'
                         value={serviceConfig['model']}
-                        variant='bordered'
-                        classNames={{
-                            base: 'justify-between',
-                            label: 'text-(length:--heroui-font-size-medium)',
-                            mainWrapper: 'max-w-[50%]',
-                        }}
-                        onValueChange={(value) => {
+                        onChange={(value) => {
                             setServiceConfig({
                                 ...serviceConfig,
                                 model: value,
                             });
                         }}
                     >
-                        {/* v3 has no `endContent`, so the pull button is an
+                        <Label className='text-base my-auto'>{t('services.translate.ollama.model')}</Label>
+                        <Input
+                            variant='bordered'
+                            className='max-w-[50%]'
+                        >
+                            {/* v3 has no `endContent`, so the pull button is an
                             ordinary trailing child of the field. */}
-                        {installedModels &&
-                        !installedModels.models
-                            .map((model) => {
-                                return model.name;
-                            })
-                            .includes(serviceConfig['model']) ? (
-                            <Tooltip>
+                            {installedModels &&
+                            !installedModels.models
+                                .map((model) => {
+                                    return model.name;
+                                })
+                                .includes(serviceConfig['model']) ? (
+                                <Tooltip>
+                                    <Button
+                                        size='sm'
+                                        variant='flat'
+                                        color='warning'
+                                        isLoading={isPulling}
+                                        onPress={pullModel}
+                                    >
+                                        {t('services.translate.ollama.install_model')}
+                                    </Button>
+                                    <Tooltip.Content>{t('services.translate.ollama.not_installed')}</Tooltip.Content>
+                                </Tooltip>
+                            ) : (
                                 <Button
                                     size='sm'
                                     variant='flat'
-                                    color='warning'
-                                    isLoading={isPulling}
-                                    onPress={pullModel}
+                                    color='success'
+                                    disabled
                                 >
-                                    {t('services.translate.ollama.install_model')}
+                                    {t('services.translate.ollama.ready')}
                                 </Button>
-                                <Tooltip.Content>{t('services.translate.ollama.not_installed')}</Tooltip.Content>
-                            </Tooltip>
-                        ) : (
-                            <Button
-                                size='sm'
-                                variant='flat'
-                                color='success'
-                                disabled
-                            >
-                                {t('services.translate.ollama.ready')}
-                            </Button>
-                        )}
-                    </Input>
+                            )}
+                        </Input>
+                    </TextField>
                 </div>
                 <Card
                     isBlurred

@@ -1,6 +1,6 @@
 import { INSTANCE_NAME_CONFIG_KEY } from '../../../utils/service_instance';
 import InstanceNameInput from '../../../components/InstanceNameInput';
-import { Input, Button, Dropdown } from '@heroui/react';
+import { Input, Button, Dropdown, Label, TextField } from '@heroui/react';
 import toast, { Toaster } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { open } from '@tauri-apps/plugin-shell';
@@ -109,42 +109,40 @@ export function Config(props) {
                     </Dropdown>
                 </div>
                 <div className={'config-item'}>
-                    <Input
-                        label={t('services.translate.baidu.appid')}
-                        labelPlacement='outside-left'
+                    <TextField
+                        className='flex w-full justify-between'
                         value={config['appid']}
-                        variant='bordered'
-                        classNames={{
-                            base: 'justify-between',
-                            label: 'text-(length:--heroui-font-size-medium)',
-                            mainWrapper: 'max-w-[50%]',
-                        }}
-                        onValueChange={(value) => {
+                        onChange={(value) => {
                             setConfig({
                                 ...config,
                                 appid: value,
                             });
                         }}
-                    />
+                    >
+                        <Label className='text-base my-auto'>{t('services.translate.baidu.appid')}</Label>
+                        <Input
+                            variant='bordered'
+                            className='max-w-[50%]'
+                        />
+                    </TextField>
                 </div>
                 <div className={'config-item'}>
-                    <Input
-                        label={t('services.translate.baidu.secret')}
-                        labelPlacement='outside-left'
+                    <TextField
+                        className='flex w-full justify-between'
                         value={config['secret']}
-                        variant='bordered'
-                        classNames={{
-                            base: 'justify-between',
-                            label: 'text-(length:--heroui-font-size-medium)',
-                            mainWrapper: 'max-w-[50%]',
-                        }}
-                        onValueChange={(value) => {
+                        onChange={(value) => {
                             setConfig({
                                 ...config,
                                 secret: value,
                             });
                         }}
-                    />
+                    >
+                        <Label className='text-base my-auto'>{t('services.translate.baidu.secret')}</Label>
+                        <Input
+                            variant='bordered'
+                            className='max-w-[50%]'
+                        />
+                    </TextField>
                 </div>
                 <Button
                     type='submit'

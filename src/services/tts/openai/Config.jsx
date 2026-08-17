@@ -1,4 +1,4 @@
-import { Button, Input, Dropdown, Label } from '@heroui/react';
+import { Button, Input, Dropdown, Label, TextField } from '@heroui/react';
 import toast, { Toaster } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { open } from '@tauri-apps/plugin-shell';
@@ -50,62 +50,59 @@ export function Config(props) {
                     </Button>
                 </div>
                 <div className='config-item'>
-                    <Input
-                        label={t('services.tts.openai_tts.request_path')}
-                        labelPlacement='outside-left'
+                    <TextField
+                        className='flex w-full justify-between'
                         value={openaiTtsConfig['requestPath']}
-                        variant='bordered'
-                        classNames={{
-                            base: 'justify-between',
-                            label: 'text-(length:--heroui-font-size-medium)',
-                            mainWrapper: 'max-w-[50%]',
-                        }}
-                        onValueChange={(value) => {
+                        onChange={(value) => {
                             setOpenaiTtsConfig({
                                 ...openaiTtsConfig,
                                 requestPath: value,
                             });
                         }}
-                    />
+                    >
+                        <Label className='text-base my-auto'>{t('services.tts.openai_tts.request_path')}</Label>
+                        <Input
+                            variant='bordered'
+                            className='max-w-[50%]'
+                        />
+                    </TextField>
                 </div>
                 <div className='config-item'>
-                    <Input
-                        label={t('services.tts.openai_tts.api_key')}
-                        labelPlacement='outside-left'
-                        type='password'
+                    <TextField
+                        className='flex w-full justify-between'
                         value={openaiTtsConfig['apiKey']}
-                        variant='bordered'
-                        classNames={{
-                            base: 'justify-between',
-                            label: 'text-(length:--heroui-font-size-medium)',
-                            mainWrapper: 'max-w-[50%]',
-                        }}
-                        onValueChange={(value) => {
+                        onChange={(value) => {
                             setOpenaiTtsConfig({
                                 ...openaiTtsConfig,
                                 apiKey: value,
                             });
                         }}
-                    />
+                    >
+                        <Label className='text-base my-auto'>{t('services.tts.openai_tts.api_key')}</Label>
+                        <Input
+                            type='password'
+                            variant='bordered'
+                            className='max-w-[50%]'
+                        />
+                    </TextField>
                 </div>
                 <div className='config-item'>
-                    <Input
-                        label={t('services.tts.openai_tts.model')}
-                        labelPlacement='outside-left'
+                    <TextField
+                        className='flex w-full justify-between'
                         value={openaiTtsConfig['model']}
-                        variant='bordered'
-                        classNames={{
-                            base: 'justify-between',
-                            label: 'text-(length:--heroui-font-size-medium)',
-                            mainWrapper: 'max-w-[50%]',
-                        }}
-                        onValueChange={(value) => {
+                        onChange={(value) => {
                             setOpenaiTtsConfig({
                                 ...openaiTtsConfig,
                                 model: value,
                             });
                         }}
-                    />
+                    >
+                        <Label className='text-base my-auto'>{t('services.tts.openai_tts.model')}</Label>
+                        <Input
+                            variant='bordered'
+                            className='max-w-[50%]'
+                        />
+                    </TextField>
                 </div>
                 <div className='config-item'>
                     <h3 className='my-auto'>{t('services.tts.openai_tts.voice')}</h3>

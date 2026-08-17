@@ -1,6 +1,6 @@
 import { INSTANCE_NAME_CONFIG_KEY } from '../../../utils/service_instance';
 import InstanceNameInput from '../../../components/InstanceNameInput';
-import { Button, Input } from '@heroui/react';
+import { Button, Input, Label, TextField } from '@heroui/react';
 import toast, { Toaster } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { open } from '@tauri-apps/plugin-shell';
@@ -62,24 +62,23 @@ export function Config(props) {
                         </Button>
                     </div>
                     <div className={'config-item'}>
-                        <Input
-                            label={t('services.collection.anki.port')}
-                            labelPlacement='outside-left'
+                        <TextField
+                            className='flex w-full justify-between'
                             value={ankiConfig['port']}
-                            type='number'
-                            variant='bordered'
-                            classNames={{
-                                base: 'justify-between',
-                                label: 'text-(length:--heroui-font-size-medium)',
-                                mainWrapper: 'max-w-[50%]',
-                            }}
-                            onValueChange={(value) => {
+                            onChange={(value) => {
                                 setAnkiConfig({
                                     ...ankiConfig,
                                     port: value,
                                 });
                             }}
-                        />
+                        >
+                            <Label className='text-base my-auto'>{t('services.collection.anki.port')}</Label>
+                            <Input
+                                type='number'
+                                variant='bordered'
+                                className='max-w-[50%]'
+                            />
+                        </TextField>
                     </div>
                     <Button
                         type='submit'

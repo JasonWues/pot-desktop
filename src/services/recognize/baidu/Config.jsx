@@ -1,6 +1,6 @@
 import { INSTANCE_NAME_CONFIG_KEY } from '../../../utils/service_instance';
 import InstanceNameInput from '../../../components/InstanceNameInput';
-import { Button, Input } from '@heroui/react';
+import { Button, Input, Label, TextField } from '@heroui/react';
 import { open } from '@tauri-apps/plugin-shell';
 import React, { useState } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
@@ -66,42 +66,40 @@ export function Config(props) {
                     </Button>
                 </div>
                 <div className={'config-item'}>
-                    <Input
-                        label={t('services.recognize.baidu_ocr.client_id')}
-                        labelPlacement='outside-left'
+                    <TextField
+                        className='flex w-full justify-between'
                         value={config['client_id']}
-                        variant='bordered'
-                        classNames={{
-                            base: 'justify-between',
-                            label: 'text-(length:--heroui-font-size-medium)',
-                            mainWrapper: 'max-w-[50%]',
-                        }}
-                        onValueChange={(value) => {
+                        onChange={(value) => {
                             setConfig({
                                 ...config,
                                 client_id: value,
                             });
                         }}
-                    />
+                    >
+                        <Label className='text-base my-auto'>{t('services.recognize.baidu_ocr.client_id')}</Label>
+                        <Input
+                            variant='bordered'
+                            className='max-w-[50%]'
+                        />
+                    </TextField>
                 </div>
                 <div className={'config-item'}>
-                    <Input
-                        label={t('services.recognize.baidu_ocr.client_secret')}
-                        labelPlacement='outside-left'
+                    <TextField
+                        className='flex w-full justify-between'
                         value={config['client_secret']}
-                        variant='bordered'
-                        classNames={{
-                            base: 'justify-between',
-                            label: 'text-(length:--heroui-font-size-medium)',
-                            mainWrapper: 'max-w-[50%]',
-                        }}
-                        onValueChange={(value) => {
+                        onChange={(value) => {
                             setConfig({
                                 ...config,
                                 client_secret: value,
                             });
                         }}
-                    />
+                    >
+                        <Label className='text-base my-auto'>{t('services.recognize.baidu_ocr.client_secret')}</Label>
+                        <Input
+                            variant='bordered'
+                            className='max-w-[50%]'
+                        />
+                    </TextField>
                 </div>
                 <Button
                     type='submit'

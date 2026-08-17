@@ -1,6 +1,6 @@
 import { INSTANCE_NAME_CONFIG_KEY } from '../../../utils/service_instance';
 import InstanceNameInput from '../../../components/InstanceNameInput';
-import { Input, Button, TextArea, Dropdown } from '@heroui/react';
+import { Input, Button, TextArea, Dropdown, Label, TextField } from '@heroui/react';
 import { MdDeleteOutline } from 'react-icons/md';
 import toast, { Toaster } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -123,24 +123,23 @@ export function Config(props) {
                     </Dropdown>
                 </div>
                 <div className='config-item'>
-                    <Input
-                        label={t('services.translate.chatglm.api_key')}
-                        labelPlacement='outside-left'
-                        type='password'
+                    <TextField
+                        className='flex w-full justify-between'
                         value={serviceConfig['apiKey']}
-                        variant='bordered'
-                        classNames={{
-                            base: 'justify-between',
-                            label: 'text-(length:--heroui-font-size-medium)',
-                            mainWrapper: 'max-w-[50%]',
-                        }}
-                        onValueChange={(value) => {
+                        onChange={(value) => {
                             setServiceConfig({
                                 ...serviceConfig,
                                 apiKey: value,
                             });
                         }}
-                    />
+                    >
+                        <Label className='text-base my-auto'>{t('services.translate.chatglm.api_key')}</Label>
+                        <Input
+                            type='password'
+                            variant='bordered'
+                            className='max-w-[50%]'
+                        />
+                    </TextField>
                 </div>
 
                 <h3 className='my-auto'>Prompt List</h3>
