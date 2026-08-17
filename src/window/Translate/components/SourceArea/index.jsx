@@ -406,7 +406,7 @@ export default function SourceArea(props) {
         <div className={hideSource && windowType !== '[INPUT_TRANSLATE]' ? 'hidden' : ''}>
             <Card
                 shadow='none'
-                className='bg-surface rounded-[10px] mt-px pb-0'
+                className='bg-surface rounded-[10px] mt-px p-0 gap-0'
             >
                 <Toaster />
                 <CardContent className='bg-surface p-[12px] pb-0 max-h-[40vh] overflow-y-auto'>

@@ -48,7 +48,7 @@ export default function LanguageArea() {
     return (
         <Card
             shadow='none'
-            className='bg-surface-secondary h-[35px] rounded-[10px]'
+            className='bg-surface-secondary h-[35px] rounded-[10px] p-0 gap-0'
         >
             <CardFooter className='bg-surface-secondary flex justify-between p-0 rounded-[10px]'>
                 <div className='flex'>

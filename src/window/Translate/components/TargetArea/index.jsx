@@ -344,11 +344,16 @@ export default function TargetArea(props) {
     return (
         <Card
             shadow='none'
-            className='rounded-[10px]'
+            className='rounded-[10px] p-0 gap-0'
         >
             <Toaster />
+            {/* `flex-row items-center` is not decoration. v3's Card.Header is a
+                column -- it is built to stack a Title above a Description -- where
+                v2's was a row. This one is a toolbar, so without the override its
+                two halves stack: the service dropdown on one line and the collapse
+                button below it, both full width, overflowing the 30px header. */}
             <CardHeader
-                className={`flex justify-between py-1 px-0 bg-surface-secondary h-[30px] ${hide ? 'rounded-[10px]' : 'rounded-t-[10px]'}`}
+                className={`flex flex-row items-center justify-between py-1 px-0 bg-surface-secondary h-[30px] ${hide ? 'rounded-[10px]' : 'rounded-t-[10px]'}`}
                 {...drag}
             >
                 {/* current service instance and available service instance to change */}
