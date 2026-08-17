@@ -130,47 +130,62 @@ export function Config(props) {
                 <h3 className='my-auto'>Prompt</h3>
                 <p className='text-[10px] text-foreground'>{t('services.recognize.openai_ocr.prompt_description')}</p>
                 <div className={'config-item'}>
-                    <TextArea
-                        label='system'
-                        labelPlacement='outside'
+                    <TextField
+                        className='w-full'
                         value={config['systemPrompt']}
-                        placeholder='Input Some System Prompt'
-                        onValueChange={(value) => {
+                        onChange={(value) => {
                             setConfig({
                                 ...config,
                                 systemPrompt: value,
                             });
                         }}
-                    />
+                    >
+                        <Label>system</Label>
+                        <TextArea
+                            fullWidth
+                            rows={3}
+                            placeholder='Input Some System Prompt'
+                        />
+                    </TextField>
                 </div>
                 <div className={'config-item'}>
-                    <TextArea
-                        label='user'
-                        labelPlacement='outside'
+                    <TextField
+                        className='w-full'
                         value={config['userPrompt']}
-                        placeholder='Input Some User Prompt'
-                        onValueChange={(value) => {
+                        onChange={(value) => {
                             setConfig({
                                 ...config,
                                 userPrompt: value,
                             });
                         }}
-                    />
+                    >
+                        <Label>user</Label>
+                        <TextArea
+                            fullWidth
+                            rows={3}
+                            placeholder='Input Some User Prompt'
+                        />
+                    </TextField>
                 </div>
                 <h3 className='my-auto'>Request Arguments</h3>
                 <div className={'config-item'}>
-                    <TextArea
-                        label=''
-                        labelPlacement='outside'
+                    <TextField
+                        className='w-full'
+                        aria-label='Request Arguments'
                         value={config['requestArguments']}
-                        placeholder='Input API Request Arguments'
-                        onValueChange={(value) => {
+                        onChange={(value) => {
                             setConfig({
                                 ...config,
                                 requestArguments: value,
                             });
                         }}
-                    />
+                    >
+                        <TextArea
+                            fullWidth
+                            rows={3}
+                            placeholder='Input API Request Arguments'
+                        />
+                    </TextField>
                 </div>
                 <br />
                 <Button

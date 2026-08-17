@@ -166,12 +166,10 @@ export function Config(props) {
                         serviceConfig.promptList.map((prompt, index) => {
                             return (
                                 <div className='config-item'>
-                                    <TextArea
-                                        label={prompt.role}
-                                        labelPlacement='outside'
+                                    <TextField
+                                        className='w-full'
                                         value={prompt.parts[0].text}
-                                        placeholder={`Input Some ${prompt.role} Prompt`}
-                                        onValueChange={(value) => {
+                                        onChange={(value) => {
                                             setServiceConfig({
                                                 ...serviceConfig,
                                                 promptList: serviceConfig.promptList.map((p, i) => {
@@ -190,7 +188,14 @@ export function Config(props) {
                                                 }),
                                             });
                                         }}
-                                    />
+                                    >
+                                        <Label>{prompt.role}</Label>
+                                        <TextArea
+                                            fullWidth
+                                            rows={3}
+                                            placeholder={`Input Some ${prompt.role} Prompt`}
+                                        />
+                                    </TextField>
                                     <Button
                                         isIconOnly
                                         className='my-auto mx-1'

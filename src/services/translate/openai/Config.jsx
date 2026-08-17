@@ -237,12 +237,10 @@ export function Config(props) {
                         openaiConfig.promptList.map((prompt, index) => {
                             return (
                                 <div className='config-item'>
-                                    <TextArea
-                                        label={prompt.role}
-                                        labelPlacement='outside'
+                                    <TextField
+                                        className='w-full'
                                         value={prompt.content}
-                                        placeholder={`Input Some ${prompt.role} Prompt`}
-                                        onValueChange={(value) => {
+                                        onChange={(value) => {
                                             setOpenaiConfig({
                                                 ...openaiConfig,
                                                 promptList: openaiConfig.promptList.map((p, i) => {
@@ -264,7 +262,14 @@ export function Config(props) {
                                                 }),
                                             });
                                         }}
-                                    />
+                                    >
+                                        <Label>{prompt.role}</Label>
+                                        <TextArea
+                                            fullWidth
+                                            rows={3}
+                                            placeholder={`Input Some ${prompt.role} Prompt`}
+                                        />
+                                    </TextField>
                                     <Button
                                         isIconOnly
                                         className='my-auto mx-1'
@@ -308,18 +313,23 @@ export function Config(props) {
 
                 <h3 className='my-auto'>Request Arguments</h3>
                 <div className='config-item'>
-                    <TextArea
-                        label=''
-                        labelPlacement='outside'
+                    <TextField
+                        className='w-full'
+                        aria-label='Request Arguments'
                         value={openaiConfig['requestArguments']}
-                        placeholder={`Input API Request Arguments`}
-                        onValueChange={(value) => {
+                        onChange={(value) => {
                             setOpenaiConfig({
                                 ...openaiConfig,
                                 requestArguments: value,
                             });
                         }}
-                    />
+                    >
+                        <TextArea
+                            fullWidth
+                            rows={3}
+                            placeholder={`Input API Request Arguments`}
+                        />
+                    </TextField>
                 </div>
                 <br />
                 <Button

@@ -194,6 +194,28 @@ html {
     width: 5px;
 }
 
+/*
+  Only the thumb was ever styled, so Chrome kept drawing its default stepper
+  buttons at both ends of any scrollbar it did style.
+*/
+*::-webkit-scrollbar-button {
+    display: none;
+}
+
+/*
+  ...but the prompt textareas are not one of those. `scrollbar-color` is an
+  INHERITED property, and v3's `.scrollbar` utility sets it on the scroll slots
+  -- `.modal__body--scroll-inside` among them -- so everything inside a modal
+  inherits it. Chrome ignores every `::-webkit-scrollbar*` rule on an element
+  whose scrollbar is coloured that way, which quietly took the five rules above
+  out of play and handed the textareas the default colour scrollbar: full width,
+  with the arrowheads back at both ends. `scrollbar-width: thin` is the standard
+  property's own answer, and it is the one Chrome is listening to here.
+*/
+.textarea {
+    scrollbar-width: thin;
+}
+
 *::-webkit-scrollbar-thumb {
     background: #c0c1c550;
     border-radius: 5px;
