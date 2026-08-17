@@ -64,9 +64,7 @@ export function Config(props) {
         <div className='config-item'>
             <h3 className='my-auto'>{label}</h3>
             <Dropdown>
-                <Dropdown.Trigger>
-                    <Button variant='bordered'>{`${(edgeConfig[key] ?? 0) > 0 ? '+' : ''}${edgeConfig[key] ?? 0}${unit}`}</Button>
-                </Dropdown.Trigger>
+                <Button variant='bordered'>{`${(edgeConfig[key] ?? 0) > 0 ? '+' : ''}${edgeConfig[key] ?? 0}${unit}`}</Button>
                 <Dropdown.Popover>
                     <Dropdown.Menu
                         aria-label={key}
@@ -101,9 +99,7 @@ export function Config(props) {
                 <div className='config-item'>
                     <h3 className='my-auto'>{t('services.tts.edge_tts.language')}</h3>
                     <Dropdown>
-                        <Dropdown.Trigger>
-                            <Button variant='bordered'>{t(`languages.${editingLanguage}`)}</Button>
-                        </Dropdown.Trigger>
+                        <Button variant='bordered'>{t(`languages.${editingLanguage}`)}</Button>
                         <Dropdown.Popover>
                             <Dropdown.Menu
                                 aria-label='tts language'
@@ -126,15 +122,13 @@ export function Config(props) {
                 <div className='config-item'>
                     <h3 className='my-auto'>{t('services.tts.edge_tts.voice')}</h3>
                     <Dropdown>
-                        <Dropdown.Trigger>
-                            <Button variant='bordered'>
-                                {configuredVoice === ''
-                                    ? `${t('services.tts.edge_tts.auto_voice')}${
-                                          autoVoice === null ? '' : ` (${autoVoice.ShortName})`
-                                      }`
-                                    : configuredVoice}
-                            </Button>
-                        </Dropdown.Trigger>
+                        <Button variant='bordered'>
+                            {configuredVoice === ''
+                                ? `${t('services.tts.edge_tts.auto_voice')}${
+                                      autoVoice === null ? '' : ` (${autoVoice.ShortName})`
+                                  }`
+                                : configuredVoice}
+                        </Button>
                         <Dropdown.Popover>
                             <Dropdown.Menu
                                 aria-label='tts voice'

@@ -271,15 +271,13 @@ export default function History() {
                         onClear={() => setSearch('')}
                     />
                     <Dropdown>
-                        <Dropdown.Trigger>
-                            <Button
-                                size='sm'
-                                variant='bordered'
-                                className='my-auto'
-                            >
-                                {serviceFilter === ALL ? t('config.history.all_services') : serviceLabel(serviceFilter)}
-                            </Button>
-                        </Dropdown.Trigger>
+                        <Button
+                            size='sm'
+                            variant='bordered'
+                            className='my-auto'
+                        >
+                            {serviceFilter === ALL ? t('config.history.all_services') : serviceLabel(serviceFilter)}
+                        </Button>
                         <Dropdown.Popover>
                             <Dropdown.Menu
                                 aria-label='service filter'
@@ -304,17 +302,15 @@ export default function History() {
                         </Dropdown.Popover>
                     </Dropdown>
                     <Dropdown>
-                        <Dropdown.Trigger>
-                            <Button
-                                size='sm'
-                                variant='bordered'
-                                className='my-auto'
-                            >
-                                {targetFilter === ALL
-                                    ? t('config.history.all_languages')
-                                    : t(`languages.${targetFilter}`, { defaultValue: targetFilter })}
-                            </Button>
-                        </Dropdown.Trigger>
+                        <Button
+                            size='sm'
+                            variant='bordered'
+                            className='my-auto'
+                        >
+                            {targetFilter === ALL
+                                ? t('config.history.all_languages')
+                                : t(`languages.${targetFilter}`, { defaultValue: targetFilter })}
+                        </Button>
                         <Dropdown.Popover>
                             <Dropdown.Menu
                                 aria-label='language filter'

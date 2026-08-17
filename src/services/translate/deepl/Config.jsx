@@ -70,9 +70,7 @@ export function Config(props) {
                 <div className='config-item'>
                     <h3 className='my-auto'>{t('services.translate.deepl.type')}</h3>
                     <Dropdown>
-                        <Dropdown.Trigger>
-                            <Button variant='bordered'>{t(`services.translate.deepl.${deeplConfig.type}`)}</Button>
-                        </Dropdown.Trigger>
+                        <Button variant='bordered'>{t(`services.translate.deepl.${deeplConfig.type}`)}</Button>
                         <Dropdown.Popover>
                             <Dropdown.Menu
                                 autoFocus='first'

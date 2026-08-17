@@ -56,21 +56,19 @@ export default function LanguageArea() {
                         ignore it, so it sits with the languages rather than in
                         any one service's header. */}
                     <Dropdown>
-                        <Dropdown.Trigger>
-                            <Button
-                                isIconOnly={aiPreset === DEFAULT_PRESET}
-                                radius='sm'
-                                variant='light'
-                                className={aiPreset === DEFAULT_PRESET ? '' : 'text-accent'}
-                            >
-                                aiPreset === DEFAULT_PRESET ? null : <LuWand className='text-[16px]' />
-                                {aiPreset === DEFAULT_PRESET ? (
-                                    <LuWand className='text-[16px] text-muted' />
-                                ) : (
-                                    t(`translate.ai_preset.${aiPreset}`)
-                                )}
-                            </Button>
-                        </Dropdown.Trigger>
+                        <Button
+                            isIconOnly={aiPreset === DEFAULT_PRESET}
+                            radius='sm'
+                            variant='light'
+                            className={aiPreset === DEFAULT_PRESET ? '' : 'text-accent'}
+                        >
+                            aiPreset === DEFAULT_PRESET ? null : <LuWand className='text-[16px]' />
+                            {aiPreset === DEFAULT_PRESET ? (
+                                <LuWand className='text-[16px] text-muted' />
+                            ) : (
+                                t(`translate.ai_preset.${aiPreset}`)
+                            )}
+                        </Button>
                         <Dropdown.Popover>
                             <Dropdown.Menu
                                 aria-label='AI preset'
@@ -90,14 +88,12 @@ export default function LanguageArea() {
                         </Dropdown.Popover>
                     </Dropdown>
                     <Dropdown>
-                        <Dropdown.Trigger>
-                            <Button
-                                radius='sm'
-                                variant='light'
-                            >
-                                {t(`languages.${sourceLanguage}`)}
-                            </Button>
-                        </Dropdown.Trigger>
+                        <Button
+                            radius='sm'
+                            variant='light'
+                        >
+                            {t(`languages.${sourceLanguage}`)}
+                        </Button>
                         <Dropdown.Popover>
                             <Dropdown.Menu
                                 aria-label='Source Language'
@@ -159,14 +155,12 @@ export default function LanguageArea() {
                 </div>
                 <div className='flex'>
                     <Dropdown>
-                        <Dropdown.Trigger>
-                            <Button
-                                radius='sm'
-                                variant='light'
-                            >
-                                {t(`languages.${targetLanguage}`)}
-                            </Button>
-                        </Dropdown.Trigger>
+                        <Button
+                            radius='sm'
+                            variant='light'
+                        >
+                            {t(`languages.${targetLanguage}`)}
+                        </Button>
                         <Dropdown.Popover>
                             <Dropdown.Menu
                                 aria-label='Target Language'

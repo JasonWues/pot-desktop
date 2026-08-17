@@ -68,9 +68,7 @@ export function Config(props) {
                 <div className='config-item'>
                     <h3 className='my-auto'>{t('services.tts.system_tts.rate')}</h3>
                     <Dropdown>
-                        <Dropdown.Trigger>
-                            <Button variant='bordered'>{`${systemTtsConfig.rate ?? 1}x`}</Button>
-                        </Dropdown.Trigger>
+                        <Button variant='bordered'>{`${systemTtsConfig.rate ?? 1}x`}</Button>
                         <Dropdown.Popover>
                             <Dropdown.Menu
                                 aria-label='tts rate'
@@ -95,9 +93,7 @@ export function Config(props) {
                 <div className='config-item'>
                     <h3 className='my-auto'>{t('services.tts.system_tts.language')}</h3>
                     <Dropdown>
-                        <Dropdown.Trigger>
-                            <Button variant='bordered'>{t(`languages.${editingLanguage}`)}</Button>
-                        </Dropdown.Trigger>
+                        <Button variant='bordered'>{t(`languages.${editingLanguage}`)}</Button>
                         <Dropdown.Popover>
                             <Dropdown.Menu
                                 aria-label='tts language'
@@ -122,15 +118,13 @@ export function Config(props) {
                 <div className='config-item'>
                     <h3 className='my-auto'>{t('services.tts.system_tts.voice')}</h3>
                     <Dropdown>
-                        <Dropdown.Trigger>
-                            <Button variant='bordered'>
-                                {configuredVoice === ''
-                                    ? `${t('services.tts.system_tts.auto_voice')}${
-                                          autoVoice === null ? '' : ` (${autoVoice.name})`
-                                      }`
-                                    : configuredVoice}
-                            </Button>
-                        </Dropdown.Trigger>
+                        <Button variant='bordered'>
+                            {configuredVoice === ''
+                                ? `${t('services.tts.system_tts.auto_voice')}${
+                                      autoVoice === null ? '' : ` (${autoVoice.name})`
+                                  }`
+                                : configuredVoice}
+                        </Button>
                         <Dropdown.Popover>
                             <Dropdown.Menu
                                 aria-label='tts voice'

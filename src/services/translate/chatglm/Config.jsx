@@ -96,9 +96,7 @@ export function Config(props) {
                 <div className='config-item'>
                     <h3 className='my-auto'>{t('services.translate.chatglm.model')}</h3>
                     <Dropdown>
-                        <Dropdown.Trigger>
-                            <Button variant='bordered'>{serviceConfig.model}</Button>
-                        </Dropdown.Trigger>
+                        <Button variant='bordered'>{serviceConfig.model}</Button>
                         <Dropdown.Popover>
                             <Dropdown.Menu
                                 autoFocus='first'

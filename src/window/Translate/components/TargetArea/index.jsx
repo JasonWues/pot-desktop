@@ -354,38 +354,34 @@ export default function TargetArea(props) {
                 {/* current service instance and available service instance to change */}
                 <div className='flex'>
                     <Dropdown>
-                        <Dropdown.Trigger>
-                            <Button
-                                size='sm'
-                                variant='solid'
-                                className='bg-transparent'
-                            >
-                                whetherPluginService(currentTranslateServiceInstanceKey) ? (
-                                <img
-                                    src={
-                                        pluginList['translate'][getServiceName(currentTranslateServiceInstanceKey)].icon
-                                    }
-                                    className='h-[20px] my-auto'
-                                />
-                                ) : (
-                                <img
-                                    src={builtinServices[getServiceName(currentTranslateServiceInstanceKey)].info.icon}
-                                    className='h-[20px] my-auto'
-                                />
-                                )
-                                {whetherPluginService(currentTranslateServiceInstanceKey) ? (
-                                    <div className='my-auto'>{`${getInstanceName(currentTranslateServiceInstanceKey, () => pluginList['translate'][getServiceName(currentTranslateServiceInstanceKey)].display)} `}</div>
-                                ) : (
-                                    <div className='my-auto'>
-                                        {getInstanceName(currentTranslateServiceInstanceKey, () =>
-                                            t(
-                                                `services.translate.${getServiceName(currentTranslateServiceInstanceKey)}.title`
-                                            )
-                                        )}
-                                    </div>
-                                )}
-                            </Button>
-                        </Dropdown.Trigger>
+                        <Button
+                            size='sm'
+                            variant='solid'
+                            className='bg-transparent'
+                        >
+                            whetherPluginService(currentTranslateServiceInstanceKey) ? (
+                            <img
+                                src={pluginList['translate'][getServiceName(currentTranslateServiceInstanceKey)].icon}
+                                className='h-[20px] my-auto'
+                            />
+                            ) : (
+                            <img
+                                src={builtinServices[getServiceName(currentTranslateServiceInstanceKey)].info.icon}
+                                className='h-[20px] my-auto'
+                            />
+                            )
+                            {whetherPluginService(currentTranslateServiceInstanceKey) ? (
+                                <div className='my-auto'>{`${getInstanceName(currentTranslateServiceInstanceKey, () => pluginList['translate'][getServiceName(currentTranslateServiceInstanceKey)].display)} `}</div>
+                            ) : (
+                                <div className='my-auto'>
+                                    {getInstanceName(currentTranslateServiceInstanceKey, () =>
+                                        t(
+                                            `services.translate.${getServiceName(currentTranslateServiceInstanceKey)}.title`
+                                        )
+                                    )}
+                                </div>
+                            )}
+                        </Button>
                         <Dropdown.Popover>
                             <Dropdown.Menu
                                 aria-label='app language'

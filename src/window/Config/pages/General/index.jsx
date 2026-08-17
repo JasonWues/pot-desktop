@@ -1,5 +1,5 @@
 import { enable, isEnabled, disable } from '@tauri-apps/plugin-autostart';
-import { CardContent, Dropdown, Button, Switch, Input, Card, Label } from '@heroui/react';
+import { CardContent, Dropdown, Button, Switch, Input, Card, Label, TextField, InputGroup } from '@heroui/react';
 import React, { useState, useEffect } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -172,12 +172,10 @@ export default function General() {
                         <h3 className='my-auto'>{t('config.general.app_language')}</h3>
                         {appLanguage !== null && (
                             <Dropdown>
-                                <Dropdown.Trigger>
-                                    <Button variant='bordered'>
-                                        <Flag code={LanguageFlag[appLanguage]} />
-                                        {languageName[appLanguage]}
-                                    </Button>
-                                </Dropdown.Trigger>
+                                <Button variant='bordered'>
+                                    <Flag code={LanguageFlag[appLanguage]} />
+                                    {languageName[appLanguage]}
+                                </Button>
                                 <Dropdown.Popover>
                                     <Dropdown.Menu
                                         aria-label='app language'
@@ -330,12 +328,10 @@ export default function General() {
                         <h3 className='my-auto'>{t('config.general.app_theme')}</h3>
                         {appTheme !== null && (
                             <Dropdown>
-                                <Dropdown.Trigger>
-                                    <Button variant='bordered'>
-                                        <ThemeIcon name={appTheme} />
-                                        {t(`config.general.theme.${appTheme}`)}
-                                    </Button>
-                                </Dropdown.Trigger>
+                                <Button variant='bordered'>
+                                    <ThemeIcon name={appTheme} />
+                                    {t(`config.general.theme.${appTheme}`)}
+                                </Button>
                                 <Dropdown.Popover>
                                     <Dropdown.Menu
                                         aria-label='app theme'
@@ -379,16 +375,14 @@ export default function General() {
                         <h3 className='my-auto'>{t('config.general.app_font')}</h3>
                         {appFont !== null && fontList !== null && (
                             <Dropdown>
-                                <Dropdown.Trigger>
-                                    <Button
-                                        variant='bordered'
-                                        style={{
-                                            fontFamily: appFont === 'default' ? 'sans-serif' : appFont,
-                                        }}
-                                    >
-                                        {appFont === 'default' ? t('config.general.default_font') : appFont}
-                                    </Button>
-                                </Dropdown.Trigger>
+                                <Button
+                                    variant='bordered'
+                                    style={{
+                                        fontFamily: appFont === 'default' ? 'sans-serif' : appFont,
+                                    }}
+                                >
+                                    {appFont === 'default' ? t('config.general.default_font') : appFont}
+                                </Button>
                                 <Dropdown.Popover>
                                     <Dropdown.Menu
                                         aria-label='app font'
@@ -427,18 +421,14 @@ export default function General() {
                         <h3 className='my-auto'>{t('config.general.app_fallback_font')}</h3>
                         {appFallbackFont !== null && fontList !== null && (
                             <Dropdown>
-                                <Dropdown.Trigger>
-                                    <Button
-                                        variant='bordered'
-                                        style={{
-                                            fontFamily: appFallbackFont === 'default' ? 'sans-serif' : appFallbackFont,
-                                        }}
-                                    >
-                                        {appFallbackFont === 'default'
-                                            ? t('config.general.default_font')
-                                            : appFallbackFont}
-                                    </Button>
-                                </Dropdown.Trigger>
+                                <Button
+                                    variant='bordered'
+                                    style={{
+                                        fontFamily: appFallbackFont === 'default' ? 'sans-serif' : appFallbackFont,
+                                    }}
+                                >
+                                    {appFallbackFont === 'default' ? t('config.general.default_font') : appFallbackFont}
+                                </Button>
                                 <Dropdown.Popover>
                                     <Dropdown.Menu
                                         aria-label='app font'
@@ -477,9 +467,7 @@ export default function General() {
                         <h3 className='my-auto mx-0'>{t('config.general.font_size.title')}</h3>
                         {appFontSize !== null && (
                             <Dropdown>
-                                <Dropdown.Trigger>
-                                    <Button variant='bordered'>{t(`config.general.font_size.${appFontSize}`)}</Button>
-                                </Dropdown.Trigger>
+                                <Button variant='bordered'>{t(`config.general.font_size.${appFontSize}`)}</Button>
                                 <Dropdown.Popover>
                                     <Dropdown.Menu
                                         aria-label='window position'
@@ -540,9 +528,7 @@ export default function General() {
                         <h3 className='my-auto'>{t('config.general.tray_click_event')}</h3>
                         {trayClickEvent !== null && (
                             <Dropdown>
-                                <Dropdown.Trigger>
-                                    <Button variant='bordered'>{t(`config.general.event.${trayClickEvent}`)}</Button>
-                                </Dropdown.Trigger>
+                                <Button variant='bordered'>{t(`config.general.event.${trayClickEvent}`)}</Button>
                                 <Dropdown.Popover>
                                     <Dropdown.Menu
                                         aria-label='tray click event'
@@ -615,9 +601,7 @@ export default function General() {
                         <h3>{t('config.general.proxy.title')}</h3>
                         {proxyMode !== null && (
                             <Dropdown>
-                                <Dropdown.Trigger>
-                                    <Button variant='bordered'>{t(`config.general.proxy.mode.${proxyMode}`)}</Button>
-                                </Dropdown.Trigger>
+                                <Button variant='bordered'>{t(`config.general.proxy.mode.${proxyMode}`)}</Button>
                                 <Dropdown.Popover>
                                     <Dropdown.Menu
                                         aria-label='proxy mode'
@@ -674,19 +658,23 @@ export default function General() {
                     )}
                     <div className={`config-item ${proxyMode === 'manual' ? '' : 'hidden'}`}>
                         {proxyHost !== null && (
-                            <Input
-                                type='url'
-                                variant='bordered'
-                                isRequired
-                                label={t('config.general.proxy.host')}
+                            // The `http://` prefix is an InputGroup.Prefix rather
+                            // than a child of the input: v3's Input is a real
+                            // <input>, a void element that cannot contain anything.
+                            <TextField
+                                className='mr-2 w-full'
                                 value={proxyHost}
-                                onValueChange={(v) => {
+                                onChange={(v) => {
                                     setProxyHost(v);
                                 }}
-                                className='mr-2'
+                                isRequired
                             >
-                                <span>http://</span>
-                            </Input>
+                                <Label className='text-base my-auto'>{t('config.general.proxy.host')}</Label>
+                                <InputGroup>
+                                    <InputGroup.Prefix>http://</InputGroup.Prefix>
+                                    <InputGroup.Input type='url' />
+                                </InputGroup>
+                            </TextField>
                         )}
                         {proxyPort !== null && (
                             <Input

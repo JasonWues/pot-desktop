@@ -53,33 +53,30 @@ export default function ControlArea(props) {
         <div className='flex justify-between px-[12px] h-full'>
             {currentServiceInstanceKey && (
                 <Dropdown>
-                    <Dropdown.Trigger>
-                        <Button
-                            className='my-auto'
-                            variant='bordered'
-                            size='sm'
-                        >
-                            <img
-                                className='h-[16px] w-[16px] my-auto'
-                                src={
-                                    getServiceSouceType(currentServiceInstanceKey) === ServiceSourceType.PLUGIN
-                                        ? pluginList[getServiceName(currentServiceInstanceKey)].icon
-                                        : builtinService[getServiceName(currentServiceInstanceKey)].info.icon ===
-                                            'system'
-                                          ? `logo/${osType}.svg`
-                                          : builtinService[getServiceName(currentServiceInstanceKey)].info.icon
-                                }
-                            />
-                            {getServiceSouceType(currentServiceInstanceKey) === ServiceSourceType.PLUGIN
-                                ? getInstanceName(
-                                      currentServiceInstanceKey,
-                                      () => pluginList[getServiceName(currentServiceInstanceKey)].display
-                                  )
-                                : getInstanceName(currentServiceInstanceKey, () =>
-                                      t(`services.recognize.${currentServiceInstanceKey}.title`)
-                                  )}
-                        </Button>
-                    </Dropdown.Trigger>
+                    <Button
+                        className='my-auto'
+                        variant='bordered'
+                        size='sm'
+                    >
+                        <img
+                            className='h-[16px] w-[16px] my-auto'
+                            src={
+                                getServiceSouceType(currentServiceInstanceKey) === ServiceSourceType.PLUGIN
+                                    ? pluginList[getServiceName(currentServiceInstanceKey)].icon
+                                    : builtinService[getServiceName(currentServiceInstanceKey)].info.icon === 'system'
+                                      ? `logo/${osType}.svg`
+                                      : builtinService[getServiceName(currentServiceInstanceKey)].info.icon
+                            }
+                        />
+                        {getServiceSouceType(currentServiceInstanceKey) === ServiceSourceType.PLUGIN
+                            ? getInstanceName(
+                                  currentServiceInstanceKey,
+                                  () => pluginList[getServiceName(currentServiceInstanceKey)].display
+                              )
+                            : getInstanceName(currentServiceInstanceKey, () =>
+                                  t(`services.recognize.${currentServiceInstanceKey}.title`)
+                              )}
+                    </Button>
                     <Dropdown.Popover>
                         <Dropdown.Menu
                             aria-label='service name'
@@ -121,15 +118,13 @@ export default function ControlArea(props) {
             )}
             {language && (
                 <Dropdown>
-                    <Dropdown.Trigger>
-                        <Button
-                            className='my-auto'
-                            variant='bordered'
-                            size='sm'
-                        >
-                            {t(`languages.${language}`)}
-                        </Button>
-                    </Dropdown.Trigger>
+                    <Button
+                        className='my-auto'
+                        variant='bordered'
+                        size='sm'
+                    >
+                        {t(`languages.${language}`)}
+                    </Button>
                     <Dropdown.Popover>
                         <Dropdown.Menu
                             aria-label='language'

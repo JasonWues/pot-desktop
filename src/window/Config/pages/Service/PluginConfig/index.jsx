@@ -71,20 +71,18 @@ export function PluginConfig(props) {
                                 )}
                                 {x.type === 'select' && (
                                     <Dropdown>
-                                        <Dropdown.Trigger>
-                                            <Button
-                                                variant='bordered'
-                                                className='max-w-[50%]'
-                                            >
-                                                {
-                                                    x.options[
-                                                        pluginConfig.hasOwnProperty(x.key)
-                                                            ? pluginConfig[x.key]
-                                                            : Object.keys(x.options)[0]
-                                                    ]
-                                                }
-                                            </Button>
-                                        </Dropdown.Trigger>
+                                        <Button
+                                            variant='bordered'
+                                            className='max-w-[50%]'
+                                        >
+                                            {
+                                                x.options[
+                                                    pluginConfig.hasOwnProperty(x.key)
+                                                        ? pluginConfig[x.key]
+                                                        : Object.keys(x.options)[0]
+                                                ]
+                                            }
+                                        </Button>
                                         <Dropdown.Popover>
                                             <Dropdown.Menu
                                                 aria-label={x.key}

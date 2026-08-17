@@ -108,9 +108,7 @@ export function Config(props) {
                 <div className='config-item'>
                     <h3 className='my-auto'>{t('services.translate.openai.service')}</h3>
                     <Dropdown>
-                        <Dropdown.Trigger>
-                            <Button variant='bordered'>{t(`services.translate.openai.${openaiConfig.service}`)}</Button>
-                        </Dropdown.Trigger>
+                        <Button variant='bordered'>{t(`services.translate.openai.${openaiConfig.service}`)}</Button>
                         <Dropdown.Popover>
                             <Dropdown.Menu
                                 autoFocus='first'

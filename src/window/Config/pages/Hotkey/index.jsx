@@ -1,7 +1,7 @@
 import { unregister, isRegistered } from '@tauri-apps/plugin-global-shortcut';
 import toast, { Toaster } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { CardContent, Button, Input, Card } from '@heroui/react';
+import { CardContent, Button, Input, Card, InputGroup } from '@heroui/react';
 import React from 'react';
 
 import { useConfig } from '../../../../hooks/useConfig';
@@ -116,122 +116,137 @@ export default function Hotkey() {
             <CardContent>
                 <div className='config-item'>
                     <h3 className='my-auto'>{t('config.hotkey.selection_translate')}</h3>
+                    {/* InputGroup, not Input with children: v3's Input renders a real
+                        <input>, which is a void element and cannot hold the OK button.
+                        `label` is not a v3 Input prop either, and the row's own <h3>
+                        already names the field, so it becomes the aria-label.
+                        `readOnly` because the value is driven by onKeyDown, and React
+                        warns on a `value` with no `onChange`. The same shape repeats
+                        for the three hotkey fields below. */}
                     {selectionTranslate !== null && (
-                        <Input
-                            type='hotkey'
-                            variant='bordered'
-                            value={selectionTranslate}
-                            label={t('config.hotkey.set_hotkey')}
-                            className='max-w-[50%]'
-                            onKeyDown={(e) => {
-                                keyDown(e, setSelectionTranslate);
-                            }}
-                            onFocus={() => {
-                                unregister(selectionTranslate);
-                                setSelectionTranslate('');
-                            }}
-                        >
-                            <Button
-                                size='sm'
-                                variant='flat'
-                                className={`${selectionTranslate === '' ? 'hidden' : ''}`}
-                                onPress={() => {
-                                    registerHandler('hotkey_selection_translate', selectionTranslate);
+                        <InputGroup className='max-w-[50%]'>
+                            <InputGroup.Input
+                                type='hotkey'
+                                aria-label={t('config.hotkey.set_hotkey')}
+                                value={selectionTranslate}
+                                readOnly
+                                onKeyDown={(e) => {
+                                    keyDown(e, setSelectionTranslate);
                                 }}
-                            >
-                                {t('common.ok')}
-                            </Button>
-                        </Input>
+                                onFocus={() => {
+                                    unregister(selectionTranslate);
+                                    setSelectionTranslate('');
+                                }}
+                            />
+                            <InputGroup.Suffix>
+                                <Button
+                                    size='sm'
+                                    variant='flat'
+                                    className={`${selectionTranslate === '' ? 'hidden' : ''}`}
+                                    onPress={() => {
+                                        registerHandler('hotkey_selection_translate', selectionTranslate);
+                                    }}
+                                >
+                                    {t('common.ok')}
+                                </Button>
+                            </InputGroup.Suffix>
+                        </InputGroup>
                     )}
                 </div>
                 <div className='config-item'>
                     <h3 className='my-auto'>{t('config.hotkey.input_translate')}</h3>
                     {inputTranslate !== null && (
-                        <Input
-                            type='hotkey'
-                            variant='bordered'
-                            value={inputTranslate}
-                            label={t('config.hotkey.set_hotkey')}
-                            className='max-w-[50%]'
-                            onKeyDown={(e) => {
-                                keyDown(e, setInputTranslate);
-                            }}
-                            onFocus={() => {
-                                unregister(inputTranslate);
-                                setInputTranslate('');
-                            }}
-                        >
-                            <Button
-                                size='sm'
-                                variant='flat'
-                                className={`${inputTranslate === '' ? 'hidden' : ''}`}
-                                onPress={() => {
-                                    registerHandler('hotkey_input_translate', inputTranslate);
+                        <InputGroup className='max-w-[50%]'>
+                            <InputGroup.Input
+                                type='hotkey'
+                                aria-label={t('config.hotkey.set_hotkey')}
+                                value={inputTranslate}
+                                readOnly
+                                onKeyDown={(e) => {
+                                    keyDown(e, setInputTranslate);
                                 }}
-                            >
-                                {t('common.ok')}
-                            </Button>
-                        </Input>
+                                onFocus={() => {
+                                    unregister(inputTranslate);
+                                    setInputTranslate('');
+                                }}
+                            />
+                            <InputGroup.Suffix>
+                                <Button
+                                    size='sm'
+                                    variant='flat'
+                                    className={`${inputTranslate === '' ? 'hidden' : ''}`}
+                                    onPress={() => {
+                                        registerHandler('hotkey_input_translate', inputTranslate);
+                                    }}
+                                >
+                                    {t('common.ok')}
+                                </Button>
+                            </InputGroup.Suffix>
+                        </InputGroup>
                     )}
                 </div>
                 <div className='config-item'>
                     <h3 className='my-auto'>{t('config.hotkey.ocr_recognize')}</h3>
                     {ocrRecognize !== null && (
-                        <Input
-                            type='hotkey'
-                            variant='bordered'
-                            value={ocrRecognize}
-                            label={t('config.hotkey.set_hotkey')}
-                            className='max-w-[50%]'
-                            onKeyDown={(e) => {
-                                keyDown(e, setOcrRecognize);
-                            }}
-                            onFocus={() => {
-                                unregister(ocrRecognize);
-                                setOcrRecognize('');
-                            }}
-                        >
-                            <Button
-                                size='sm'
-                                variant='flat'
-                                className={`${ocrRecognize === '' ? 'hidden' : ''}`}
-                                onPress={() => {
-                                    registerHandler('hotkey_ocr_recognize', ocrRecognize);
+                        <InputGroup className='max-w-[50%]'>
+                            <InputGroup.Input
+                                type='hotkey'
+                                aria-label={t('config.hotkey.set_hotkey')}
+                                value={ocrRecognize}
+                                readOnly
+                                onKeyDown={(e) => {
+                                    keyDown(e, setOcrRecognize);
                                 }}
-                            >
-                                {t('common.ok')}
-                            </Button>
-                        </Input>
+                                onFocus={() => {
+                                    unregister(ocrRecognize);
+                                    setOcrRecognize('');
+                                }}
+                            />
+                            <InputGroup.Suffix>
+                                <Button
+                                    size='sm'
+                                    variant='flat'
+                                    className={`${ocrRecognize === '' ? 'hidden' : ''}`}
+                                    onPress={() => {
+                                        registerHandler('hotkey_ocr_recognize', ocrRecognize);
+                                    }}
+                                >
+                                    {t('common.ok')}
+                                </Button>
+                            </InputGroup.Suffix>
+                        </InputGroup>
                     )}
                 </div>
                 <div className='config-item'>
                     <h3 className='my-auto'>{t('config.hotkey.ocr_translate')}</h3>
                     {ocrTranslate !== null && (
-                        <Input
-                            type='hotkey'
-                            variant='bordered'
-                            value={ocrTranslate}
-                            label={t('config.hotkey.set_hotkey')}
-                            className='max-w-[50%]'
-                            onKeyDown={(e) => {
-                                keyDown(e, setOcrTranslate);
-                            }}
-                            onFocus={() => {
-                                unregister(ocrTranslate);
-                                setOcrTranslate('');
-                            }}
-                        >
-                            <Button
-                                size='sm'
-                                variant='flat'
-                                className={`${ocrTranslate === '' ? 'hidden' : ''}`}
-                                onPress={() => {
-                                    registerHandler('hotkey_ocr_translate', ocrTranslate);
+                        <InputGroup className='max-w-[50%]'>
+                            <InputGroup.Input
+                                type='hotkey'
+                                aria-label={t('config.hotkey.set_hotkey')}
+                                value={ocrTranslate}
+                                readOnly
+                                onKeyDown={(e) => {
+                                    keyDown(e, setOcrTranslate);
                                 }}
-                            >
-                                {t('common.ok')}
-                            </Button>
-                        </Input>
+                                onFocus={() => {
+                                    unregister(ocrTranslate);
+                                    setOcrTranslate('');
+                                }}
+                            />
+                            <InputGroup.Suffix>
+                                <Button
+                                    size='sm'
+                                    variant='flat'
+                                    className={`${ocrTranslate === '' ? 'hidden' : ''}`}
+                                    onPress={() => {
+                                        registerHandler('hotkey_ocr_translate', ocrTranslate);
+                                    }}
+                                >
+                                    {t('common.ok')}
+                                </Button>
+                            </InputGroup.Suffix>
+                        </InputGroup>
                     )}
                 </div>
             </CardContent>

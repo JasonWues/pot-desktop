@@ -178,9 +178,7 @@ export default function Backup() {
                     <h3 className='my-auto'>{t('config.backup.type')}</h3>
                     {backupType !== null && (
                         <Dropdown>
-                            <Dropdown.Trigger>
-                                <Button variant='bordered'>{t(`config.backup.${backupType}`)}</Button>
-                            </Dropdown.Trigger>
+                            <Button variant='bordered'>{t(`config.backup.${backupType}`)}</Button>
                             <Dropdown.Popover>
                                 <Dropdown.Menu
                                     aria-label='backup type'

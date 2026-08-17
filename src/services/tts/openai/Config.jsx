@@ -107,9 +107,7 @@ export function Config(props) {
                 <div className='config-item'>
                     <h3 className='my-auto'>{t('services.tts.openai_tts.voice')}</h3>
                     <Dropdown>
-                        <Dropdown.Trigger>
-                            <Button variant='bordered'>{openaiTtsConfig['voice']}</Button>
-                        </Dropdown.Trigger>
+                        <Button variant='bordered'>{openaiTtsConfig['voice']}</Button>
                         <Dropdown.Popover>
                             <Dropdown.Menu
                                 aria-label='openai tts voice'
@@ -135,9 +133,7 @@ export function Config(props) {
                 <div className='config-item'>
                     <h3 className='my-auto'>{t('services.tts.openai_tts.speed')}</h3>
                     <Dropdown>
-                        <Dropdown.Trigger>
-                            <Button variant='bordered'>{`${openaiTtsConfig['speed'] ?? 1}x`}</Button>
-                        </Dropdown.Trigger>
+                        <Button variant='bordered'>{`${openaiTtsConfig['speed'] ?? 1}x`}</Button>
                         <Dropdown.Popover>
                             <Dropdown.Menu
                                 aria-label='openai tts speed'

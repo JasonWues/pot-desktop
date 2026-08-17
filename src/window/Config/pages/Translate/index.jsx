@@ -49,9 +49,7 @@ export default function Translate() {
                         <h3 className='my-auto mx-0'>{t('config.translate.source_language')}</h3>
                         {sourceLanguage !== null && (
                             <Dropdown>
-                                <Dropdown.Trigger>
-                                    <Button variant='bordered'>{t(`languages.${sourceLanguage}`)}</Button>
-                                </Dropdown.Trigger>
+                                <Button variant='bordered'>{t(`languages.${sourceLanguage}`)}</Button>
                                 <Dropdown.Popover>
                                     <Dropdown.Menu
                                         aria-label='source language'
@@ -85,9 +83,7 @@ export default function Translate() {
                         <h3 className='my-auto mx-0'>{t('config.translate.target_language')}</h3>
                         {targetLanguage !== null && (
                             <Dropdown>
-                                <Dropdown.Trigger>
-                                    <Button variant='bordered'>{t(`languages.${targetLanguage}`)}</Button>
-                                </Dropdown.Trigger>
+                                <Button variant='bordered'>{t(`languages.${targetLanguage}`)}</Button>
                                 <Dropdown.Popover>
                                     <Dropdown.Menu
                                         aria-label='target language'
@@ -115,9 +111,7 @@ export default function Translate() {
                         <h3 className='my-auto mx-0'>{t('config.translate.second_language')}</h3>
                         {secondLanguage !== null && (
                             <Dropdown>
-                                <Dropdown.Trigger>
-                                    <Button variant='bordered'>{t(`languages.${secondLanguage}`)}</Button>
-                                </Dropdown.Trigger>
+                                <Button variant='bordered'>{t(`languages.${secondLanguage}`)}</Button>
                                 <Dropdown.Popover>
                                     <Dropdown.Menu
                                         aria-label='second language'
@@ -145,9 +139,7 @@ export default function Translate() {
                         <h3 className='my-auto mx-0'>{t('config.translate.detect_engine')}</h3>
                         {detectEngine !== null && (
                             <Dropdown>
-                                <Dropdown.Trigger>
-                                    <Button variant='bordered'>{t(`config.translate.${detectEngine}`)}</Button>
-                                </Dropdown.Trigger>
+                                <Button variant='bordered'>{t(`config.translate.${detectEngine}`)}</Button>
                                 <Dropdown.Popover>
                                     <Dropdown.Menu
                                         aria-label='detect engine'
@@ -211,9 +203,7 @@ export default function Translate() {
                         <h3 className='my-auto mx-0'>{t('config.translate.auto_copy')}</h3>
                         {autoCopy !== null && (
                             <Dropdown>
-                                <Dropdown.Trigger>
-                                    <Button variant='bordered'>{t(`config.translate.${autoCopy}`)}</Button>
-                                </Dropdown.Trigger>
+                                <Button variant='bordered'>{t(`config.translate.${autoCopy}`)}</Button>
                                 <Dropdown.Popover>
                                     <Dropdown.Menu
                                         aria-label='auto copy'
@@ -278,11 +268,9 @@ export default function Translate() {
                         <h3 className='my-auto mx-0'>{t('config.translate.cache_ttl')}</h3>
                         {cacheTtl !== null && (
                             <Dropdown>
-                                <Dropdown.Trigger>
-                                    <Button variant='bordered'>
-                                        {t('config.translate.cache_ttl_value', { days: cacheTtl })}
-                                    </Button>
-                                </Dropdown.Trigger>
+                                <Button variant='bordered'>
+                                    {t('config.translate.cache_ttl_value', { days: cacheTtl })}
+                                </Button>
                                 <Dropdown.Popover>
                                     <Dropdown.Menu
                                         aria-label='cache ttl'
@@ -375,11 +363,9 @@ export default function Translate() {
                         <h3 className='my-auto mx-0'>{t('config.translate.font_size.title')}</h3>
                         {translateFontSize !== null && (
                             <Dropdown>
-                                <Dropdown.Trigger>
                                     <Button variant='bordered'>
                                         {t(`config.translate.font_size.${translateFontSize}`)}
                                     </Button>
-                                </Dropdown.Trigger>
                                 <Dropdown.Popover>
                                 <Dropdown.Menu
                                     aria-label='window position'
@@ -404,9 +390,7 @@ export default function Translate() {
                         <h3 className='my-auto mx-0'>{t('config.translate.window_position')}</h3>
                         {windowPosition !== null && (
                             <Dropdown>
-                                <Dropdown.Trigger>
-                                    <Button variant='bordered'>{t(`config.translate.${windowPosition}`)}</Button>
-                                </Dropdown.Trigger>
+                                <Button variant='bordered'>{t(`config.translate.${windowPosition}`)}</Button>
                                 <Dropdown.Popover>
                                     <Dropdown.Menu
                                         aria-label='window position'

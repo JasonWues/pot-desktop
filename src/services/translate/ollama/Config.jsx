@@ -10,6 +10,7 @@ import {
     ProgressBar,
     Label,
     TextField,
+    InputGroup,
 } from '@heroui/react';
 import { INSTANCE_NAME_CONFIG_KEY } from '../../../utils/service_instance';
 import InstanceNameInput from '../../../components/InstanceNameInput';
@@ -193,41 +194,44 @@ export function Config(props) {
                         }}
                     >
                         <Label className='text-base my-auto'>{t('services.translate.ollama.model')}</Label>
-                        <Input
-                            variant='bordered'
-                            className='max-w-[50%]'
-                        >
-                            {/* v3 has no `endContent`, so the pull button is an
-                            ordinary trailing child of the field. */}
-                            {installedModels &&
-                            !installedModels.models
-                                .map((model) => {
-                                    return model.name;
-                                })
-                                .includes(serviceConfig['model']) ? (
-                                <Tooltip>
+                        {/* InputGroup, not a child of Input: v3's Input renders a
+                            real <input>, which is a void element. The pull button
+                            is a Suffix, which is what v2's `endContent` meant. */}
+                        <InputGroup className='max-w-[50%]'>
+                            <InputGroup.Input variant='bordered' />
+                            <InputGroup.Suffix>
+                                {installedModels &&
+                                !installedModels.models
+                                    .map((model) => {
+                                        return model.name;
+                                    })
+                                    .includes(serviceConfig['model']) ? (
+                                    <Tooltip>
+                                        <Button
+                                            size='sm'
+                                            variant='flat'
+                                            color='warning'
+                                            isLoading={isPulling}
+                                            onPress={pullModel}
+                                        >
+                                            {t('services.translate.ollama.install_model')}
+                                        </Button>
+                                        <Tooltip.Content>
+                                            {t('services.translate.ollama.not_installed')}
+                                        </Tooltip.Content>
+                                    </Tooltip>
+                                ) : (
                                     <Button
                                         size='sm'
                                         variant='flat'
-                                        color='warning'
-                                        isLoading={isPulling}
-                                        onPress={pullModel}
+                                        color='success'
+                                        disabled
                                     >
-                                        {t('services.translate.ollama.install_model')}
+                                        {t('services.translate.ollama.ready')}
                                     </Button>
-                                    <Tooltip.Content>{t('services.translate.ollama.not_installed')}</Tooltip.Content>
-                                </Tooltip>
-                            ) : (
-                                <Button
-                                    size='sm'
-                                    variant='flat'
-                                    color='success'
-                                    disabled
-                                >
-                                    {t('services.translate.ollama.ready')}
-                                </Button>
-                            )}
-                        </Input>
+                                )}
+                            </InputGroup.Suffix>
+                        </InputGroup>
                     </TextField>
                 </div>
                 <Card
