@@ -47,7 +47,7 @@ export function Config(props) {
                 <div className={'config-item'}>
                     <h3 className='my-auto'>{t('services.tts.lingva_tts.request_path')}</h3>
                     <TextField
-                        className='flex w-full justify-between max-w-[50%]'
+                        className='flex w-full flex-row items-center justify-between max-w-[50%]'
                         value={lingvaConfig['requestPath']}
                         onChange={(value) => {
                             setLingvaConfig({

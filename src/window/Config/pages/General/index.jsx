@@ -148,7 +148,7 @@ export default function General() {
                         <h3 className='my-auto'>{t('config.general.server_port')}</h3>
                         {serverPort !== null && (
                             <TextField
-                                className='flex w-full justify-between max-w-[100px]'
+                                className='flex w-full flex-row items-center justify-between max-w-[100px]'
                                 value={serverPort}
                                 onChange={(v) => {
                                     if (parseInt(v) !== serverPort) {
@@ -706,7 +706,7 @@ export default function General() {
                         )}
                         {proxyPort !== null && (
                             <TextField
-                                className='flex w-full justify-between ml-2'
+                                className='flex w-full flex-row items-center justify-between ml-2'
                                 value={proxyPort}
                                 onChange={(v) => {
                                     if (parseInt(v) > 65535) {
@@ -727,7 +727,7 @@ export default function General() {
                     <div className={`config-item ${proxyMode === 'manual' ? '' : 'hidden'}`}>
                         {proxyUsername !== null && (
                             <TextField
-                                className='flex w-full justify-between mr-2'
+                                className='flex w-full flex-row items-center justify-between mr-2'
                                 value={proxyUsername}
                                 onChange={(v) => {
                                     setProxyUsername(v);
@@ -739,7 +739,7 @@ export default function General() {
                         )}
                         {proxyPassword !== null && (
                             <TextField
-                                className='flex w-full justify-between ml-2'
+                                className='flex w-full flex-row items-center justify-between ml-2'
                                 value={proxyPassword}
                                 onChange={(v) => {
                                     setProxyPassword(v);
@@ -753,7 +753,7 @@ export default function General() {
                     <div className={`config-item ${proxyMode === 'manual' ? '' : 'hidden'}`}>
                         {noProxy !== null && (
                             <TextField
-                                className='flex w-full justify-between'
+                                className='flex w-full flex-row items-center justify-between'
                                 value={noProxy}
                                 onChange={(v) => {
                                     setNoProxy(v);

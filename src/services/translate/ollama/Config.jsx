@@ -159,9 +159,9 @@ export function Config(props) {
                                 stream: value,
                             });
                         }}
-                        className='flex flex-row-reverse justify-between w-full max-w-full justify-center items-center'
+                        className='w-full max-w-full'
                     >
-                        <Switch.Content>
+                        <Switch.Content className='flex w-full flex-row-reverse items-center justify-between'>
                             <Switch.Control>
                                 <Switch.Thumb />
                             </Switch.Control>
@@ -171,7 +171,7 @@ export function Config(props) {
                 </div>
                 <div className='config-item'>
                     <TextField
-                        className='flex w-full justify-between'
+                        className='flex w-full flex-row items-center justify-between'
                         value={serviceConfig['requestPath']}
                         onChange={(value) => {
                             setServiceConfig({
@@ -186,7 +186,7 @@ export function Config(props) {
                 </div>
                 <div className='config-item'>
                     <TextField
-                        className='flex w-full justify-between'
+                        className='flex w-full flex-row items-center justify-between'
                         value={serviceConfig['model']}
                         onChange={(value) => {
                             setServiceConfig({

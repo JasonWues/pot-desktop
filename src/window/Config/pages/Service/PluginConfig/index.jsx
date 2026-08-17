@@ -26,7 +26,7 @@ export function PluginConfig(props) {
             {pluginConfig && (
                 <div className='config-item'>
                     <TextField
-                        className='flex w-full justify-between'
+                        className='flex w-full flex-row items-center justify-between'
                         value={pluginConfig[INSTANCE_NAME_CONFIG_KEY] ?? pluginList[name].display}
                         onChange={(value) => {
                             setPluginConfig({
@@ -55,7 +55,7 @@ export function PluginConfig(props) {
                                 <h3 className='my-auto select-none cursor-default'>{x.display}</h3>
                                 {x.type === 'input' && (
                                     <TextField
-                                        className='flex w-full justify-between max-w-[50%]'
+                                        className='flex w-full flex-row items-center justify-between max-w-[50%]'
                                         value={`${pluginConfig.hasOwnProperty(x.key) ? pluginConfig[x.key] : ''}`}
                                         onChange={(value) => {
                                             setPluginConfig({
@@ -115,7 +115,7 @@ export function PluginConfig(props) {
                             >
                                 <h3 className='my-auto select-none cursor-default'>{x.display}</h3>
                                 <TextField
-                                    className='flex w-full justify-between max-w-[50%]'
+                                    className='flex w-full flex-row items-center justify-between max-w-[50%]'
                                     value={`${pluginConfig.hasOwnProperty(x.key) ? pluginConfig[x.key] : ''}`}
                                     onChange={(value) => {
                                         setPluginConfig({

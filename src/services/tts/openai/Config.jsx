@@ -51,7 +51,7 @@ export function Config(props) {
                 </div>
                 <div className='config-item'>
                     <TextField
-                        className='flex w-full justify-between'
+                        className='flex w-full flex-row items-center justify-between'
                         value={openaiTtsConfig['requestPath']}
                         onChange={(value) => {
                             setOpenaiTtsConfig({
@@ -66,7 +66,7 @@ export function Config(props) {
                 </div>
                 <div className='config-item'>
                     <TextField
-                        className='flex w-full justify-between'
+                        className='flex w-full flex-row items-center justify-between'
                         value={openaiTtsConfig['apiKey']}
                         onChange={(value) => {
                             setOpenaiTtsConfig({
@@ -84,7 +84,7 @@ export function Config(props) {
                 </div>
                 <div className='config-item'>
                     <TextField
-                        className='flex w-full justify-between'
+                        className='flex w-full flex-row items-center justify-between'
                         value={openaiTtsConfig['model']}
                         onChange={(value) => {
                             setOpenaiTtsConfig({

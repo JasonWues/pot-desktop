@@ -17,7 +17,7 @@ export default function InstanceNameInput({ config, onChange }) {
     return (
         <div className='config-item'>
             <TextField
-                className='flex w-full justify-between'
+                className='flex w-full flex-row items-center justify-between'
                 value={config[INSTANCE_NAME_CONFIG_KEY]}
                 onChange={(value) => {
                     onChange({ ...config, [INSTANCE_NAME_CONFIG_KEY]: value });

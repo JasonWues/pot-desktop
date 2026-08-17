@@ -145,9 +145,9 @@ export function Config(props) {
                                 stream: value,
                             });
                         }}
-                        className='flex flex-row-reverse justify-between w-full max-w-full justify-center items-center'
+                        className='w-full max-w-full'
                     >
-                        <Switch.Content>
+                        <Switch.Content className='flex w-full flex-row-reverse items-center justify-between'>
                             <Switch.Control>
                                 <Switch.Thumb />
                             </Switch.Control>
@@ -157,7 +157,7 @@ export function Config(props) {
                 </div>
                 <div className='config-item'>
                     <TextField
-                        className='flex w-full justify-between'
+                        className='flex w-full flex-row items-center justify-between'
                         value={openaiConfig['requestPath']}
                         onChange={(value) => {
                             setOpenaiConfig({
@@ -172,7 +172,7 @@ export function Config(props) {
                 </div>
                 <div className='config-item'>
                     <TextField
-                        className='flex w-full justify-between'
+                        className='flex w-full flex-row items-center justify-between'
                         value={openaiConfig['apiKey']}
                         onChange={(value) => {
                             setOpenaiConfig({
@@ -216,7 +216,7 @@ export function Config(props) {
                 </Card>
                 <div className={`config-item ${openaiConfig.service === 'azure' ? 'hidden' : ''}`}>
                     <TextField
-                        className='flex w-full justify-between'
+                        className='flex w-full flex-row items-center justify-between'
                         value={openaiConfig['model']}
                         onChange={(value) => {
                             setOpenaiConfig({

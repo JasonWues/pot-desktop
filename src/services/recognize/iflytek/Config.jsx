@@ -69,7 +69,7 @@ export function Config(props) {
                 </div>
                 <div className={'config-item'}>
                     <TextField
-                        className='flex w-full justify-between'
+                        className='flex w-full flex-row items-center justify-between'
                         value={config['appid']}
                         onChange={(value) => {
                             setConfig({
@@ -84,7 +84,7 @@ export function Config(props) {
                 </div>
                 <div className={'config-item'}>
                     <TextField
-                        className='flex w-full justify-between'
+                        className='flex w-full flex-row items-center justify-between'
                         value={config['apisecret']}
                         onChange={(value) => {
                             setConfig({
@@ -99,7 +99,7 @@ export function Config(props) {
                 </div>
                 <div className={'config-item'}>
                     <TextField
-                        className='flex w-full justify-between'
+                        className='flex w-full flex-row items-center justify-between'
                         value={config['apikey']}
                         onChange={(value) => {
                             setConfig({

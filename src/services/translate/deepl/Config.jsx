@@ -106,7 +106,7 @@ export function Config(props) {
                 </div>
                 <div className={`config-item ${deeplConfig.type !== 'api' ? 'hidden' : ''}`}>
                     <TextField
-                        className='flex w-full justify-between'
+                        className='flex w-full flex-row items-center justify-between'
                         value={deeplConfig['authKey']}
                         onChange={(value) => {
                             setDeeplConfig({
@@ -124,7 +124,7 @@ export function Config(props) {
                 </div>
                 <div className={`config-item ${deeplConfig.type !== 'deeplx' ? 'hidden' : ''}`}>
                     <TextField
-                        className='flex w-full justify-between'
+                        className='flex w-full flex-row items-center justify-between'
                         value={deeplConfig.customUrl}
                         onChange={(value) => {
                             setDeeplConfig({

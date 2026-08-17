@@ -214,7 +214,7 @@ export default function Backup() {
                         <h3 className='my-auto'>{t('config.backup.webdav_url')}</h3>
                         {davUrl !== null && (
                             <TextField
-                                className='flex w-full justify-between max-w-[300px]'
+                                className='flex w-full flex-row items-center justify-between max-w-[300px]'
                                 value={davUrl}
                                 onChange={(v) => {
                                     setDavUrl(v);
@@ -229,7 +229,7 @@ export default function Backup() {
                         <h3 className='my-auto'>{t('config.backup.username')}</h3>
                         {davUserName !== null && (
                             <TextField
-                                className='flex w-full justify-between max-w-[300px]'
+                                className='flex w-full flex-row items-center justify-between max-w-[300px]'
                                 value={davUserName}
                                 onChange={(v) => {
                                     setDavUserName(v);
@@ -244,7 +244,7 @@ export default function Backup() {
                         <h3 className='my-auto'>{t('config.backup.password')}</h3>
                         {davPassword !== null && (
                             <TextField
-                                className='flex w-full justify-between max-w-[300px]'
+                                className='flex w-full flex-row items-center justify-between max-w-[300px]'
                                 value={davPassword}
                                 onChange={(v) => {
                                     setDavPassword(v);

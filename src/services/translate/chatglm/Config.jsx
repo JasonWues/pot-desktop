@@ -122,7 +122,7 @@ export function Config(props) {
                 </div>
                 <div className='config-item'>
                     <TextField
-                        className='flex w-full justify-between'
+                        className='flex w-full flex-row items-center justify-between'
                         value={serviceConfig['apiKey']}
                         onChange={(value) => {
                             setServiceConfig({

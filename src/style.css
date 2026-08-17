@@ -52,6 +52,33 @@
 }
 
 /*
+  All 12 modals in the app are forms with an icon-plus-title header, and v3
+  changed both parts under them:
+
+  `.modal__header` is `flex-col` where v2's ModalHeader was a row, so every one
+  of them stacked its service icon above its title -- the same trap as
+  Card.Header and Switch.
+
+  `.modal__body` paints itself `--muted`. That is reasonable for prose and wrong
+  for a form: every plain <h3> row label inside inherited grey at 14px while the
+  v3 `Label` components beside them forced `--foreground` at 16px/500, so a
+  single column of labels came out in two different styles.
+
+  One rule each rather than a className on 12 call sites: the intent is uniform,
+  and a per-file class would be 24 places to keep in step.
+*/
+@layer components {
+    .modal__header {
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .modal__body {
+        color: var(--foreground);
+    }
+}
+
+/*
   v2's `isLoading` swapped the label for a spinner. Its v3 successor `isPending`
   draws nothing at all -- `@apply status-pending` resolves to `pointer-events:
   none` and that is the whole of it -- so the ~40 "test connection" and "save"
