@@ -212,15 +212,17 @@ export function Config(props) {
                                     })
                                     .includes(serviceConfig['model']) ? (
                                     <Tooltip>
-                                        <Button
-                                            size='sm'
-                                            variant='flat'
-                                            color='warning'
-                                            isLoading={isPulling}
-                                            onPress={pullModel}
-                                        >
-                                            {t('services.translate.ollama.install_model')}
-                                        </Button>
+                                        <Tooltip.Trigger>
+                                            <Button
+                                                size='sm'
+                                                variant='flat'
+                                                color='warning'
+                                                isLoading={isPulling}
+                                                onPress={pullModel}
+                                            >
+                                                {t('services.translate.ollama.install_model')}
+                                            </Button>
+                                        </Tooltip.Trigger>
                                         <Tooltip.Content>
                                             {t('services.translate.ollama.not_installed')}
                                         </Tooltip.Content>

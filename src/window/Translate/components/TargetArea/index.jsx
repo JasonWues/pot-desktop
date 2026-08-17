@@ -603,133 +603,91 @@ export default function TargetArea(props) {
                         <ButtonGroup>
                             {/* speak button */}
                             <Tooltip>
-                                <Button
-                                    isIconOnly
-                                    variant='light'
-                                    size='sm'
-                                    isDisabled={typeof result !== 'string' || result === ''}
-                                    onPress={() => {
-                                        handleSpeak().catch((e) => {
-                                            toast.error(e.toString(), { style: toastStyle });
-                                        });
-                                    }}
-                                >
-                                    <HiOutlineVolumeUp className='text-[16px]' />
-                                </Button>
+                                <Tooltip.Trigger>
+                                    <Button
+                                        isIconOnly
+                                        variant='light'
+                                        size='sm'
+                                        isDisabled={typeof result !== 'string' || result === ''}
+                                        onPress={() => {
+                                            handleSpeak().catch((e) => {
+                                                toast.error(e.toString(), { style: toastStyle });
+                                            });
+                                        }}
+                                    >
+                                        <HiOutlineVolumeUp className='text-[16px]' />
+                                    </Button>
+                                </Tooltip.Trigger>
                                 <Tooltip.Content>{t('translate.speak')}</Tooltip.Content>
                             </Tooltip>
                             {/* copy button */}
                             <Tooltip>
-                                <Button
-                                    isIconOnly
-                                    variant='light'
-                                    size='sm'
-                                    isDisabled={typeof result !== 'string' || result === ''}
-                                    onPress={() => {
-                                        writeText(result);
-                                    }}
-                                >
-                                    <MdContentCopy className='text-[16px]' />
-                                </Button>
+                                <Tooltip.Trigger>
+                                    <Button
+                                        isIconOnly
+                                        variant='light'
+                                        size='sm'
+                                        isDisabled={typeof result !== 'string' || result === ''}
+                                        onPress={() => {
+                                            writeText(result);
+                                        }}
+                                    >
+                                        <MdContentCopy className='text-[16px]' />
+                                    </Button>
+                                </Tooltip.Trigger>
                                 <Tooltip.Content>{t('translate.copy')}</Tooltip.Content>
                             </Tooltip>
                             {/* translate back button */}
                             <Tooltip>
-                                <Button
-                                    isIconOnly
-                                    variant='light'
-                                    size='sm'
-                                    isDisabled={typeof result !== 'string' || result === ''}
-                                    onPress={async () => {
-                                        setError('');
-                                        let newTargetLanguage = sourceLanguage;
-                                        if (sourceLanguage === 'auto') {
-                                            newTargetLanguage = detectLanguage;
-                                        }
-                                        let newSourceLanguage = targetLanguage;
-                                        if (sourceLanguage === 'auto') {
-                                            newSourceLanguage = 'auto';
-                                        }
-                                        if (whetherPluginService(currentTranslateServiceInstanceKey)) {
-                                            const pluginInfo =
-                                                pluginList['translate'][
-                                                    getServiceName(currentTranslateServiceInstanceKey)
-                                                ];
-                                            if (
-                                                newSourceLanguage in pluginInfo.language &&
-                                                newTargetLanguage in pluginInfo.language
-                                            ) {
-                                                setIsLoading(true);
-                                                setHide(true);
-                                                const instanceConfig =
-                                                    serviceInstanceConfigMap[currentTranslateServiceInstanceKey];
-                                                instanceConfig['enable'] = 'true';
-                                                const setHideOnce = invokeOnce(setHide);
-                                                let [func, utils] = await invoke_plugin(
-                                                    'translate',
-                                                    getServiceName(currentTranslateServiceInstanceKey)
-                                                );
-                                                func(
-                                                    result.trim(),
-                                                    pluginInfo.language[newSourceLanguage],
-                                                    pluginInfo.language[newTargetLanguage],
-                                                    {
-                                                        config: instanceConfig,
-                                                        detect: detectLanguage,
-                                                        setResult: (v) => {
-                                                            setResult(v);
-                                                            setHideOnce(false);
-                                                        },
-                                                        utils,
-                                                    }
-                                                ).then(
-                                                    (v) => {
-                                                        if (v === result) {
-                                                            setResult(v + ' ');
-                                                        } else {
-                                                            setResult(v.trim());
-                                                        }
-                                                        setIsLoading(false);
-                                                        if (v !== '') {
-                                                            setHideOnce(false);
-                                                        }
-                                                    },
-                                                    (e) => {
-                                                        setError(e.toString());
-                                                        setIsLoading(false);
-                                                    }
-                                                );
-                                            } else {
-                                                setError('Language not supported');
+                                <Tooltip.Trigger>
+                                    <Button
+                                        isIconOnly
+                                        variant='light'
+                                        size='sm'
+                                        isDisabled={typeof result !== 'string' || result === ''}
+                                        onPress={async () => {
+                                            setError('');
+                                            let newTargetLanguage = sourceLanguage;
+                                            if (sourceLanguage === 'auto') {
+                                                newTargetLanguage = detectLanguage;
                                             }
-                                        } else {
-                                            const LanguageEnum =
-                                                builtinServices[getServiceName(currentTranslateServiceInstanceKey)]
-                                                    .Language;
-                                            if (
-                                                newSourceLanguage in LanguageEnum &&
-                                                newTargetLanguage in LanguageEnum
-                                            ) {
-                                                setIsLoading(true);
-                                                setHide(true);
-                                                const instanceConfig =
-                                                    serviceInstanceConfigMap[currentTranslateServiceInstanceKey];
-                                                const setHideOnce = invokeOnce(setHide);
-                                                builtinServices[getServiceName(currentTranslateServiceInstanceKey)]
-                                                    .translate(
+                                            let newSourceLanguage = targetLanguage;
+                                            if (sourceLanguage === 'auto') {
+                                                newSourceLanguage = 'auto';
+                                            }
+                                            if (whetherPluginService(currentTranslateServiceInstanceKey)) {
+                                                const pluginInfo =
+                                                    pluginList['translate'][
+                                                        getServiceName(currentTranslateServiceInstanceKey)
+                                                    ];
+                                                if (
+                                                    newSourceLanguage in pluginInfo.language &&
+                                                    newTargetLanguage in pluginInfo.language
+                                                ) {
+                                                    setIsLoading(true);
+                                                    setHide(true);
+                                                    const instanceConfig =
+                                                        serviceInstanceConfigMap[currentTranslateServiceInstanceKey];
+                                                    instanceConfig['enable'] = 'true';
+                                                    const setHideOnce = invokeOnce(setHide);
+                                                    let [func, utils] = await invoke_plugin(
+                                                        'translate',
+                                                        getServiceName(currentTranslateServiceInstanceKey)
+                                                    );
+                                                    func(
                                                         result.trim(),
-                                                        LanguageEnum[newSourceLanguage],
-                                                        LanguageEnum[newTargetLanguage],
+                                                        pluginInfo.language[newSourceLanguage],
+                                                        pluginInfo.language[newTargetLanguage],
                                                         {
                                                             config: instanceConfig,
-                                                            detect: newSourceLanguage,
+                                                            detect: detectLanguage,
                                                             setResult: (v) => {
                                                                 setResult(v);
                                                                 setHideOnce(false);
                                                             },
+                                                            utils,
                                                         }
-                                                    )
-                                                    .then(
+                                                    ).then(
                                                         (v) => {
                                                             if (v === result) {
                                                                 setResult(v + ' ');
@@ -746,31 +704,81 @@ export default function TargetArea(props) {
                                                             setIsLoading(false);
                                                         }
                                                     );
+                                                } else {
+                                                    setError('Language not supported');
+                                                }
                                             } else {
-                                                setError('Language not supported');
+                                                const LanguageEnum =
+                                                    builtinServices[getServiceName(currentTranslateServiceInstanceKey)]
+                                                        .Language;
+                                                if (
+                                                    newSourceLanguage in LanguageEnum &&
+                                                    newTargetLanguage in LanguageEnum
+                                                ) {
+                                                    setIsLoading(true);
+                                                    setHide(true);
+                                                    const instanceConfig =
+                                                        serviceInstanceConfigMap[currentTranslateServiceInstanceKey];
+                                                    const setHideOnce = invokeOnce(setHide);
+                                                    builtinServices[getServiceName(currentTranslateServiceInstanceKey)]
+                                                        .translate(
+                                                            result.trim(),
+                                                            LanguageEnum[newSourceLanguage],
+                                                            LanguageEnum[newTargetLanguage],
+                                                            {
+                                                                config: instanceConfig,
+                                                                detect: newSourceLanguage,
+                                                                setResult: (v) => {
+                                                                    setResult(v);
+                                                                    setHideOnce(false);
+                                                                },
+                                                            }
+                                                        )
+                                                        .then(
+                                                            (v) => {
+                                                                if (v === result) {
+                                                                    setResult(v + ' ');
+                                                                } else {
+                                                                    setResult(v.trim());
+                                                                }
+                                                                setIsLoading(false);
+                                                                if (v !== '') {
+                                                                    setHideOnce(false);
+                                                                }
+                                                            },
+                                                            (e) => {
+                                                                setError(e.toString());
+                                                                setIsLoading(false);
+                                                            }
+                                                        );
+                                                } else {
+                                                    setError('Language not supported');
+                                                }
                                             }
-                                        }
-                                    }}
-                                >
-                                    <TbTransformFilled className='text-[16px]' />
-                                </Button>
+                                        }}
+                                    >
+                                        <TbTransformFilled className='text-[16px]' />
+                                    </Button>
+                                </Tooltip.Trigger>
                                 <Tooltip.Content>{t('translate.translate_back')}</Tooltip.Content>
                             </Tooltip>
                             {/* error retry button */}
                             <Tooltip>
-                                <Button
-                                    isIconOnly
-                                    variant='light'
-                                    size='sm'
-                                    className={`${error === '' ? 'hidden' : ''}`}
-                                    onPress={() => {
-                                        setError('');
-                                        setResult('');
-                                        translate();
-                                    }}
-                                >
-                                    <GiCycle className='text-[16px]' />
-                                </Button>
+                                <Tooltip.Trigger>
+                                    <Button
+                                        isIconOnly
+                                        variant='light'
+                                        size='sm'
+                                        className={`${error === '' ? 'hidden' : ''}`}
+                                        onPress={() => {
+                                            setError('');
+                                            setResult('');
+                                            translate();
+                                        }}
+                                    >
+                                        <GiCycle className='text-[16px]' />
+                                    </Button>
+                                </Tooltip.Trigger>
                                 <Tooltip.Content>{t('translate.retry')}</Tooltip.Content>
                             </Tooltip>
                             {/* available collection service instance */}

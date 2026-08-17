@@ -447,62 +447,70 @@ export default function SourceArea(props) {
                     <div className='flex justify-start'>
                         <ButtonGroup className='mr-[5px]'>
                             <Tooltip>
-                                <Button
-                                    isIconOnly
-                                    variant='light'
-                                    size='sm'
-                                    onPress={() => {
-                                        handleSpeak().catch((e) => {
-                                            toast.error(e.toString(), { style: toastStyle });
-                                        });
-                                    }}
-                                >
-                                    <HiOutlineVolumeUp className='text-[16px]' />
-                                </Button>
+                                <Tooltip.Trigger>
+                                    <Button
+                                        isIconOnly
+                                        variant='light'
+                                        size='sm'
+                                        onPress={() => {
+                                            handleSpeak().catch((e) => {
+                                                toast.error(e.toString(), { style: toastStyle });
+                                            });
+                                        }}
+                                    >
+                                        <HiOutlineVolumeUp className='text-[16px]' />
+                                    </Button>
+                                </Tooltip.Trigger>
                                 <Tooltip.Content>{t('translate.speak')}</Tooltip.Content>
                             </Tooltip>
                             <Tooltip>
-                                <Button
-                                    isIconOnly
-                                    variant='light'
-                                    size='sm'
-                                    onPress={() => {
-                                        writeText(sourceText);
-                                    }}
-                                >
-                                    <MdContentCopy className='text-[16px]' />
-                                </Button>
+                                <Tooltip.Trigger>
+                                    <Button
+                                        isIconOnly
+                                        variant='light'
+                                        size='sm'
+                                        onPress={() => {
+                                            writeText(sourceText);
+                                        }}
+                                    >
+                                        <MdContentCopy className='text-[16px]' />
+                                    </Button>
+                                </Tooltip.Trigger>
                                 <Tooltip.Content>{t('translate.copy')}</Tooltip.Content>
                             </Tooltip>
                             <Tooltip>
-                                <Button
-                                    isIconOnly
-                                    variant='light'
-                                    size='sm'
-                                    onPress={() => {
-                                        const newText = sourceText.replace(/\-\s+/g, '').replace(/\s+/g, ' ');
-                                        setSourceText(newText);
-                                        detect_language(newText).then(() => {
-                                            syncSourceText();
-                                        });
-                                    }}
-                                >
-                                    <MdSmartButton className='text-[16px]' />
-                                </Button>
+                                <Tooltip.Trigger>
+                                    <Button
+                                        isIconOnly
+                                        variant='light'
+                                        size='sm'
+                                        onPress={() => {
+                                            const newText = sourceText.replace(/\-\s+/g, '').replace(/\s+/g, ' ');
+                                            setSourceText(newText);
+                                            detect_language(newText).then(() => {
+                                                syncSourceText();
+                                            });
+                                        }}
+                                    >
+                                        <MdSmartButton className='text-[16px]' />
+                                    </Button>
+                                </Tooltip.Trigger>
                                 <Tooltip.Content>{t('translate.delete_newline')}</Tooltip.Content>
                             </Tooltip>
                             <Tooltip>
-                                <Button
-                                    variant='light'
-                                    size='sm'
-                                    isIconOnly
-                                    isDisabled={sourceText === ''}
-                                    onPress={() => {
-                                        setSourceText('');
-                                    }}
-                                >
-                                    <LuDelete className='text-[16px]' />
-                                </Button>
+                                <Tooltip.Trigger>
+                                    <Button
+                                        variant='light'
+                                        size='sm'
+                                        isIconOnly
+                                        isDisabled={sourceText === ''}
+                                        onPress={() => {
+                                            setSourceText('');
+                                        }}
+                                    >
+                                        <LuDelete className='text-[16px]' />
+                                    </Button>
+                                </Tooltip.Trigger>
                                 <Tooltip.Content>{t('common.clear')}</Tooltip.Content>
                             </Tooltip>
                         </ButtonGroup>
@@ -518,20 +526,22 @@ export default function SourceArea(props) {
                         )}
                     </div>
                     <Tooltip>
-                        <Button
-                            size='sm'
-                            color='primary'
-                            variant='light'
-                            isIconOnly
-                            className='text-[14px] font-bold'
-                            onPress={() => {
-                                detect_language(sourceText).then(() => {
-                                    syncSourceText();
-                                });
-                            }}
-                        >
-                            <HiTranslate className='text-[16px]' />
-                        </Button>
+                        <Tooltip.Trigger>
+                            <Button
+                                size='sm'
+                                color='primary'
+                                variant='light'
+                                isIconOnly
+                                className='text-[14px] font-bold'
+                                onPress={() => {
+                                    detect_language(sourceText).then(() => {
+                                        syncSourceText();
+                                    });
+                                }}
+                            >
+                                <HiTranslate className='text-[16px]' />
+                            </Button>
+                        </Tooltip.Trigger>
                         <Tooltip.Content>{t('translate.translate')}</Tooltip.Content>
                     </Tooltip>
                 </CardFooter>

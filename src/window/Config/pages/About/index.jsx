@@ -100,59 +100,67 @@ export default function About() {
                         <PopoverContent>
                             <div className='flex justify-between'>
                                 <Tooltip>
-                                    <Button
-                                        isIconOnly
-                                        variant='light'
-                                        className='my-[5px]'
-                                        size='lg'
-                                        onPress={() => {
-                                            open('https://pd.qq.com/s/akns94e1r');
-                                        }}
-                                    >
-                                        <BsTencentQq />
-                                    </Button>
+                                    <Tooltip.Trigger>
+                                        <Button
+                                            isIconOnly
+                                            variant='light'
+                                            className='my-[5px]'
+                                            size='lg'
+                                            onPress={() => {
+                                                open('https://pd.qq.com/s/akns94e1r');
+                                            }}
+                                        >
+                                            <BsTencentQq />
+                                        </Button>
+                                    </Tooltip.Trigger>
                                     <Tooltip.Content>{t('config.about.qq_channel')}</Tooltip.Content>
                                 </Tooltip>
                                 <Tooltip>
-                                    <Button
-                                        isIconOnly
-                                        variant='light'
-                                        className='my-[5px]'
-                                        size='lg'
-                                        onPress={() => {
-                                            open('https://pot-app.com/img/qq_group.png');
-                                        }}
-                                    >
-                                        <BsTencentQq />
-                                    </Button>
+                                    <Tooltip.Trigger>
+                                        <Button
+                                            isIconOnly
+                                            variant='light'
+                                            className='my-[5px]'
+                                            size='lg'
+                                            onPress={() => {
+                                                open('https://pot-app.com/img/qq_group.png');
+                                            }}
+                                        >
+                                            <BsTencentQq />
+                                        </Button>
+                                    </Tooltip.Trigger>
                                     <Tooltip.Content>{t('config.about.qq_group')}</Tooltip.Content>
                                 </Tooltip>
                                 <Tooltip>
-                                    <Button
-                                        isIconOnly
-                                        variant='light'
-                                        className='my-[5px]'
-                                        size='lg'
-                                        onPress={() => {
-                                            open('https://t.me/pot_app');
-                                        }}
-                                    >
-                                        <BsTelegram />
-                                    </Button>
+                                    <Tooltip.Trigger>
+                                        <Button
+                                            isIconOnly
+                                            variant='light'
+                                            className='my-[5px]'
+                                            size='lg'
+                                            onPress={() => {
+                                                open('https://t.me/pot_app');
+                                            }}
+                                        >
+                                            <BsTelegram />
+                                        </Button>
+                                    </Tooltip.Trigger>
                                     <Tooltip.Content>{t('config.about.telegram')}</Tooltip.Content>
                                 </Tooltip>
                                 <Tooltip>
-                                    <Button
-                                        isIconOnly
-                                        variant='light'
-                                        className='my-[5px]'
-                                        size='lg'
-                                        onPress={() => {
-                                            open('https://github.com/pot-app/pot-desktop/discussions');
-                                        }}
-                                    >
-                                        <BsGithub />
-                                    </Button>
+                                    <Tooltip.Trigger>
+                                        <Button
+                                            isIconOnly
+                                            variant='light'
+                                            className='my-[5px]'
+                                            size='lg'
+                                            onPress={() => {
+                                                open('https://github.com/pot-app/pot-desktop/discussions');
+                                            }}
+                                        >
+                                            <BsGithub />
+                                        </Button>
+                                    </Tooltip.Trigger>
                                     <Tooltip.Content>{t('config.about.discussion')}</Tooltip.Content>
                                 </Tooltip>
                             </div>

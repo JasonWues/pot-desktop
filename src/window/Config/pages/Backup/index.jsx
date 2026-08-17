@@ -271,21 +271,23 @@ export default function Backup() {
                             <h3 className='my-auto'>{t('config.backup.username')}</h3>
 
                             <Tooltip>
-                                <Button
-                                    variant='light'
-                                    onClick={() => {
-                                        setAliyunAccessToken('');
-                                        // setAliyunRefreshToken('');
-                                        setAliyunUserInfo(null);
-                                        refreshQrCode();
-                                    }}
-                                >
-                                    <Avatar
-                                        src={aliyunUserInfo.avatar}
-                                        size='sm'
-                                    />
-                                    <h3 className='my-auto'>{aliyunUserInfo.name}</h3>
-                                </Button>
+                                <Tooltip.Trigger>
+                                    <Button
+                                        variant='light'
+                                        onClick={() => {
+                                            setAliyunAccessToken('');
+                                            // setAliyunRefreshToken('');
+                                            setAliyunUserInfo(null);
+                                            refreshQrCode();
+                                        }}
+                                    >
+                                        <Avatar
+                                            src={aliyunUserInfo.avatar}
+                                            size='sm'
+                                        />
+                                        <h3 className='my-auto'>{aliyunUserInfo.name}</h3>
+                                    </Button>
+                                </Tooltip.Trigger>
                                 <Tooltip.Content placement='bottom-end'>{t('config.backup.logout')}</Tooltip.Content>
                             </Tooltip>
                         </>

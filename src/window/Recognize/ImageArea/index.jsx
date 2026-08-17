@@ -102,16 +102,18 @@ export default function ImageArea() {
             </CardContent>
             <CardFooter className='bg-surface flex justify-start px-[12px] gap-[4px]'>
                 <Tooltip>
-                    <Button
-                        isIconOnly
-                        size='sm'
-                        variant='light'
-                        onPress={async () => {
-                            await invoke('copy_img');
-                        }}
-                    >
-                        <MdContentCopy className='text-[16px]' />
-                    </Button>
+                    <Tooltip.Trigger>
+                        <Button
+                            isIconOnly
+                            size='sm'
+                            variant='light'
+                            onPress={async () => {
+                                await invoke('copy_img');
+                            }}
+                        >
+                            <MdContentCopy className='text-[16px]' />
+                        </Button>
+                    </Tooltip.Trigger>
                     <Tooltip.Content>{t('recognize.copy_img')}</Tooltip.Content>
                 </Tooltip>
                 <Button

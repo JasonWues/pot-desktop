@@ -177,42 +177,48 @@ export default function TextArea(props) {
             <CardFooter className='bg-surface flex justify-start px-[12px]'>
                 <ButtonGroup>
                     <Tooltip>
-                        <Button
-                            isIconOnly
-                            size='sm'
-                            variant='light'
-                            onPress={() => {
-                                writeText(text);
-                            }}
-                        >
-                            <MdContentCopy className='text-[16px]' />
-                        </Button>
+                        <Tooltip.Trigger>
+                            <Button
+                                isIconOnly
+                                size='sm'
+                                variant='light'
+                                onPress={() => {
+                                    writeText(text);
+                                }}
+                            >
+                                <MdContentCopy className='text-[16px]' />
+                            </Button>
+                        </Tooltip.Trigger>
                         <Tooltip.Content>{t('recognize.copy_text')}</Tooltip.Content>
                     </Tooltip>
                     <Tooltip>
-                        <Button
-                            isIconOnly
-                            variant='light'
-                            size='sm'
-                            onPress={() => {
-                                setText(text.replace(/\-\s+/g, '').replace(/\s+/g, ' '));
-                            }}
-                        >
-                            <MdSmartButton className='text-[16px]' />
-                        </Button>
+                        <Tooltip.Trigger>
+                            <Button
+                                isIconOnly
+                                variant='light'
+                                size='sm'
+                                onPress={() => {
+                                    setText(text.replace(/\-\s+/g, '').replace(/\s+/g, ' '));
+                                }}
+                            >
+                                <MdSmartButton className='text-[16px]' />
+                            </Button>
+                        </Tooltip.Trigger>
                         <Tooltip.Content>{t('recognize.delete_newline')}</Tooltip.Content>
                     </Tooltip>
                     <Tooltip>
-                        <Button
-                            isIconOnly
-                            variant='light'
-                            size='sm'
-                            onPress={() => {
-                                setText(text.replaceAll(' ', ''));
-                            }}
-                        >
-                            <CgSpaceBetween className='text-[16px]' />
-                        </Button>
+                        <Tooltip.Trigger>
+                            <Button
+                                isIconOnly
+                                variant='light'
+                                size='sm'
+                                onPress={() => {
+                                    setText(text.replaceAll(' ', ''));
+                                }}
+                            >
+                                <CgSpaceBetween className='text-[16px]' />
+                            </Button>
+                        </Tooltip.Trigger>
                         <Tooltip.Content>{t('recognize.delete_space')}</Tooltip.Content>
                     </Tooltip>
                 </ButtonGroup>
