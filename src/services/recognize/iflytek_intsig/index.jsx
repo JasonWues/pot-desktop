@@ -1,5 +1,5 @@
+import { base64ToUtf8 } from '../../../utils/crypto';
 import { fetch } from '../../../utils/http';
-import CryptoJS from 'crypto-js';
 import { iflytek_auth } from '../iflytek';
 
 export async function recognize(base64, language, options = {}) {
@@ -64,8 +64,7 @@ export async function recognize(base64, language, options = {}) {
         throw `Result payload not found\nResult:\n${JSON.stringify(res)}`;
     }
 
-    let text = CryptoJS.enc.Base64.parse(res_payload['recognizeDocumentRes']['text']); // Base64解码
-    let text_string = CryptoJS.enc.Utf8.stringify(text);
+    let text_string = base64ToUtf8(res_payload['recognizeDocumentRes']['text']); // Base64解码
     let text_json = JSON.parse(text_string);
     let return_content = text_json['whole_text']; // 最终结果
     if (!return_content) {

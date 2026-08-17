@@ -1,6 +1,5 @@
+import { hmacSha1, toBase64 } from '../../../utils/crypto';
 import { fetch } from '../../../utils/http';
-import HmacSHA1 from 'crypto-js/hmac-sha1';
-import base64 from 'crypto-js/enc-base64';
 
 export async function translate(text, from, to, options = {}) {
     const { config } = options;
@@ -36,7 +35,8 @@ export async function translate(text, from, to, options = {}) {
     stringToSign = stringToSign.replaceAll('+', '%252B');
     stringToSign = stringToSign.replaceAll(',', '%252C');
 
-    let signature = base64.stringify(HmacSHA1(stringToSign, accesskey_secret + '&'));
+    // Key first, message second -- the reverse of crypto-js's HmacSHA1.
+    let signature = toBase64(hmacSha1(accesskey_secret + '&', stringToSign));
 
     CanonicalizedQueryString = CanonicalizedQueryString + '&Signature=' + encodeURIComponent(signature);
 

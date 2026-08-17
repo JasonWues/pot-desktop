@@ -1,5 +1,5 @@
+import { sha256, toHex } from '../../../utils/crypto';
 import { fetch } from '../../../utils/http';
-import CryptoJS from 'crypto-js';
 import { nanoid } from 'nanoid';
 
 export async function translate(text, from, to, options = {}) {
@@ -12,7 +12,7 @@ export async function translate(text, from, to, options = {}) {
     const curtime = String(Math.round(new Date().getTime() / 1000));
     const salt = nanoid();
     const str1 = appkey + truncate(text) + salt + curtime + key;
-    const sign = CryptoJS.SHA256(str1).toString(CryptoJS.enc.Hex);
+    const sign = toHex(sha256(str1));
 
     let res = await fetch(url, {
         method: 'GET',

@@ -1,5 +1,5 @@
 import Database from '@tauri-apps/plugin-sql';
-import CryptoJS from 'crypto-js';
+import { md5, toHex } from './crypto';
 
 // Single shared handle. The schema used to be created from the error path of the
 // first failed INSERT, which meant nothing could rely on a table existing (and
@@ -69,8 +69,11 @@ const SEPARATOR = '\u0000';
 // endpoint misses the cache instead of replaying a result the new settings
 // would not have produced.
 export function buildCacheKey({ instanceKey, config, from, to, detect, text }) {
+    // Still MD5, and still hex. This is a cache key, not a security boundary --
+    // but changing either would change every key, so every user's existing cache
+    // would miss once and be rebuilt for no benefit.
     const parts = [instanceKey, JSON.stringify(config ?? {}), from, to, detect ?? '', text];
-    return CryptoJS.MD5(parts.join(SEPARATOR)).toString();
+    return toHex(md5(parts.join(SEPARATOR)));
 }
 
 export async function getCachedTranslation(key, ttlDays) {

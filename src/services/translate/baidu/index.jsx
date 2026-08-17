@@ -1,6 +1,6 @@
 import { fetch } from '../../../utils/http';
+import { md5, toHex } from '../../../utils/crypto';
 import { nanoid } from 'nanoid';
-import md5 from 'crypto-js/md5';
 
 export async function translate(text, from, to, options = {}) {
     const { config } = options;
@@ -15,7 +15,7 @@ export async function translate(text, from, to, options = {}) {
     }
 
     const str = appid + text + salt + secret;
-    const sign = md5(str).toString();
+    const sign = toHex(md5(str));
 
     let res = await fetch(url, {
         query: {
