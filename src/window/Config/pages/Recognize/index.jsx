@@ -53,6 +53,7 @@ export default function Recognize() {
                     <h3 className='my-auto mx-0'>{t('config.recognize.delete_newline')}</h3>
                     {deleteNewline !== null && (
                         <Switch
+                            className='justify-center items-center'
                             isSelected={deleteNewline}
                             onChange={(v) => {
                                 setDeleteNewline(v);
@@ -70,6 +71,7 @@ export default function Recognize() {
                     <h3 className='my-auto mx-0'>{t('config.recognize.auto_copy')}</h3>
                     {autoCopy !== null && (
                         <Switch
+                            className='justify-center items-center'
                             isSelected={autoCopy}
                             onChange={(v) => {
                                 setAutoCopy(v);
@@ -87,6 +89,7 @@ export default function Recognize() {
                     <h3 className='my-auto mx-0'>{t('config.recognize.close_on_blur')}</h3>
                     {closeOnBlur !== null && (
                         <Switch
+                            className='justify-center items-center'
                             isSelected={closeOnBlur}
                             onChange={(v) => {
                                 setCloseOnBlur(v);
@@ -104,6 +107,7 @@ export default function Recognize() {
                     <h3 className='my-auto mx-0'>{t('config.recognize.hide_window')}</h3>
                     {hideWindow !== null && (
                         <Switch
+                            className='justify-center items-center'
                             isSelected={hideWindow}
                             onChange={(v) => {
                                 setHideWindow(v);

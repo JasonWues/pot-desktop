@@ -68,7 +68,7 @@ export function Config(props) {
                         onChange={(v) => {
                             setConfig({ ...config, https: v });
                         }}
-                        className='flex flex-row-reverse justify-between w-full max-w-full'
+                        className='flex flex-row-reverse justify-between w-full max-w-full justify-center items-center'
                     >
                         <Switch.Content>
                             <Switch.Control>

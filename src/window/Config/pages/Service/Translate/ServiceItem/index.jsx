@@ -72,6 +72,7 @@ export default function ServiceItem(props) {
                 </div>
                 <div className='flex'>
                     <Switch
+                        className='justify-center items-center'
                         size='sm'
                         isSelected={serviceInstanceConfig['enable'] ?? true}
                         onChange={(v) => {

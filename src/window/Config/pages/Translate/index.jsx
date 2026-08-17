@@ -246,6 +246,7 @@ export default function Translate() {
                         <h3>{t('config.translate.history_disable')}</h3>
                         {historyDisable !== null && (
                             <Switch
+                                className='justify-center items-center'
                                 isSelected={historyDisable}
                                 onChange={(v) => {
                                     setHistoryDisable(v);
@@ -263,6 +264,7 @@ export default function Translate() {
                         <h3 className='my-auto mx-0'>{t('config.translate.cache_enable')}</h3>
                         {cacheEnable !== null && (
                             <Switch
+                                className='justify-center items-center'
                                 isSelected={cacheEnable}
                                 onChange={(v) => {
                                     setCacheEnable(v);
@@ -326,6 +328,7 @@ export default function Translate() {
                         <h3 className='my-auto mx-0'>{t('config.translate.incremental_translate')}</h3>
                         {incrementalTranslate !== null && (
                             <Switch
+                                className='justify-center items-center'
                                 isSelected={incrementalTranslate}
                                 onChange={(v) => {
                                     setIncrementalTranslate(v);
@@ -343,6 +346,7 @@ export default function Translate() {
                         <h3 className='my-auto mx-0'>{t('config.translate.dynamic_translate')}</h3>
                         {dynamicTranslate !== null && (
                             <Switch
+                                className='justify-center items-center'
                                 isSelected={dynamicTranslate}
                                 onChange={(v) => {
                                     setDynamicTranslate(v);
@@ -360,6 +364,7 @@ export default function Translate() {
                         <h3 className='my-auto mx-0'>{t('config.translate.delete_newline')}</h3>
                         {deleteNewline !== null && (
                             <Switch
+                                className='justify-center items-center'
                                 isSelected={deleteNewline}
                                 onChange={(v) => {
                                     setDeleteNewline(v);
@@ -377,6 +382,7 @@ export default function Translate() {
                         <h3 className='my-auto mx-0'>{t('config.translate.remember_language')}</h3>
                         {rememberLanguage !== null && (
                             <Switch
+                                className='justify-center items-center'
                                 isSelected={rememberLanguage}
                                 onChange={(v) => {
                                     setRememberLanguage(v);
@@ -455,6 +461,7 @@ export default function Translate() {
                         <h3 className='my-auto mx-0'>{t('config.translate.remember_window_size')}</h3>
                         {rememberWindowSize !== null && (
                             <Switch
+                                className='justify-center items-center'
                                 isSelected={rememberWindowSize}
                                 onChange={(v) => {
                                     setRememberWindowSize(v);
@@ -472,6 +479,7 @@ export default function Translate() {
                         <h3 className='my-auto mx-0'>{t('config.translate.close_on_blur')}</h3>
                         {closeOnBlur !== null && (
                             <Switch
+                                className='justify-center items-center'
                                 isSelected={closeOnBlur}
                                 onChange={(v) => {
                                     setCloseOnBlur(v);
@@ -489,6 +497,7 @@ export default function Translate() {
                         <h3 className='my-auto mx-0'>{t('config.translate.always_on_top')}</h3>
                         {alwaysOnTop !== null && (
                             <Switch
+                                className='justify-center items-center'
                                 isSelected={alwaysOnTop}
                                 onChange={(v) => {
                                     setAlwaysOnTop(v);
@@ -506,6 +515,7 @@ export default function Translate() {
                         <h3 className='my-auto mx-0'>{t('config.translate.hide_source')}</h3>
                         {hideSource !== null && (
                             <Switch
+                                className='justify-center items-center'
                                 isSelected={hideSource}
                                 onChange={(v) => {
                                     setHideSource(v);
@@ -523,6 +533,7 @@ export default function Translate() {
                         <h3 className='my-auto mx-0'>{t('config.translate.hide_language')}</h3>
                         {hideLanguage !== null && (
                             <Switch
+                                className='justify-center items-center'
                                 isSelected={hideLanguage}
                                 onChange={(v) => {
                                     setHideLanguage(v);
@@ -540,6 +551,7 @@ export default function Translate() {
                         <h3 className='my-auto mx-0'>{t('config.translate.hide_window')}</h3>
                         {hideWindow !== null && (
                             <Switch
+                                className='justify-center items-center'
                                 isSelected={hideWindow}
                                 onChange={(v) => {
                                     setHideWindow(v);

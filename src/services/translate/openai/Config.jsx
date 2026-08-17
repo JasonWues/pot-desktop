@@ -145,7 +145,7 @@ export function Config(props) {
                                 stream: value,
                             });
                         }}
-                        className='flex flex-row-reverse justify-between w-full max-w-full'
+                        className='flex flex-row-reverse justify-between w-full max-w-full justify-center items-center'
                     >
                         <Switch.Content>
                             <Switch.Control>

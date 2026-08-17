@@ -104,6 +104,7 @@ export default function General() {
                     <div className='config-item'>
                         <h3>{t('config.general.auto_start')}</h3>
                         <Switch
+                            className='justify-center items-center'
                             isSelected={autoStart}
                             onChange={(v) => {
                                 setAutoStart(v);
@@ -129,6 +130,7 @@ export default function General() {
                         <h3>{t('config.general.check_update')}</h3>
                         {checkUpdate !== null && (
                             <Switch
+                                className='justify-center items-center'
                                 isSelected={checkUpdate}
                                 onChange={(v) => {
                                     setCheckUpdate(v);
@@ -590,6 +592,7 @@ export default function General() {
                         <h3>{t('config.general.transparent')}</h3>
                         {transparent !== null && (
                             <Switch
+                                className='justify-center items-center'
                                 isSelected={transparent}
                                 onChange={(v) => {
                                     setTransparent(v);
@@ -607,6 +610,7 @@ export default function General() {
                         <h3>{t('config.general.dev_mode')}</h3>
                         {devMode !== null && (
                             <Switch
+                                className='justify-center items-center'
                                 isSelected={devMode}
                                 onChange={(v) => {
                                     setDevMode(v);
