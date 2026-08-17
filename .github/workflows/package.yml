@@ -101,7 +101,7 @@ jobs:
             - name: Setup Nodejs
               uses: actions/setup-node@v4
               with:
-                  node-version: 21
+                  node-version: 22
             - name: Install Rust Stable
               uses: dtolnay/rust-toolchain@stable
             - name: install dependencies
@@ -192,7 +192,7 @@ jobs:
             - name: Setup Nodejs
               uses: actions/setup-node@v4
               with:
-                  node-version: 21
+                  node-version: 22
             - name: Install Rust Stable
               uses: dtolnay/rust-toolchain@stable
             - name: install dependencies
@@ -254,7 +254,7 @@ jobs:
             - name: Setup Nodejs
               uses: actions/setup-node@v4
               with:
-                  node-version: 21
+                  node-version: 22
             - name: Install Rust Stable
               uses: dtolnay/rust-toolchain@stable
             - name: install dependencies
@@ -406,6 +406,13 @@ jobs:
               run: |
                   echo "VERSION=$(git describe --tags | sed 's/-[0-9]*-.*//g')" >> $GITHUB_ENV
                   echo "VERSION=$(git describe --tags | sed 's/-[0-9]*-.*//g')"
+            # This job had no Setup Nodejs of its own and ran on whatever the
+            # ubuntu-latest image happened to ship. It only fires on tags, so it
+            # would have failed the same way the others just did, out of sight.
+            - name: Setup Nodejs
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 22
             - name: Setup pnpm
               uses: pnpm/action-setup@v4
               with:
