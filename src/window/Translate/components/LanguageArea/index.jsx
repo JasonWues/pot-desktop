@@ -62,7 +62,7 @@ export default function LanguageArea() {
                             variant='light'
                             className={aiPreset === DEFAULT_PRESET ? '' : 'text-accent'}
                         >
-                            aiPreset === DEFAULT_PRESET ? null : <LuWand className='text-[16px]' />
+                            {aiPreset === DEFAULT_PRESET ? null : <LuWand className='text-[16px]' />}
                             {aiPreset === DEFAULT_PRESET ? (
                                 <LuWand className='text-[16px] text-muted' />
                             ) : (
