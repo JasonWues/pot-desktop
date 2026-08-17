@@ -1,4 +1,4 @@
-import { Input, Button, Switch, Textarea, Card, CardBody, Link } from '@heroui/react';
+import { Input, Button, Switch, TextArea, Card, CardContent, Link } from '@heroui/react';
 import { DropdownTrigger } from '@heroui/react';
 import { MdDeleteOutline } from 'react-icons/md';
 import { DropdownMenu } from '@heroui/react';
@@ -190,7 +190,7 @@ export function Config(props) {
                     className='border-none bg-success/20 dark:bg-success/10'
                     shadow='sm'
                 >
-                    <CardBody>
+                    <CardContent>
                         <div>
                             推荐
                             <Link
@@ -209,7 +209,7 @@ export function Config(props) {
                                 配置文档
                             </Link>
                         </div>
-                    </CardBody>
+                    </CardContent>
                 </Card>
                 <div className={`config-item ${openaiConfig.service === 'azure' ? 'hidden' : ''}`}>
                     <Input
@@ -238,7 +238,7 @@ export function Config(props) {
                         openaiConfig.promptList.map((prompt, index) => {
                             return (
                                 <div className='config-item'>
-                                    <Textarea
+                                    <TextArea
                                         label={prompt.role}
                                         labelPlacement='outside'
                                         variant='faded'
@@ -311,7 +311,7 @@ export function Config(props) {
 
                 <h3 className='my-auto'>Request Arguments</h3>
                 <div className='config-item'>
-                    <Textarea
+                    <TextArea
                         label=''
                         labelPlacement='outside'
                         variant='faded'

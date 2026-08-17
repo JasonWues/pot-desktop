@@ -2,7 +2,7 @@ import { DropdownTrigger } from '@heroui/react';
 import { DropdownMenu } from '@heroui/react';
 import { DropdownItem } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
-import { CardBody } from '@heroui/react';
+import { CardContent } from '@heroui/react';
 import { Dropdown } from '@heroui/react';
 import { Switch } from '@heroui/react';
 import { Button } from '@heroui/react';
@@ -21,7 +21,7 @@ export default function Recognize() {
     const { t } = useTranslation();
     return (
         <Card className='mb-[10px]'>
-            <CardBody>
+            <CardContent>
                 <div className='config-item'>
                     <h3 className='my-auto mx-0'>{t('config.recognize.language')}</h3>
                     {recognizeLanguage !== null && (
@@ -88,7 +88,7 @@ export default function Recognize() {
                         />
                     )}
                 </div>
-            </CardBody>
+            </CardContent>
         </Card>
     );
 }

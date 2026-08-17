@@ -1,6 +1,6 @@
 import { INSTANCE_NAME_CONFIG_KEY } from '../../../utils/service_instance';
 import InstanceNameInput from '../../../components/InstanceNameInput';
-import { Input, Button, Textarea } from '@heroui/react';
+import { Input, Button, TextArea } from '@heroui/react';
 import { DropdownTrigger } from '@heroui/react';
 import { MdDeleteOutline } from 'react-icons/md';
 import { DropdownMenu } from '@heroui/react';
@@ -134,7 +134,7 @@ export function Config(props) {
                         serviceConfig.promptList.map((prompt, index) => {
                             return (
                                 <div className='config-item'>
-                                    <Textarea
+                                    <TextArea
                                         label={prompt.role}
                                         labelPlacement='outside'
                                         variant='faded'

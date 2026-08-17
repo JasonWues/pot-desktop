@@ -2,7 +2,7 @@ import { DropdownTrigger } from '@heroui/react';
 import { DropdownMenu } from '@heroui/react';
 import { DropdownItem } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
-import { CardBody } from '@heroui/react';
+import { CardContent } from '@heroui/react';
 import { Dropdown } from '@heroui/react';
 import { Switch } from '@heroui/react';
 import { Button } from '@heroui/react';
@@ -51,7 +51,7 @@ export default function Translate() {
         <>
             <Toaster />
             <Card className='mb-[10px]'>
-                <CardBody>
+                <CardContent>
                     <div className='config-item'>
                         <h3 className='my-auto mx-0'>{t('config.translate.source_language')}</h3>
                         {sourceLanguage !== null && (
@@ -141,10 +141,10 @@ export default function Translate() {
                             </Dropdown>
                         )}
                     </div>
-                </CardBody>
+                </CardContent>
             </Card>
             <Card className='mb-[10px]'>
-                <CardBody>
+                <CardContent>
                     <div className='config-item'>
                         <h3 className='my-auto mx-0'>{t('config.translate.auto_copy')}</h3>
                         {autoCopy !== null && (
@@ -280,10 +280,10 @@ export default function Translate() {
                             />
                         )}
                     </div>
-                </CardBody>
+                </CardContent>
             </Card>
             <Card>
-                <CardBody>
+                <CardContent>
                     {/* <div className='config-item'>
                         <h3 className='my-auto mx-0'>{t('config.translate.font_size.title')}</h3>
                         {translateFontSize !== null && (
@@ -397,7 +397,7 @@ export default function Translate() {
                             />
                         )}
                     </div>
-                </CardBody>
+                </CardContent>
             </Card>
         </>
     );

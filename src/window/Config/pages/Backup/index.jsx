@@ -1,11 +1,11 @@
 import { readTextFile, BaseDirectory } from '@tauri-apps/plugin-fs';
 import { DropdownTrigger } from '@heroui/react';
-import { useDisclosure } from '@heroui/react';
+
 import toast, { Toaster } from 'react-hot-toast';
 import { DropdownMenu } from '@heroui/react';
 import { DropdownItem } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
-import { CardBody } from '@heroui/react';
+import { CardContent } from '@heroui/react';
 import { Dropdown } from '@heroui/react';
 import { warn } from '@tauri-apps/plugin-log';
 import { Button } from '@heroui/react';
@@ -14,7 +14,7 @@ import { Card } from '@heroui/react';
 import { Avatar, Tooltip } from '@heroui/react';
 import React, { useEffect, useState } from 'react';
 
-import { useConfig, useToastStyle } from '../../../../hooks';
+import { useConfig, useToastStyle, useDisclosure } from '../../../../hooks';
 import { osType } from '../../../../utils/env';
 import * as webdav from './utils/webdav';
 import WebDavModal from './WebDavModal';
@@ -181,7 +181,7 @@ export default function Backup() {
     return (
         <Card className='mb-[10px]'>
             <Toaster />
-            <CardBody>
+            <CardContent>
                 <div className='config-item'>
                     <h3 className='my-auto'>{t('config.backup.type')}</h3>
                     {backupType !== null && (
@@ -298,7 +298,7 @@ export default function Backup() {
                         {t('config.backup.restore')}
                     </Button>
                 </div>
-            </CardBody>
+            </CardContent>
             <WebDavModal
                 isOpen={isWebDavListOpen}
                 onOpenChange={onWebDavListOpenChange}

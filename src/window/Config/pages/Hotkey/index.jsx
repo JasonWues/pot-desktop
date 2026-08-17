@@ -1,7 +1,7 @@
 import { unregister, isRegistered } from '@tauri-apps/plugin-global-shortcut';
 import toast, { Toaster } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { CardBody } from '@heroui/react';
+import { CardContent } from '@heroui/react';
 import { Button } from '@heroui/react';
 import { Input } from '@heroui/react';
 import { Card } from '@heroui/react';
@@ -116,7 +116,7 @@ export default function Hotkey() {
     return (
         <Card>
             <Toaster />
-            <CardBody>
+            <CardContent>
                 <div className='config-item'>
                     <h3 className='my-auto'>{t('config.hotkey.selection_translate')}</h3>
                     {selectionTranslate !== null && (
@@ -241,7 +241,7 @@ export default function Hotkey() {
                         />
                     )}
                 </div>
-            </CardBody>
+            </CardContent>
         </Card>
     );
 }

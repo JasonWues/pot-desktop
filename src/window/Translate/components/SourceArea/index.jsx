@@ -1,4 +1,5 @@
-import { Button, Card, CardBody, CardFooter, ButtonGroup, Chip, Tooltip, Spacer } from '@heroui/react';
+import { Button, Card, CardContent, CardFooter, ButtonGroup, Chip, Tooltip } from '@heroui/react';
+import Spacer from '../../../../components/Spacer';
 import { BaseDirectory, readTextFile } from '@tauri-apps/plugin-fs';
 import React, { useEffect, useRef, useState } from 'react';
 import { writeText } from '@tauri-apps/plugin-clipboard-manager';
@@ -399,7 +400,7 @@ export default function SourceArea(props) {
                 className='bg-surface rounded-[10px] mt-px pb-0'
             >
                 <Toaster />
-                <CardBody className='bg-surface p-[12px] pb-0 max-h-[40vh] overflow-y-auto'>
+                <CardContent className='bg-surface p-[12px] pb-0 max-h-[40vh] overflow-y-auto'>
                     <textarea
                         autoFocus
                         ref={textAreaRef}
@@ -431,7 +432,7 @@ export default function SourceArea(props) {
                             }
                         }}
                     />
-                </CardBody>
+                </CardContent>
 
                 <CardFooter className='bg-surface rounded-none rounded-b-[10px] flex justify-between px-[12px] p-[5px]'>
                     <div className='flex justify-start'>

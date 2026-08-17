@@ -1,4 +1,4 @@
-import { Card, CardBody, CardFooter, Button, Tooltip } from '@heroui/react';
+import { Card, CardContent, CardFooter, Button, Tooltip } from '@heroui/react';
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 import React, { useEffect, useRef, useState } from 'react';
 import { listen } from '@tauri-apps/api/event';
@@ -80,7 +80,7 @@ export default function ImageArea() {
             className='bg-surface h-full ml-[12px] mr-[6px]'
             radius='10'
         >
-            <CardBody className='bg-surface h-full p-0 relative'>
+            <CardContent className='bg-surface h-full p-0 relative'>
                 {base64 !== '' && (
                     <>
                         <img
@@ -99,7 +99,7 @@ export default function ImageArea() {
                         />
                     </>
                 )}
-            </CardBody>
+            </CardContent>
             <CardFooter className='bg-surface flex justify-start px-[12px] gap-[4px]'>
                 <Tooltip content={t('recognize.copy_img')}>
                     <Button

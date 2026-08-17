@@ -1,4 +1,5 @@
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Spacer } from '@heroui/react';
+import { Modal, ModalHeader, ModalBody, ModalFooter, Button } from '@heroui/react';
+import Spacer from '../../../../../../components/Spacer';
 
 import { useTranslation } from 'react-i18next';
 import React from 'react';
@@ -26,65 +27,68 @@ export default function ConfigModal(props) {
     return pluginServiceFlag && !(serviceName in pluginList) ? (
         <></>
     ) : (
-        <Modal
-            isOpen={isOpen}
-            onOpenChange={onOpenChange}
-            scrollBehavior='inside'
-        >
-            <ModalContent className='max-h-[75vh]'>
-                {(onClose) => (
-                    <>
-                        <ModalHeader>
-                            {serviceSourceType === ServiceSourceType.BUILDIN && (
-                                <>
-                                    <img
-                                        src={
-                                            serviceName === 'system'
-                                                ? `logo/${osType}.svg`
-                                                : builtinServices[serviceName].info.icon
-                                        }
-                                        className='h-[24px] w-[24px] my-auto'
-                                        draggable={false}
-                                    />
-                                    <Spacer x={2} />
-                                    {t(`services.recognize.${serviceName}.title`)}
-                                </>
-                            )}
-                            {pluginServiceFlag && (
-                                <>
-                                    <img
-                                        src={pluginList[serviceName].icon}
-                                        className='h-[24px] w-[24px] my-auto'
-                                        draggable={false}
-                                    />
+        <Modal>
+            <Modal.Backdrop
+                isOpen={isOpen}
+                onOpenChange={onOpenChange}
+            >
+                <Modal.Container scroll='inside'>
+                    <Modal.Dialog className='max-h-[75vh]'>
+                        {({ close }) => (
+                            <>
+                                <ModalHeader>
+                                    {serviceSourceType === ServiceSourceType.BUILDIN && (
+                                        <>
+                                            <img
+                                                src={
+                                                    serviceName === 'system'
+                                                        ? `logo/${osType}.svg`
+                                                        : builtinServices[serviceName].info.icon
+                                                }
+                                                className='h-[24px] w-[24px] my-auto'
+                                                draggable={false}
+                                            />
+                                            <Spacer x={2} />
+                                            {t(`services.recognize.${serviceName}.title`)}
+                                        </>
+                                    )}
+                                    {pluginServiceFlag && (
+                                        <>
+                                            <img
+                                                src={pluginList[serviceName].icon}
+                                                className='h-[24px] w-[24px] my-auto'
+                                                draggable={false}
+                                            />
 
-                                    <Spacer x={2} />
-                                    {`${pluginList[serviceName].display} [${t('common.plugin')}]`}
-                                </>
-                            )}
-                        </ModalHeader>
-                        <ModalBody>
-                            <ConfigComponent
-                                name={serviceName}
-                                instanceKey={serviceInstanceKey}
-                                pluginType='recognize'
-                                pluginList={pluginList}
-                                updateServiceList={updateServiceInstanceList}
-                                onClose={onClose}
-                            />
-                        </ModalBody>
-                        <ModalFooter>
-                            <Button
-                                color='danger'
-                                variant='light'
-                                onPress={onClose}
-                            >
-                                {t('common.cancel')}
-                            </Button>
-                        </ModalFooter>
-                    </>
-                )}
-            </ModalContent>
+                                            <Spacer x={2} />
+                                            {`${pluginList[serviceName].display} [${t('common.plugin')}]`}
+                                        </>
+                                    )}
+                                </ModalHeader>
+                                <ModalBody>
+                                    <ConfigComponent
+                                        name={serviceName}
+                                        instanceKey={serviceInstanceKey}
+                                        pluginType='recognize'
+                                        pluginList={pluginList}
+                                        updateServiceList={updateServiceInstanceList}
+                                        onClose={close}
+                                    />
+                                </ModalBody>
+                                <ModalFooter>
+                                    <Button
+                                        color='danger'
+                                        variant='light'
+                                        onPress={close}
+                                    >
+                                        {t('common.cancel')}
+                                    </Button>
+                                </ModalFooter>
+                            </>
+                        )}
+                    </Modal.Dialog>
+                </Modal.Container>
+            </Modal.Backdrop>
         </Modal>
     );
 }

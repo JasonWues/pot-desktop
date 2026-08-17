@@ -1,7 +1,7 @@
 import { useLocation, useRoutes } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
-import { Card, Divider } from '@heroui/react';
+import { Card, Separator } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 
 import WindowControl from '../../components/WindowControl';
@@ -65,7 +65,7 @@ export default function Config() {
 
                     <div className='flex'>{osType !== 'Darwin' && <WindowControl />}</div>
                 </div>
-                <Divider />
+                <Separator />
                 <div
                     className={`p-[10px] overflow-y-auto ${
                         osType === 'Linux' ? 'h-[calc(100vh-38px)]' : 'h-[calc(100vh-36px)]'

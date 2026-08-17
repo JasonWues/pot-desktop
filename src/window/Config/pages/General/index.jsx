@@ -5,7 +5,7 @@ import toast, { Toaster } from 'react-hot-toast';
 import { DropdownMenu } from '@heroui/react';
 import { DropdownItem } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
-import { CardBody } from '@heroui/react';
+import { CardContent } from '@heroui/react';
 import { Dropdown } from '@heroui/react';
 import { info } from '@tauri-apps/plugin-log';
 import { Button } from '@heroui/react';
@@ -108,7 +108,7 @@ export default function General() {
         <>
             <Toaster />
             <Card className='mb-[10px]'>
-                <CardBody>
+                <CardContent>
                     <div className='config-item'>
                         <h3>{t('config.general.auto_start')}</h3>
                         <Switch
@@ -172,10 +172,10 @@ export default function General() {
                             />
                         )}
                     </div>
-                </CardBody>
+                </CardContent>
             </Card>
             <Card className='mb-[10px]'>
-                <CardBody>
+                <CardContent>
                     <div className='config-item'>
                         <h3 className='my-auto'>{t('config.general.app_language')}</h3>
                         {appLanguage !== null && (
@@ -527,10 +527,10 @@ export default function General() {
                             />
                         )}
                     </div>
-                </CardBody>
+                </CardContent>
             </Card>
             <Card>
-                <CardBody>
+                <CardContent>
                     <div className='config-item'>
                         <h3>{t('config.general.proxy.title')}</h3>
                         {proxyMode !== null && (
@@ -648,7 +648,7 @@ export default function General() {
                             />
                         )}
                     </div>
-                </CardBody>
+                </CardContent>
             </Card>
         </>
     );

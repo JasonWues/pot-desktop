@@ -1,4 +1,4 @@
-import { Modal, ModalContent, ModalHeader, ModalBody, Button, Skeleton } from '@heroui/react';
+import { Modal, ModalHeader, ModalBody, Button, Skeleton } from '@heroui/react';
 import React, { useEffect, useState } from 'react';
 import { MdDeleteOutline } from 'react-icons/md';
 import toast, { Toaster } from 'react-hot-toast';
@@ -60,82 +60,87 @@ export default function WebDavModal(props) {
         );
     };
     return (
-        <Modal
-            isOpen={isOpen}
-            onOpenChange={onOpenChange}
-            scrollBehavior='inside'
-        >
-            <Toaster />
-            <ModalContent className='max-h-[80vh]'>
-                {(onClose) => (
-                    <>
-                        <ModalHeader>{t('config.backup.list')}</ModalHeader>
-                        <ModalBody>
-                            {loading ? (
-                                <div className='space-y-3'>
-                                    <Skeleton className='w-4/5 rounded-lg'>
-                                        <div className='h-3 w-4/5 rounded-lg bg-default'></div>
-                                    </Skeleton>
-                                    <Skeleton className='w-3/5 rounded-lg'>
-                                        <div className='h-3 w-3/5 rounded-lg bg-default'></div>
-                                    </Skeleton>
-                                </div>
-                            ) : webdavList.length === 0 ? (
-                                <h2>{t('config.backup.empty')}</h2>
-                            ) : (
-                                <div>
-                                    {webdavList.map((file, index) => {
-                                        return (
-                                            <div
-                                                className='flex justify-between'
-                                                key={file}
-                                            >
-                                                <Button
-                                                    fullWidth
-                                                    variant='flat'
-                                                    className='mb-[8px] mr-[8px]'
-                                                    isLoading={downloading[index]}
-                                                    onPress={async () => {
-                                                        setDownloading(
-                                                            downloading.map((_, i) => {
-                                                                return i === index;
-                                                            })
-                                                        );
-                                                        await getBackup(file, onClose);
-                                                    }}
-                                                >
-                                                    {file}
-                                                </Button>
-                                                <Button
-                                                    isIconOnly
-                                                    color='danger'
-                                                    variant='flat'
-                                                    onPress={() => {
-                                                        webdav.remove(url, username, password, file).then(
-                                                            () => {
-                                                                setWebdavList(
-                                                                    webdavList.filter((_, i) => {
-                                                                        return i !== index;
+        <Modal>
+            <Modal.Backdrop
+                isOpen={isOpen}
+                onOpenChange={onOpenChange}
+            >
+                <Modal.Container scroll='inside'>
+                    <Toaster />
+                    <Modal.Dialog className='max-h-[80vh]'>
+                        {({ close }) => (
+                            <>
+                                <ModalHeader>{t('config.backup.list')}</ModalHeader>
+                                <ModalBody>
+                                    {loading ? (
+                                        <div className='space-y-3'>
+                                            <Skeleton className='w-4/5 rounded-lg'>
+                                                <div className='h-3 w-4/5 rounded-lg bg-default'></div>
+                                            </Skeleton>
+                                            <Skeleton className='w-3/5 rounded-lg'>
+                                                <div className='h-3 w-3/5 rounded-lg bg-default'></div>
+                                            </Skeleton>
+                                        </div>
+                                    ) : webdavList.length === 0 ? (
+                                        <h2>{t('config.backup.empty')}</h2>
+                                    ) : (
+                                        <div>
+                                            {webdavList.map((file, index) => {
+                                                return (
+                                                    <div
+                                                        className='flex justify-between'
+                                                        key={file}
+                                                    >
+                                                        <Button
+                                                            fullWidth
+                                                            variant='flat'
+                                                            className='mb-[8px] mr-[8px]'
+                                                            isLoading={downloading[index]}
+                                                            onPress={async () => {
+                                                                setDownloading(
+                                                                    downloading.map((_, i) => {
+                                                                        return i === index;
                                                                     })
                                                                 );
-                                                            },
-                                                            (e) => {
-                                                                toast.error(e.toString(), { style: toastStyle });
-                                                            }
-                                                        );
-                                                    }}
-                                                >
-                                                    <MdDeleteOutline className='text-xl' />
-                                                </Button>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                            )}
-                        </ModalBody>
-                    </>
-                )}
-            </ModalContent>
+                                                                await getBackup(file, close);
+                                                            }}
+                                                        >
+                                                            {file}
+                                                        </Button>
+                                                        <Button
+                                                            isIconOnly
+                                                            color='danger'
+                                                            variant='flat'
+                                                            onPress={() => {
+                                                                webdav.remove(url, username, password, file).then(
+                                                                    () => {
+                                                                        setWebdavList(
+                                                                            webdavList.filter((_, i) => {
+                                                                                return i !== index;
+                                                                            })
+                                                                        );
+                                                                    },
+                                                                    (e) => {
+                                                                        toast.error(e.toString(), {
+                                                                            style: toastStyle,
+                                                                        });
+                                                                    }
+                                                                );
+                                                            }}
+                                                        >
+                                                            <MdDeleteOutline className='text-xl' />
+                                                        </Button>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    )}
+                                </ModalBody>
+                            </>
+                        )}
+                    </Modal.Dialog>
+                </Modal.Container>
+            </Modal.Backdrop>
         </Modal>
     );
 }

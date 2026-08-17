@@ -1,4 +1,4 @@
-import { Input, Button, Switch, Textarea, Card, CardBody, Link, Tooltip, Progress } from '@heroui/react';
+import { Input, Button, Switch, TextArea, Card, CardContent, Link, Tooltip, ProgressBar } from '@heroui/react';
 import { INSTANCE_NAME_CONFIG_KEY } from '../../../utils/service_instance';
 import InstanceNameInput from '../../../components/InstanceNameInput';
 import { MdDeleteOutline } from 'react-icons/md';
@@ -112,7 +112,7 @@ export function Config(props) {
                         className='border-none bg-danger/20 dark:bg-danger/10'
                         shadow='sm'
                     >
-                        <CardBody>
+                        <CardContent>
                             <div>
                                 {t('services.translate.ollama.install_ollama')}
                                 <br />
@@ -124,7 +124,7 @@ export function Config(props) {
                                     {t('services.translate.ollama.install_ollama_link')}
                                 </Link>
                             </div>
-                        </CardBody>
+                        </CardContent>
                     </Card>
                 )}
                 <div className='config-item'>
@@ -225,22 +225,25 @@ export function Config(props) {
                     className='border-none bg-success/20 dark:bg-success/10'
                     shadow='sm'
                 >
-                    <CardBody>
+                    <CardContent>
+                        {/* See the Updater window for the same shape: v3 drops
+                            `label`, `showValueLabel` and `classNames`, so the
+                            status line is markup and each slot becomes a className
+                            on the part it named. */}
                         {isPulling && (
-                            <Progress
-                                size='sm'
-                                radius='sm'
-                                classNames={{
-                                    base: 'max-w-md',
-                                    track: 'drop-shadow-md border border-default',
-                                    indicator: 'bg-linear-to-r from-pink-500 to-yellow-500',
-                                    label: 'tracking-wider font-medium text-default-600',
-                                    value: 'text-foreground/60',
-                                }}
-                                label={pullingStatus}
+                            <ProgressBar
+                                aria-label={pullingStatus}
                                 value={progress}
-                                showValueLabel={true}
-                            />
+                                className='max-w-md'
+                            >
+                                <div className='flex justify-between'>
+                                    <span className='tracking-wider font-medium text-muted'>{pullingStatus}</span>
+                                    <ProgressBar.Output className='text-foreground/60' />
+                                </div>
+                                <ProgressBar.Track className='drop-shadow-md border border-default'>
+                                    <ProgressBar.Fill className='bg-linear-to-r from-pink-500 to-yellow-500' />
+                                </ProgressBar.Track>
+                            </ProgressBar>
                         )}
                         <div className='flex justify-center'>
                             <Link
@@ -251,7 +254,7 @@ export function Config(props) {
                                 {t('services.translate.ollama.supported_models')}
                             </Link>
                         </div>
-                    </CardBody>
+                    </CardContent>
                 </Card>
                 <h3 className='my-auto'>Prompt List</h3>
                 <p className='text-[10px] text-foreground'>{t('services.translate.ollama.prompt_description')}</p>
@@ -261,7 +264,7 @@ export function Config(props) {
                         serviceConfig.promptList.map((prompt, index) => {
                             return (
                                 <div className='config-item'>
-                                    <Textarea
+                                    <TextArea
                                         label={prompt.role}
                                         labelPlacement='outside'
                                         variant='faded'

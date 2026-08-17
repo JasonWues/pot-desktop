@@ -1,5 +1,6 @@
 import { RxDragHandleHorizontal } from 'react-icons/rx';
-import { Spacer, Button, Switch } from '@heroui/react';
+import Spacer from '../../../../../../components/Spacer';
+import { Button, Switch } from '@heroui/react';
 import { MdDeleteOutline } from 'react-icons/md';
 import { useTranslation } from 'react-i18next';
 import { BiSolidEdit } from 'react-icons/bi';

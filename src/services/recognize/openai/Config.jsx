@@ -1,6 +1,6 @@
 import { INSTANCE_NAME_CONFIG_KEY } from '../../../utils/service_instance';
 import InstanceNameInput from '../../../components/InstanceNameInput';
-import { Input, Button, Textarea } from '@heroui/react';
+import { Input, Button, TextArea } from '@heroui/react';
 import toast, { Toaster } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { open } from '@tauri-apps/plugin-shell';
@@ -140,7 +140,7 @@ export function Config(props) {
                 <h3 className='my-auto'>Prompt</h3>
                 <p className='text-[10px] text-foreground'>{t('services.recognize.openai_ocr.prompt_description')}</p>
                 <div className={'config-item'}>
-                    <Textarea
+                    <TextArea
                         label='system'
                         labelPlacement='outside'
                         variant='faded'
@@ -155,7 +155,7 @@ export function Config(props) {
                     />
                 </div>
                 <div className={'config-item'}>
-                    <Textarea
+                    <TextArea
                         label='user'
                         labelPlacement='outside'
                         variant='faded'
@@ -171,7 +171,7 @@ export function Config(props) {
                 </div>
                 <h3 className='my-auto'>Request Arguments</h3>
                 <div className={'config-item'}>
-                    <Textarea
+                    <TextArea
                         label=''
                         labelPlacement='outside'
                         variant='faded'

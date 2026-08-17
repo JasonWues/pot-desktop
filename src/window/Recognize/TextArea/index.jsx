@@ -1,4 +1,4 @@
-import { Card, CardBody, CardFooter, Button, Skeleton, ButtonGroup, Tooltip } from '@heroui/react';
+import { Card, CardContent, CardFooter, Button, Skeleton, ButtonGroup, Tooltip } from '@heroui/react';
 import { sendNotification } from '@tauri-apps/plugin-notification';
 import { writeText } from '@tauri-apps/plugin-clipboard-manager';
 import { atom, useAtom, useAtomValue } from 'jotai';
@@ -137,7 +137,7 @@ export default function TextArea(props) {
             className='bg-surface h-full ml-[6px] mr-[12px]'
             radius='10'
         >
-            <CardBody className='bg-surface p-0 h-full'>
+            <CardContent className='bg-surface p-0 h-full'>
                 {loading ? (
                     <div className='space-y-3 m-[12px]'>
                         <Skeleton className='w-3/5 rounded-lg'>
@@ -173,7 +173,7 @@ export default function TextArea(props) {
                         )}
                     </>
                 )}
-            </CardBody>
+            </CardContent>
             <CardFooter className='bg-surface flex justify-start px-[12px]'>
                 <ButtonGroup>
                     <Tooltip content={t('recognize.copy_text')}>

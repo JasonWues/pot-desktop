@@ -1,6 +1,6 @@
 import {
     Card,
-    CardBody,
+    CardContent,
     CardHeader,
     CardFooter,
     Button,
@@ -481,7 +481,7 @@ export default function TargetArea(props) {
             >
                 <div>
                     {/* result content */}
-                    <CardBody className={`p-[12px] pb-0 ${hide ? 'h-0 p-0' : ''}`}>
+                    <CardContent className={`p-[12px] pb-0 ${hide ? 'h-0 p-0' : ''}`}>
                         {typeof result === 'string' ? (
                             <textarea
                                 ref={textAreaRef}
@@ -613,7 +613,7 @@ export default function TargetArea(props) {
                         ) : (
                             <></>
                         )}
-                    </CardBody>
+                    </CardContent>
                     <CardFooter
                         className={`bg-surface rounded-none rounded-b-[10px] flex px-[12px] p-[5px] ${hide ? 'hidden' : ''}`}
                     >

@@ -1,4 +1,4 @@
-import { Divider, Button, Popover, PopoverTrigger, PopoverContent, Tooltip } from '@heroui/react';
+import { Separator, Button, Popover, PopoverTrigger, PopoverContent, Tooltip } from '@heroui/react';
 import { appLogDir, appConfigDir } from '@tauri-apps/api/path';
 import { useTranslation } from 'react-i18next';
 import { open } from '@tauri-apps/plugin-shell';
@@ -23,7 +23,7 @@ export default function About() {
             <div className='content-center'>
                 <h1 className='font-bold text-2xl text-center'>Pot</h1>
                 <p className='text-center text-sm text-gray-500 mb-[5px]'>{appVersion}</p>
-                <Divider />
+                <Separator />
                 <div className='flex justify-between'>
                     <Button
                         variant='light'
@@ -155,7 +155,7 @@ export default function About() {
                         </PopoverContent>
                     </Popover>
                 </div>
-                <Divider />
+                <Separator />
             </div>
             <div className='content-center px-[40px]'>
                 <div className='flex justify-between'>
@@ -193,7 +193,7 @@ export default function About() {
                     </Button>
                 </div>
 
-                <Divider />
+                <Separator />
             </div>
         </div>
     );
