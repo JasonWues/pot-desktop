@@ -510,6 +510,7 @@
             "add_collection_success": "Add to collection successfully",
             "recognizing": "Recognizing…",
             "speak": "Speak",
+            "no_tts_service": "No speech service configured",
             "copy": "Copy",
             "retry": "Try again",
             "delete_newline": "Delete Newline",

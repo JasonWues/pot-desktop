@@ -510,6 +510,7 @@
             "add_collection_success": "添加成功",
             "recognizing": "识别中…",
             "speak": "朗读",
+            "no_tts_service": "未配置语音服务",
             "copy": "复制",
             "retry": "重试",
             "delete_newline": "删除换行",

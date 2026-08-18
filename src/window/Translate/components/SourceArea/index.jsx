@@ -191,6 +191,14 @@ export default function SourceArea(props) {
     };
 
     const handleSpeak = async () => {
+        // `[]` is truthy, so the length check is what keeps `[0]` from being
+        // undefined when every tts service has been removed -- `getServiceSouceType`
+        // would then throw a bare TypeError on `undefined.startsWith` and the toast
+        // would show that instead of the actual problem. The button is disabled in
+        // that state; this is the guard behind it.
+        if (!ttsServiceList?.length) {
+            throw new Error(t('translate.no_tts_service'));
+        }
         const instanceKey = ttsServiceList[0];
         let detected = detectLanguage;
         if (detected === '') {
@@ -452,6 +460,8 @@ export default function SourceArea(props) {
                     <button
                         type='button'
                         className='translate-action'
+                        disabled={!ttsServiceList?.length}
+                        title={ttsServiceList?.length ? undefined : t('translate.no_tts_service')}
                         onClick={() => {
                             handleSpeak().catch((e) => {
                                 toast.error(e.toString(), { style: toastStyle });

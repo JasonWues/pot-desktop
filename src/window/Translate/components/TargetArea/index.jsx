@@ -312,6 +312,11 @@ export default function TargetArea(props) {
 
     // handle tts speak
     const handleSpeak = async () => {
+        // See SourceArea's handleSpeak: with no tts service configured `[0]` is
+        // undefined and `getServiceSouceType` throws on `undefined.startsWith`.
+        if (!ttsServiceList?.length) {
+            throw new Error(t('translate.no_tts_service'));
+        }
         const instanceKey = ttsServiceList[0];
         if (getServiceSouceType(instanceKey) === ServiceSourceType.PLUGIN) {
             const pluginConfig = serviceInstanceConfigMap[instanceKey];
@@ -580,7 +585,8 @@ export default function TargetArea(props) {
                             <button
                                 type='button'
                                 className='translate-action'
-                                disabled={!hasText}
+                                disabled={!hasText || !ttsServiceList?.length}
+                                title={ttsServiceList?.length ? undefined : t('translate.no_tts_service')}
                                 onClick={() => {
                                     handleSpeak().catch((e) => {
                                         toast.error(e.toString(), { style: toastStyle });
