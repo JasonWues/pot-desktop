@@ -1,5 +1,11 @@
 import fs from 'fs';
 
+// See updater.mjs for why this follows GITHUB_REPOSITORY and why upstream's
+// dl.pot-app.com mirror is gone rather than repointed.
+const REPO = process.env.GITHUB_REPOSITORY ?? 'JasonWues/pot-desktop';
+const RELEASES = `https://github.com/${REPO}/releases/download`;
+const LATEST_RELEASE_API = `https://api.github.com/repos/${REPO}/releases/latest`;
+
 async function resolveUpdater() {
     if (process.env.GITHUB_TOKEN === undefined) {
         throw new Error('GITHUB_TOKEN is required');
@@ -9,12 +15,12 @@ async function resolveUpdater() {
     let version = await getVersion(TOKEN);
     let changelog = await getChangeLog(TOKEN);
 
-    const windows_x86_64 = `https://dl.pot-app.com/https://github.com/pot-app/pot-desktop/releases/download/${version}/pot_${version}_x64_fix_webview2_runtime-setup.nsis.zip`;
-    const windows_x86_64_sig = await getSignature(`https://github.com/pot-app/pot-desktop/releases/download/${version}/pot_${version}_x64_fix_webview2_runtime-setup.nsis.zip.sig`);
-    const windows_i686 = `https://dl.pot-app.com/https://github.com/pot-app/pot-desktop/releases/download/${version}/pot_${version}_x86_fix_webview2_runtime-setup.nsis.zip`;
-    const windows_i686_sig = await getSignature(`https://github.com/pot-app/pot-desktop/releases/download/${version}/pot_${version}_x86_fix_webview2_runtime-setup.nsis.zip.sig`);
-    const windows_aarch64 = `https://dl.pot-app.com/https://github.com/pot-app/pot-desktop/releases/download/${version}/pot_${version}_arm64_fix_webview2_runtime-setup.nsis.zip`;
-    const windows_aarch64_sig = await getSignature(`https://github.com/pot-app/pot-desktop/releases/download/${version}/pot_${version}_arm64_fix_webview2_runtime-setup.nsis.zip.sig`);
+    const windows_x86_64 = `${RELEASES}/${version}/pot_${version}_x64_fix_webview2_runtime-setup.nsis.zip`;
+    const windows_x86_64_sig = await getSignature(`${windows_x86_64}.sig`);
+    const windows_i686 = `${RELEASES}/${version}/pot_${version}_x86_fix_webview2_runtime-setup.nsis.zip`;
+    const windows_i686_sig = await getSignature(`${windows_i686}.sig`);
+    const windows_aarch64 = `${RELEASES}/${version}/pot_${version}_arm64_fix_webview2_runtime-setup.nsis.zip`;
+    const windows_aarch64_sig = await getSignature(`${windows_aarch64}.sig`);
 
     let updateData = {
         name: version,
@@ -23,7 +29,7 @@ async function resolveUpdater() {
         platforms: {
             'windows-x86_64': { signature: windows_x86_64_sig, url: windows_x86_64 },
             'windows-i686': { signature: windows_i686_sig, url: windows_i686 },
-            'windows-aarch64': { signature: windows_aarch64_sig, url: windows_aarch64 }
+            'windows-aarch64': { signature: windows_aarch64_sig, url: windows_aarch64 },
         },
     };
     fs.writeFile('./update-fix-runtime.json', JSON.stringify(updateData), (e) => {
@@ -32,7 +38,7 @@ async function resolveUpdater() {
 }
 
 async function getVersion(token) {
-    const res = await fetch('https://api.github.com/repos/pot-app/pot-desktop/releases/latest', {
+    const res = await fetch(LATEST_RELEASE_API, {
         method: 'GET',
         headers: {
             Authorization: `Bearer ${token}`,
@@ -48,7 +54,7 @@ async function getVersion(token) {
 }
 
 async function getChangeLog(token) {
-    const res = await fetch('https://api.github.com/repos/pot-app/pot-desktop/releases/latest', {
+    const res = await fetch(LATEST_RELEASE_API, {
         method: 'GET',
         headers: {
             Authorization: `Bearer ${token}`,
