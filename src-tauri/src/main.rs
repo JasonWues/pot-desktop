@@ -123,6 +123,12 @@ fn main() {
         .plugin(tauri_plugin_store::Builder::default().build())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_shell::init())
+        // Opening a FOLDER is not something the shell plugin will do: its `open`
+        // scope defaults to `^((mailto:\w+)|(tel:\w+)|(https?://\w+)).+`, so a
+        // filesystem path never validates. The opener plugin is v2's answer, and
+        // its scope is a path allowlist rather than a URL regex -- see
+        // capabilities/default.json, which limits it to the log and config dirs.
+        .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_http::init())
         .plugin(tauri_plugin_os::init())

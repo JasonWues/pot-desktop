@@ -1,10 +1,11 @@
-import { Separator, Button, Popover, PopoverTrigger, PopoverContent, Tooltip } from '@heroui/react';
+import { Separator, Button, Popover, PopoverTrigger, PopoverContent } from '@heroui/react';
 import { appLogDir, appConfigDir } from '@tauri-apps/api/path';
 import { useTranslation } from 'react-i18next';
 import { open } from '@tauri-apps/plugin-shell';
-import { BsTencentQq } from 'react-icons/bs';
-import { BsTelegram } from 'react-icons/bs';
-import { BsGithub } from 'react-icons/bs';
+// Not `shell`'s `open`: that one validates against a URL regex which no
+// filesystem path can satisfy, so both directory buttons below were silently
+// rejected. `openPath` is scoped by path instead -- see capabilities/default.json.
+import { openPath } from '@tauri-apps/plugin-opener';
 import { invoke } from '@tauri-apps/api/core';
 import React from 'react';
 
@@ -40,7 +41,7 @@ export default function About() {
                         className='my-[5px]'
                         size='sm'
                         onPress={() => {
-                            open('https://github.com/pot-app/pot-desktop');
+                            open('https://github.com/JasonWues/pot-desktop');
                         }}
                     >
                         {t('config.about.github')}
@@ -65,7 +66,7 @@ export default function About() {
                                     className='my-[5px]'
                                     size='sm'
                                     onPress={() => {
-                                        open('https://github.com/pot-app/pot-desktop/issues');
+                                        open('https://github.com/JasonWues/pot-desktop/issues');
                                     }}
                                 >
                                     {t('config.about.issue')}
@@ -80,89 +81,6 @@ export default function About() {
                                 >
                                     {t('config.about.email')}
                                 </Button>
-                            </div>
-                        </PopoverContent>
-                    </Popover>
-
-                    <Popover
-                        placement='top'
-                        offset={10}
-                    >
-                        <PopoverTrigger>
-                            <Button
-                                variant='tertiary'
-                                className='my-[5px]'
-                                size='sm'
-                            >
-                                {t('config.about.community')}
-                            </Button>
-                        </PopoverTrigger>
-                        <PopoverContent>
-                            <div className='flex justify-between'>
-                                <Tooltip>
-                                    <Tooltip.Trigger>
-                                        <Button
-                                            isIconOnly
-                                            variant='tertiary'
-                                            className='my-[5px]'
-                                            size='lg'
-                                            onPress={() => {
-                                                open('https://pd.qq.com/s/akns94e1r');
-                                            }}
-                                        >
-                                            <BsTencentQq />
-                                        </Button>
-                                    </Tooltip.Trigger>
-                                    <Tooltip.Content>{t('config.about.qq_channel')}</Tooltip.Content>
-                                </Tooltip>
-                                <Tooltip>
-                                    <Tooltip.Trigger>
-                                        <Button
-                                            isIconOnly
-                                            variant='tertiary'
-                                            className='my-[5px]'
-                                            size='lg'
-                                            onPress={() => {
-                                                open('https://pot-app.com/img/qq_group.png');
-                                            }}
-                                        >
-                                            <BsTencentQq />
-                                        </Button>
-                                    </Tooltip.Trigger>
-                                    <Tooltip.Content>{t('config.about.qq_group')}</Tooltip.Content>
-                                </Tooltip>
-                                <Tooltip>
-                                    <Tooltip.Trigger>
-                                        <Button
-                                            isIconOnly
-                                            variant='tertiary'
-                                            className='my-[5px]'
-                                            size='lg'
-                                            onPress={() => {
-                                                open('https://t.me/pot_app');
-                                            }}
-                                        >
-                                            <BsTelegram />
-                                        </Button>
-                                    </Tooltip.Trigger>
-                                    <Tooltip.Content>{t('config.about.telegram')}</Tooltip.Content>
-                                </Tooltip>
-                                <Tooltip>
-                                    <Tooltip.Trigger>
-                                        <Button
-                                            isIconOnly
-                                            variant='tertiary'
-                                            className='my-[5px]'
-                                            size='lg'
-                                            onPress={() => {
-                                                open('https://github.com/pot-app/pot-desktop/discussions');
-                                            }}
-                                        >
-                                            <BsGithub />
-                                        </Button>
-                                    </Tooltip.Trigger>
-                                    <Tooltip.Content>{t('config.about.discussion')}</Tooltip.Content>
-                                </Tooltip>
                             </div>
                         </PopoverContent>
                     </Popover>
@@ -187,7 +105,7 @@ export default function About() {
                         size='sm'
                         onPress={async () => {
                             const dir = await appLogDir();
-                            open(dir);
+                            openPath(dir);
                         }}
                     >
                         {t('config.about.view_log')}
@@ -198,7 +116,7 @@ export default function About() {
                         size='sm'
                         onPress={async () => {
                             const dir = await appConfigDir();
-                            open(dir);
+                            openPath(dir);
                         }}
                     >
                         {t('config.about.view_config')}
