@@ -1,9 +1,6 @@
 import { RxDragHandleHorizontal } from 'react-icons/rx';
-import Spacer from '../../../../../../components/Spacer';
-import { Button, Switch } from '@heroui/react';
-import { MdDeleteOutline } from 'react-icons/md';
 import { useTranslation } from 'react-i18next';
-import { BiSolidEdit } from 'react-icons/bi';
+
 import React from 'react';
 
 import * as builtinServices from '../../../../../../services/translate';
@@ -11,102 +8,111 @@ import { useConfig } from '../../../../../../hooks';
 import {
     INSTANCE_NAME_CONFIG_KEY,
     ServiceSourceType,
-    getDisplayInstanceName,
     getServiceName,
     getServiceSouceType,
 } from '../../../../../../utils/service_instance';
 
 export default function ServiceItem(props) {
-    const { serviceInstanceKey, pluginList, deleteServiceInstance, setCurrentConfigKey, onConfigOpen, ...drag } = props;
+    const {
+        serviceInstanceKey,
+        pluginList,
+        deleteServiceInstance,
+        setCurrentConfigKey,
+        onConfigOpen,
+        index,
+        isDragging,
+        ...drag
+    } = props;
     const { t } = useTranslation();
     const [serviceInstanceConfig, setServiceInstanceConfig] = useConfig(serviceInstanceKey, {});
 
     const serviceSourceType = getServiceSouceType(serviceInstanceKey);
     const serviceName = getServiceName(serviceInstanceKey);
+    const isPlugin = serviceSourceType === ServiceSourceType.PLUGIN;
+    const enabled = serviceInstanceConfig?.['enable'] ?? true;
 
-    return serviceSourceType === ServiceSourceType.PLUGIN && !(serviceName in pluginList) ? (
+    return isPlugin && !(serviceName in pluginList) ? (
         <></>
     ) : (
         serviceInstanceConfig !== null && (
-            <div className='bg-surface-secondary rounded-md px-[10px] py-[20px] flex justify-between'>
-                <div className='flex'>
-                    <div
+            <div
+                className={`service-row ${index === 0 ? 'service-row--first' : ''} ${
+                    isDragging ? 'service-row--marked' : ''
+                }`}
+            >
+                <span className='service-row__rank'>{String(index + 1).padStart(2, '0')}</span>
+                <img
+                    className='service-row__logo'
+                    src={isPlugin ? pluginList[serviceName].icon : builtinServices[serviceName].info.icon}
+                    draggable={false}
+                />
+                <div className='service-row__body'>
+                    <div className='service-row__name'>
+                        {serviceInstanceConfig[INSTANCE_NAME_CONFIG_KEY] ||
+                            (isPlugin ? pluginList[serviceName].display : t(`services.translate.${serviceName}.title`))}
+                    </div>
+                    {/*
+                        Only this tab can switch a service off, so only this one
+                        has a disabled state to report -- and a row that says
+                        "default" while switched off would be a lie, hence the
+                        first-in-order note yielding to it.
+                    */}
+                    <div className='service-row__note'>
+                        {[
+                            !enabled ? t('config.service.disabled') : index === 0 ? t('config.service.default') : null,
+                            isPlugin ? t('common.plugin') : null,
+                        ]
+                            .filter(Boolean)
+                            .join(' · ')}
+                    </div>
+                </div>
+                <div className='service-row__tools'>
+                    <span
                         {...drag}
-                        className='text-2xl my-auto'
+                        className='service-row__grip'
+                        aria-label={t('config.service.reorder')}
                     >
                         <RxDragHandleHorizontal />
-                    </div>
+                    </span>
+                    {/*
+                        A word rather than a switch. HeroUI's switch paints its
+                        off-state track with `--default`, which on this row's
+                        transparent ground rendered as nothing at all -- a
+                        disabled service had no visible control to re-enable it.
+                        A labelled action cannot disappear, and it matches the
+                        two beside it.
 
-                    <Spacer x={2} />
-                    {serviceSourceType === ServiceSourceType.BUILDIN && (
-                        <>
-                            <img
-                                src={`${builtinServices[serviceName].info.icon}`}
-                                className='h-[24px] w-[24px] my-auto'
-                                draggable={false}
-                            />
-                            <Spacer x={2} />
-                            <h2 className='my-auto'>
-                                {getDisplayInstanceName(serviceInstanceConfig[INSTANCE_NAME_CONFIG_KEY], () =>
-                                    t(`services.translate.${serviceName}.title`)
-                                )}
-                            </h2>
-                        </>
-                    )}
-                    {serviceSourceType === ServiceSourceType.PLUGIN && (
-                        <>
-                            <img
-                                src={pluginList[serviceName].icon}
-                                className='h-[24px] w-[24px] my-auto'
-                                draggable={false}
-                            />
-                            <Spacer x={2} />
-                            <h2 className='my-auto'>
-                                {getDisplayInstanceName(
-                                    serviceInstanceConfig[INSTANCE_NAME_CONFIG_KEY],
-                                    () => pluginList[serviceName].display
-                                ) + `[${t('common.plugin')}]`}
-                            </h2>
-                        </>
-                    )}
-                </div>
-                <div className='flex'>
-                    <Switch
-                        className='justify-center items-center'
-                        size='sm'
-                        isSelected={serviceInstanceConfig['enable'] ?? true}
-                        onChange={(v) => {
-                            setServiceInstanceConfig({ ...serviceInstanceConfig, enable: v });
+                        The label is the verb, not the state: the state is
+                        already in the note above.
+                    */}
+                    <button
+                        type='button'
+                        className='flat-action'
+                        onClick={() => {
+                            setServiceInstanceConfig({ ...serviceInstanceConfig, enable: !enabled });
                         }}
                     >
-                        <Switch.Content>
-                            <Switch.Control>
-                                <Switch.Thumb />
-                            </Switch.Control>
-                        </Switch.Content>
-                    </Switch>
-                    <Button
-                        isIconOnly
-                        size='sm'
-                        variant='tertiary'
-                        onPress={() => {
+                        {enabled ? t('config.service.disable') : t('config.service.enable')}
+                    </button>
+                    <button
+                        type='button'
+                        className='flat-action'
+                        onClick={() => {
                             setCurrentConfigKey(serviceInstanceKey);
                             onConfigOpen();
                         }}
                     >
-                        <BiSolidEdit className='text-2xl' />
-                    </Button>
-                    <Spacer x={2} />
-                    <Button
-                        isIconOnly
-                        size='sm'
-                        variant='danger-soft'
-                        onPress={() => {
+                        {t('config.service.edit')}
+                    </button>
+                    <button
+                        type='button'
+                        className='flat-action flat-action--danger'
+                        onClick={() => {
                             deleteServiceInstance(serviceInstanceKey);
                         }}
                     >
-                        <MdDeleteOutline className='text-2xl' />
-                    </Button>
+                        {t('config.service.remove')}
+                    </button>
                 </div>
             </div>
         )

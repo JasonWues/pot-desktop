@@ -1,0 +1,219 @@
+/*
+  The primitives the flat/squared surfaces are built from: no cards, no fills,
+  rules doing the dividing, actions as flush-left uppercase words, machine facts
+  in a quieter face. Used by the Recognize window and the Service settings page.
+
+  Everything is painted with v3 theme tokens, so these hold under every theme:
+
+    --border-secondary   the strong 2px rule between major regions
+    --border             the 1px hairline between minor ones
+    --muted              metadata and inactive labels
+    --accent             the single primary action, and destructive text
+
+  Chrome is sized in px and content in rem on purpose. App.jsx writes
+  `app_font_size` onto <html> as its font-size, so 1rem IS the user's chosen
+  reading size -- body copy tracks it while rules, labels and status text stay
+  at the size the design draws them.
+
+  NOTE: src/window/Translate/style.css predates this file and carries its own
+  copies of `.translate-action` / `.translate-meta` / `.translate-primary`. They
+  are the same three ideas. If you touch both surfaces, converge them here.
+*/
+
+@layer components {
+    /* ---------------------------------------------------------------- labels */
+
+    /* A region's name: "CAPTURE", "TEXT". Sits above content, never beside it. */
+    .flat-label {
+        font-size: 11px;
+        font-weight: 700;
+        line-height: 1;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+
+    /* What the region can say about itself -- dimensions, char count, service. */
+    .flat-meta {
+        font-size: 11px;
+        line-height: 1;
+        letter-spacing: 0.06em;
+        color: var(--muted);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* --------------------------------------------------------------- actions */
+
+    /*
+      A word, not a button: no fill, no border, no radius. The affordance is the
+      accent on hover, which is also why the disabled state drops opacity rather
+      than colour -- a greyed word beside muted metadata would read as prose.
+    */
+    .flat-action {
+        flex: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: transparent;
+        border: 0;
+        padding: 0;
+        cursor: pointer;
+        color: var(--muted);
+        font: inherit;
+        font-size: 12px;
+        font-weight: 600;
+        line-height: 1;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+
+    .flat-action:hover:not(:disabled) {
+        color: var(--accent);
+    }
+
+    .flat-action:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+    }
+
+    .flat-action:focus-visible {
+        outline: 2px solid var(--focus);
+        outline-offset: 3px;
+    }
+
+    /* The destructive one. Red is reserved for this and for the primary fill. */
+    .flat-action--danger {
+        color: var(--accent);
+    }
+
+    .flat-action--danger:hover:not(:disabled) {
+        color: var(--accent-hover);
+    }
+
+    /* An action carrying a glyph rather than a word: pane tools, service logos. */
+    .flat-action svg,
+    .flat-action img {
+        display: block;
+        width: 15px;
+        height: 15px;
+        flex: none;
+    }
+
+    /* -------------------------------------------------------------- controls */
+
+    /*
+      The one filled control on a surface. `--accent-foreground` rather than a
+      literal white: a theme is free to pair its accent with dark text.
+    */
+    .flat-primary {
+        flex: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 0 20px;
+        border: 0;
+        cursor: pointer;
+        background: var(--accent);
+        color: var(--accent-foreground);
+        font: inherit;
+        font-size: 13px;
+        font-weight: 600;
+        line-height: 1;
+        letter-spacing: 0.02em;
+        white-space: nowrap;
+    }
+
+    .flat-primary:hover:not(:disabled) {
+        background: var(--accent-hover);
+    }
+
+    .flat-primary:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+    }
+
+    .flat-primary:focus-visible {
+        outline: 2px solid var(--focus);
+        outline-offset: -3px;
+    }
+
+    .flat-primary svg,
+    .flat-primary img {
+        display: block;
+        width: 15px;
+        height: 15px;
+        flex: none;
+    }
+
+    /* An outlined control -- the 2px rule turned into a button. */
+    .flat-outline {
+        flex: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        height: 34px;
+        padding: 0 16px;
+        cursor: pointer;
+        background: transparent;
+        color: var(--foreground);
+        border: 2px solid var(--border-secondary);
+        font: inherit;
+        font-size: 13px;
+        font-weight: 600;
+        line-height: 1;
+        white-space: nowrap;
+    }
+
+    /*
+      Two of these sit flush against each other, so the pair must not draw a
+      4px seam down the middle.
+    */
+    .flat-outline + .flat-outline {
+        border-left-width: 0;
+    }
+
+    .flat-outline:hover {
+        background: var(--surface);
+    }
+
+    .flat-outline:focus-visible {
+        outline: 2px solid var(--focus);
+        outline-offset: -4px;
+    }
+
+    /*
+      A hit target big enough to click without a box drawn around it. The
+      window-control cells in the Recognize titlebar use it at 35px, pane tools
+      at 22px.
+    */
+    .flat-iconbtn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 22px;
+        height: 22px;
+        flex: none;
+        cursor: pointer;
+        border: 0;
+        padding: 0;
+        color: var(--muted);
+        background: transparent;
+    }
+
+    .flat-iconbtn:hover:not(:disabled) {
+        color: var(--accent);
+    }
+
+    .flat-iconbtn:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+    }
+
+    .flat-iconbtn:focus-visible {
+        outline: 2px solid var(--focus);
+        outline-offset: -1px;
+    }
+}

@@ -1,0 +1,217 @@
+/*
+  Service settings, squared: underline tabs, no card around the list, rows
+  separated by rules and numbered in the margin.
+
+  The numbers are not decoration. This list is ordered and the order is what
+  decides which service answers first, which the old equal-weight rows said
+  nothing about -- so row 1 carries the accent and every row states its rank.
+
+  Built on src/styles/flat.css. Imported from src/style.css after
+  `@import '@heroui/styles'`, because several rules here override HeroUI's own
+  `.tabs*` and `.button`, and inside @layer components only source order
+  separates them.
+*/
+
+@layer components {
+    .service-page {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        min-height: 0;
+    }
+
+    /* ------------------------------------------------------------------ tabs */
+
+    /*
+      HeroUI's secondary tabs are already an underline, so this only has to
+      strip the container's own chrome and let the strip rule the full width.
+    */
+    .service-page .tabs__list-container {
+        border-bottom: 1px solid var(--border);
+        padding: 0 18px;
+        background: transparent;
+    }
+
+    .service-page .tabs__list {
+        justify-content: flex-start;
+        gap: 18px;
+        background: transparent;
+        border: 0;
+        padding: 0;
+    }
+
+    .service-page .tabs__tab {
+        height: 42px;
+        padding: 0 18px 0 0;
+        border-radius: 0;
+        background: transparent;
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 500;
+    }
+
+    .service-page .tabs__tab[data-selected='true'],
+    .service-page .tabs__tab[aria-selected='true'] {
+        color: var(--foreground);
+        font-weight: 700;
+        background: transparent;
+    }
+
+    /*
+      The indicator is drawn as an inset shadow on the tab rather than left to
+      HeroUI's own sliding pill, which is a filled rounded rect -- the one shape
+      this page is not allowed to have.
+    */
+    .service-page .tabs__tab[data-selected='true'] {
+        box-shadow: inset 0 -2px 0 var(--accent);
+    }
+
+    .service-page .tabs__indicator {
+        display: none;
+    }
+
+    .service-page .tabs__panel {
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        padding: 0;
+    }
+
+    /* ----------------------------------------------------------- list header */
+
+    /*
+      The count and the two add buttons. In the old layout the buttons were two
+      full-width accent slabs pinned under the list, which made adding a service
+      the loudest thing on a page about the services already there.
+    */
+    .service-head {
+        flex: none;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        padding: 14px 18px;
+    }
+
+    .service-head__count {
+        font-size: 11px;
+        font-weight: 600;
+        line-height: 1;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--muted);
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .service-head__actions {
+        display: flex;
+        flex: none;
+    }
+
+    /* ------------------------------------------------------------------ list */
+
+    .service-list {
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
+        border-top: 2px solid var(--border-secondary);
+    }
+
+    .service-row {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 16px 18px;
+        border-bottom: 1px solid var(--border);
+        background: transparent;
+    }
+
+    /* The row being dragged, and the row whose config is incomplete. */
+    .service-row--marked {
+        background: var(--surface);
+    }
+
+    /*
+      The rank. Fixed width so the logos below it line up in a column no matter
+      how many services are configured -- 01 and 10 have to occupy the same
+      space or the list develops a wobble.
+    */
+    .service-row__rank {
+        width: 26px;
+        flex: none;
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 1;
+        letter-spacing: 0.06em;
+        color: var(--muted);
+        font-variant-numeric: tabular-nums;
+    }
+
+    /* First in the list is first to answer, so it gets the accent. */
+    .service-row--first .service-row__rank {
+        color: var(--accent);
+    }
+
+    .service-row__logo {
+        width: 22px;
+        height: 22px;
+        flex: none;
+        object-fit: contain;
+        display: block;
+    }
+
+    .service-row__body {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .service-row__name {
+        font-size: 1rem;
+        font-weight: 600;
+        line-height: 1.3;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .service-row__note {
+        margin-top: 3px;
+        font-size: 11px;
+        line-height: 1;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--muted);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .service-row__tools {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        flex: none;
+        color: var(--muted);
+    }
+
+    /* The drag handle is a tool, not an action: it does nothing on click. */
+    .service-row__grip {
+        display: flex;
+        align-items: center;
+        cursor: grab;
+        color: inherit;
+    }
+
+    .service-row__grip:active {
+        cursor: grabbing;
+    }
+
+    .service-row__grip svg {
+        width: 17px;
+        height: 17px;
+        display: block;
+    }
+}

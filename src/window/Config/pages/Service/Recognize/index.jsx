@@ -1,13 +1,10 @@
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
-import Spacer from '../../../../../components/Spacer';
-import { Card, Button } from '@heroui/react';
 import toast, { Toaster } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 
 import { useToastStyle } from '../../../../../hooks';
 import SelectPluginModal from '../SelectPluginModal';
-import { osType } from '../../../../../utils/env';
 import { useConfig, deleteKey, useDisclosure } from '../../../../../hooks';
 import ServiceItem from './ServiceItem';
 import SelectModal from './SelectModal';
@@ -65,73 +62,81 @@ export default function Recognize(props) {
     return (
         <>
             <Toaster />
-            <Card
-                className={`${
-                    osType === 'Linux' ? 'h-[calc(100vh-140px)]' : 'h-[calc(100vh-120px)]'
-                } overflow-y-auto p-5 flex justify-between`}
-            >
-                <DragDropContext onDragEnd={onDragEnd}>
-                    <Droppable
-                        droppableId='droppable'
-                        direction='vertical'
-                    >
-                        {(provided) => (
-                            <div
-                                className='overflow-y-auto h-full'
-                                ref={provided.innerRef}
-                                {...provided.droppableProps}
-                            >
-                                {recognizeServiceInstanceList !== null &&
-                                    recognizeServiceInstanceList.map((x, i) => {
-                                        return (
-                                            <Draggable
-                                                key={x}
-                                                draggableId={x}
-                                                index={i}
-                                            >
-                                                {(provided) => {
-                                                    return (
-                                                        <div
-                                                            ref={provided.innerRef}
-                                                            {...provided.draggableProps}
-                                                        >
-                                                            <ServiceItem
-                                                                {...provided.dragHandleProps}
-                                                                serviceInstanceKey={x}
-                                                                key={x}
-                                                                pluginList={pluginList}
-                                                                deleteServiceInstance={deleteServiceInstance}
-                                                                setCurrentConfigKey={setCurrentConfigKey}
-                                                                onConfigOpen={onConfigOpen}
-                                                            />
-                                                            <Spacer y={2} />
-                                                        </div>
-                                                    );
-                                                }}
-                                            </Draggable>
-                                        );
-                                    })}
-                            </div>
-                        )}
-                    </Droppable>
-                </DragDropContext>
-                <Spacer y={2} />
-                <div className='flex'>
-                    <Button
-                        fullWidth
-                        onPress={onSelectOpen}
+            {/*
+                The count states what the numbers down the list mean: this is an
+                ordered list and the order is the priority. The two add buttons
+                shrink into this header -- as full-width slabs under the list
+                they were the loudest thing on a page about the services that
+                are already configured.
+            */}
+            <div className='service-head'>
+                <span className='service-head__count'>
+                    {t('config.service.instance_count', { count: recognizeServiceInstanceList?.length ?? 0 })}
+                </span>
+                <div className='service-head__actions'>
+                    <button
+                        type='button'
+                        className='flat-outline'
+                        onClick={onSelectOpen}
                     >
                         {t('config.service.add_builtin_service')}
-                    </Button>
-                    <Spacer x={2} />
-                    <Button
-                        fullWidth
-                        onPress={onSelectPluginOpen}
+                    </button>
+                    <button
+                        type='button'
+                        className='flat-outline'
+                        onClick={onSelectPluginOpen}
                     >
                         {t('config.service.add_external_service')}
-                    </Button>
+                    </button>
                 </div>
-            </Card>
+            </div>
+            <DragDropContext onDragEnd={onDragEnd}>
+                <Droppable
+                    droppableId='droppable'
+                    direction='vertical'
+                >
+                    {(provided) => (
+                        <div
+                            className='service-list'
+                            ref={provided.innerRef}
+                            {...provided.droppableProps}
+                        >
+                            {recognizeServiceInstanceList !== null &&
+                                recognizeServiceInstanceList.map((x, i) => {
+                                    return (
+                                        <Draggable
+                                            key={x}
+                                            draggableId={x}
+                                            index={i}
+                                        >
+                                            {(provided, snapshot) => {
+                                                return (
+                                                    <div
+                                                        ref={provided.innerRef}
+                                                        {...provided.draggableProps}
+                                                    >
+                                                        <ServiceItem
+                                                            {...provided.dragHandleProps}
+                                                            serviceInstanceKey={x}
+                                                            key={x}
+                                                            index={i}
+                                                            isDragging={snapshot.isDragging}
+                                                            pluginList={pluginList}
+                                                            deleteServiceInstance={deleteServiceInstance}
+                                                            setCurrentConfigKey={setCurrentConfigKey}
+                                                            onConfigOpen={onConfigOpen}
+                                                        />
+                                                    </div>
+                                                );
+                                            }}
+                                        </Draggable>
+                                    );
+                                })}
+                            {provided.placeholder}
+                        </div>
+                    )}
+                </Droppable>
+            </DragDropContext>
             <SelectPluginModal
                 isOpen={isSelectPluginOpen}
                 onOpenChange={onSelectPluginOpenChange}

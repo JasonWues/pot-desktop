@@ -1,0 +1,268 @@
+/*
+  The Recognize window, squared: a titlebar over two panes over a control bar,
+  divided by 2px rules rather than assembled from floating cards. Each pane
+  carries its own header -- what it is, what it can say about itself, and the
+  tools that act on it -- so the bottom bar is left holding only the two inputs
+  (service, language) and the two actions.
+
+  The image bleeds to its pane's edge. That is the point of dropping the card:
+  a screenshot is the content, and inset padding around it was only ever there
+  to make the card look like a card.
+
+  Built on src/styles/flat.css for the shared primitives. Imported from
+  src/style.css rather than from this window's index.jsx -- import order decides
+  ties inside @layer components, and App.jsx imports the window components
+  before its own stylesheet, so from there these rules would land before
+  HeroUI's `.button` and lose every tie to it.
+*/
+
+@layer components {
+    .recognize-window {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    /* -------------------------------------------------------------- titlebar */
+
+    .recognize-titlebar {
+        flex: none;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 35px;
+        border-bottom: 2px solid var(--border-secondary);
+    }
+
+    /*
+      The window controls are cells in the titlebar rather than buttons floating
+      in it, so each carries its own 2px left edge and the row reads as one
+      ruled strip. 35px square keeps them on the titlebar's own grid.
+    */
+    .recognize-titlebar .flat-iconbtn {
+        width: 35px;
+        height: 35px;
+    }
+
+    /*
+      WindowControl renders its own wrapper div around three HeroUI Buttons, so
+      the rule has to reach the buttons rather than the wrapper -- `> *` would
+      have drawn a single edge to the left of all three.
+    */
+    .recognize-controls,
+    .recognize-controls > div {
+        display: flex;
+        align-items: stretch;
+        flex: none;
+    }
+
+    .recognize-controls .button {
+        border-left: 2px solid var(--border-secondary);
+        border-radius: 0;
+    }
+
+    /* ----------------------------------------------------------------- panes */
+
+    .recognize-panes {
+        flex: 1;
+        min-height: 0;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .recognize-pane {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        overflow: hidden;
+    }
+
+    /* The seam between the two panes is the same strong rule as the titlebar's. */
+    .recognize-pane--left {
+        border-right: 2px solid var(--border-secondary);
+    }
+
+    .recognize-pane__head {
+        flex: none;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        height: 34px;
+        padding: 0 14px;
+        border-bottom: 1px solid var(--border);
+    }
+
+    /* Name and metadata share a baseline, which is what keeps 11px caps and
+       11px numerals from looking like two unrelated rows. */
+    .recognize-pane__title {
+        display: flex;
+        align-items: baseline;
+        gap: 12px;
+        min-width: 0;
+    }
+
+    .recognize-pane__tools {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex: none;
+        color: var(--foreground);
+    }
+
+    .recognize-pane__tools .flat-iconbtn {
+        width: 18px;
+        height: 18px;
+        color: inherit;
+    }
+
+    .recognize-pane__body {
+        flex: 1;
+        min-height: 0;
+        overflow: hidden;
+        position: relative;
+    }
+
+    /* The image, edge to edge. */
+    .recognize-image {
+        height: 100%;
+        width: 100%;
+        background: var(--surface);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .recognize-image img {
+        max-height: 100%;
+        max-width: 100%;
+        object-fit: contain;
+        display: block;
+    }
+
+    /* The recognized text, editable in place. `font: inherit` because a
+       textarea otherwise opts out of the app's family and size entirely. */
+    .recognize-text {
+        width: 100%;
+        height: 100%;
+        padding: 18px 14px;
+        border: 0;
+        resize: none;
+        outline: none;
+        background: transparent;
+        color: var(--foreground);
+        font: inherit;
+        font-size: 1rem;
+        line-height: 1.5;
+    }
+
+    .recognize-text--error {
+        color: var(--danger);
+    }
+
+    /* --------------------------------------------------------- the bottom bar */
+
+    /*
+      Inputs on the left, actions on the right, every cell full height with a
+      hairline between. `align-items: stretch` is load-bearing: it is what makes
+      the dividers rule the whole bar instead of floating in the middle of it.
+    */
+    .recognize-bar {
+        flex: none;
+        height: 50px;
+        display: flex;
+        align-items: stretch;
+        justify-content: space-between;
+        border-top: 2px solid var(--border-secondary);
+    }
+
+    .recognize-bar__group {
+        display: flex;
+        align-items: stretch;
+        min-width: 0;
+    }
+
+    .recognize-bar__group--inputs > * {
+        border-right: 1px solid var(--border);
+    }
+
+    .recognize-bar__group--actions > * {
+        border-left: 1px solid var(--border);
+    }
+
+    /*
+      A cell in the bar. Also the shape a HeroUI Dropdown trigger has to take,
+      which is why the reset is this thorough -- `.button` brings a background,
+      a radius, a height and its own padding, and every one of them has to go
+      for the cell to rule cleanly to the bar's edges.
+    */
+    .recognize-cell {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        height: 100%;
+        padding: 0 14px;
+        border-radius: 0;
+        border: 0;
+        cursor: pointer;
+        background: transparent;
+        color: var(--foreground);
+        font: inherit;
+        font-size: 13px;
+        font-weight: 500;
+        line-height: 1;
+        white-space: nowrap;
+        min-width: 0;
+    }
+
+    /*
+      HeroUI's Button paints `background-color: var(--button-bg)` and hovers to
+      `var(--button-bg-hover)`, so setting `background` alone would leave the
+      hover state pointing at whatever the variant's token says.
+    */
+    .recognize-cell {
+        --button-bg: transparent;
+        --button-bg-hover: var(--surface);
+    }
+
+    .recognize-cell:hover {
+        background: var(--surface);
+    }
+
+    .recognize-cell:focus-visible {
+        outline: 2px solid var(--focus);
+        outline-offset: -3px;
+    }
+
+    .recognize-cell img,
+    .recognize-cell svg {
+        display: block;
+        width: 16px;
+        height: 16px;
+        flex: none;
+    }
+
+    .recognize-cell > span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    /* The accent cell closes the bar, so it takes the wider padding. */
+    .recognize-bar .flat-primary {
+        height: 100%;
+        font-weight: 600;
+    }
+
+    /* In-place translation reports progress and failure in the bar itself. */
+    .recognize-bar__note {
+        display: flex;
+        align-items: center;
+        padding: 0 14px;
+        min-width: 0;
+    }
+
+    .recognize-bar__note--error {
+        color: var(--danger);
+    }
+}

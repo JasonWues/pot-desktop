@@ -4,7 +4,7 @@ import { convertFileSrc } from '@tauri-apps/api/core';
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 import React, { useState, useEffect } from 'react';
 import { listen } from '@tauri-apps/api/event';
-import { Button } from '@heroui/react';
+import { useTranslation } from 'react-i18next';
 import { BsPinFill } from 'react-icons/bs';
 import { atom, useAtom } from 'jotai';
 
@@ -58,6 +58,7 @@ export default function Recognize() {
     const [pined, setPined] = useState(false);
     const [serviceInstanceList] = useConfig('recognize_service_list', ['system', 'tesseract']);
     const [serviceInstanceConfigMap, setServiceInstanceConfigMap] = useState(null);
+    const { t } = useTranslation();
 
     const loadPluginList = async () => {
         let temp = {};
@@ -108,20 +109,25 @@ export default function Recognize() {
         pluginList &&
         serviceInstanceConfigMap !== null && (
             <div
-                className={`bg-background h-screen ${osType === 'Linux' ? 'rounded-[10px] border-1 border-border' : ''}`}
+                className={`recognize-window bg-background h-screen ${osType === 'Linux' ? 'rounded-[10px] border-1 border-border' : ''}`}
             >
+                {/*
+                    The drag region is the titlebar itself rather than a fixed
+                    strip laid over it. Tauri checks the attribute on the event
+                    target, so the buttons inside -- which do not carry it --
+                    still take their own clicks.
+                */}
                 <div
+                    className={`recognize-titlebar ${osType === 'Darwin' ? 'justify-end' : ''}`}
                     data-tauri-drag-region='true'
-                    className='fixed top-[5px] left-[5px] right-[5px] h-[30px]'
-                />
-                <div className={`h-[35px] flex ${osType === 'Darwin' ? 'justify-end' : 'justify-between'}`}>
-                    <Button
-                        isIconOnly
-                        size='sm'
-                        variant='tertiary'
-                        disableAnimation
-                        className='my-auto mx-[5px] bg-transparent'
-                        onPress={() => {
+                >
+                    <button
+                        type='button'
+                        className='flat-iconbtn'
+                        title={t('recognize.pin')}
+                        aria-label={t('recognize.pin')}
+                        aria-pressed={pined}
+                        onClick={() => {
                             if (pined) {
                                 if (closeOnBlur) {
                                     unlisten = listenBlur();
@@ -134,24 +140,22 @@ export default function Recognize() {
                             setPined(!pined);
                         }}
                     >
-                        <BsPinFill className={`text-[20px] ${pined ? 'text-accent' : 'text-muted'}`} />
-                    </Button>
-                    {osType !== 'Darwin' && <WindowControl />}
+                        <BsPinFill className={`text-[18px] ${pined ? 'text-accent' : ''}`} />
+                    </button>
+                    {osType !== 'Darwin' && (
+                        <div className='recognize-controls'>
+                            <WindowControl />
+                        </div>
+                    )}
                 </div>
-                <div
-                    className={`${
-                        osType === 'Linux' ? 'h-[calc(100vh-87px)]' : 'h-[calc(100vh-85px)]'
-                    } grid grid-cols-2`}
-                >
+                <div className='recognize-panes'>
                     <ImageArea />
                     <TextArea serviceInstanceConfigMap={serviceInstanceConfigMap} />
                 </div>
-                <div className='h-[50px]'>
-                    <ControlArea
-                        serviceInstanceList={serviceInstanceList}
-                        serviceInstanceConfigMap={serviceInstanceConfigMap}
-                    />
-                </div>
+                <ControlArea
+                    serviceInstanceList={serviceInstanceList}
+                    serviceInstanceConfigMap={serviceInstanceConfigMap}
+                />
             </div>
         )
     );

@@ -1,9 +1,5 @@
 import { RxDragHandleHorizontal } from 'react-icons/rx';
-import Spacer from '../../../../../../components/Spacer';
-import { Button } from '@heroui/react';
-import { MdDeleteOutline } from 'react-icons/md';
 import { useTranslation } from 'react-i18next';
-import { BiSolidEdit } from 'react-icons/bi';
 import React from 'react';
 
 import {
@@ -17,81 +13,83 @@ import { osType } from '../../../../../../utils/env';
 import { useConfig } from '../../../../../../hooks';
 
 export default function ServiceItem(props) {
-    const { serviceInstanceKey, pluginList, deleteServiceInstance, setCurrentConfigKey, onConfigOpen, ...drag } = props;
+    const {
+        serviceInstanceKey,
+        pluginList,
+        deleteServiceInstance,
+        setCurrentConfigKey,
+        onConfigOpen,
+        index,
+        isDragging,
+        ...drag
+    } = props;
     const { t } = useTranslation();
 
-    const [serviceInstanceConfig, setServiceInstanceConfig] = useConfig(serviceInstanceKey, {});
+    const [serviceInstanceConfig] = useConfig(serviceInstanceKey, {});
 
     const serviceSourceType = getServiceSouceType(serviceInstanceKey);
     const serviceName = getServiceName(serviceInstanceKey);
+    const isPlugin = serviceSourceType === ServiceSourceType.PLUGIN;
 
-    return serviceSourceType === ServiceSourceType.PLUGIN && !(serviceName in pluginList) ? (
+    return isPlugin && !(serviceName in pluginList) ? (
         <></>
     ) : (
         serviceInstanceConfig !== null && (
-            <div className='bg-surface-secondary rounded-md px-[10px] py-[20px] flex justify-between'>
-                <div className='flex'>
-                    <div
+            <div
+                className={`service-row ${index === 0 ? 'service-row--first' : ''} ${
+                    isDragging ? 'service-row--marked' : ''
+                }`}
+            >
+                <span className='service-row__rank'>{String(index + 1).padStart(2, '0')}</span>
+                <img
+                    className='service-row__logo'
+                    src={
+                        isPlugin
+                            ? pluginList[serviceName].icon
+                            : serviceName === 'system'
+                              ? `logo/${osType}.svg`
+                              : builtinServices[serviceName].info.icon
+                    }
+                    draggable={false}
+                />
+                <div className='service-row__body'>
+                    <div className='service-row__name'>
+                        {serviceInstanceConfig[INSTANCE_NAME_CONFIG_KEY] ||
+                            (isPlugin ? pluginList[serviceName].display : t(`services.tts.${serviceName}.title`))}
+                    </div>
+                    <div className='service-row__note'>
+                        {[index === 0 ? t('config.service.default') : null, isPlugin ? t('common.plugin') : null]
+                            .filter(Boolean)
+                            .join(' · ')}
+                    </div>
+                </div>
+                <div className='service-row__tools'>
+                    <span
                         {...drag}
-                        className='text-2xl my-auto'
+                        className='service-row__grip'
+                        aria-label={t('config.service.reorder')}
                     >
                         <RxDragHandleHorizontal />
-                    </div>
-
-                    <Spacer x={2} />
-                    {serviceSourceType === ServiceSourceType.BUILDIN && (
-                        <>
-                            <img
-                                src={
-                                    serviceName === 'system_tts'
-                                        ? `logo/${osType}.svg`
-                                        : builtinServices[serviceName].info.icon
-                                }
-                                className='h-[24px] w-[24px] my-auto'
-                                draggable={false}
-                            />
-                            <Spacer x={2} />
-                            <h2 className='my-auto'>
-                                {serviceInstanceConfig[INSTANCE_NAME_CONFIG_KEY] ||
-                                    t(`services.tts.${serviceName}.title`)}
-                            </h2>
-                        </>
-                    )}
-                    {serviceSourceType === ServiceSourceType.PLUGIN && (
-                        <>
-                            <img
-                                src={pluginList[serviceName].icon}
-                                className='h-[24px] w-[24px] my-auto'
-                                draggable={false}
-                            />
-                            <Spacer x={2} />
-                            <h2 className='my-auto'>{`${serviceInstanceConfig[INSTANCE_NAME_CONFIG_KEY] || pluginList[serviceName].display} [${t('common.plugin')}]`}</h2>
-                        </>
-                    )}
-                </div>
-                <div className='flex'>
-                    <Button
-                        isIconOnly
-                        size='sm'
-                        variant='tertiary'
-                        onPress={() => {
+                    </span>
+                    <button
+                        type='button'
+                        className='flat-action'
+                        onClick={() => {
                             setCurrentConfigKey(serviceInstanceKey);
                             onConfigOpen();
                         }}
                     >
-                        <BiSolidEdit className='text-2xl' />
-                    </Button>
-                    <Spacer x={2} />
-                    <Button
-                        isIconOnly
-                        size='sm'
-                        variant='danger-soft'
-                        onPress={() => {
+                        {t('config.service.edit')}
+                    </button>
+                    <button
+                        type='button'
+                        className='flat-action flat-action--danger'
+                        onClick={() => {
                             deleteServiceInstance(serviceInstanceKey);
                         }}
                     >
-                        <MdDeleteOutline className='text-2xl' />
-                    </Button>
+                        {t('config.service.remove')}
+                    </button>
                 </div>
             </div>
         )

@@ -72,21 +72,24 @@ export default function Service() {
     return (
         pluginList !== null && (
             /*
-              v2 put `className` on the tab-list wrapper, so `justify-center
-              max-h-[calc(100%-40px)] overflow-y-auto` here only ever constrained
-              the strip of tab labels. v3 puts it on the root, which also wraps
-              every panel -- the clamp then cut the panel short and gave the page
-              a second scrollbar outside the list's own, with the two "add
-              service" buttons stranded past the fold. The panel content already
-              carries `h-[calc(100vh-120px)] overflow-y-auto`, which is the one
-              scroller this page should have.
+              `className` lands on the Tabs ROOT in v3, which wraps every panel
+              as well as the label strip -- so anything clamping height here
+              clamps the panels too. That is why the root only establishes the
+              column and the one scroller lives on `.service-list` inside each
+              panel; a height cap here previously cut the panel short and gave
+              the page a second scrollbar outside the list's own.
+
+              `variant='secondary'` asks for HeroUI's underline tabs. The look
+              does not depend on it -- style.css restyles `.tabs__tab` either
+              way -- but v3 drops unknown props silently, so the prop is here to
+              carry the intent rather than to be load-bearing.
             */
-            <Tabs className='flex h-full flex-col'>
+            <Tabs
+                className='service-page'
+                variant='secondary'
+            >
                 <Tabs.ListContainer>
-                    <Tabs.List
-                        className='justify-center'
-                        aria-label={t('config.service.label')}
-                    >
+                    <Tabs.List aria-label={t('config.service.label')}>
                         <Tabs.Tab id='translate'>
                             {t(`config.service.translate`)}
                             <Tabs.Indicator />

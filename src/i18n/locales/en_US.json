@@ -185,7 +185,15 @@
                 "install_plugin": "Install Plugin",
                 "view_plugin_list": "View Plugin List",
                 "uninstall_success": "Plugin Uninstall Successfully",
-                "homepage": "Homepage"
+                "homepage": "Homepage",
+                "instance_count": "{{count}} instances · order sets priority",
+                "default": "Default",
+                "edit": "Edit",
+                "remove": "Remove",
+                "reorder": "Reorder",
+                "disabled": "Disabled",
+                "enable": "Enable",
+                "disable": "Disable"
             },
             "history": {
                 "label": "History",
@@ -535,7 +543,12 @@
             "in_place_translate": "Translate image",
             "in_place_restore": "Show original",
             "in_place_recognizing": "Recognizing…",
-            "in_place_translating": "Translating {{done}}/{{total}}"
+            "in_place_translating": "Translating {{done}}/{{total}}",
+            "image": "Capture",
+            "text": "Text",
+            "char_count": "{{count}} chars",
+            "recognizing": "Recognizing…",
+            "pin": "Pin window"
         }
     }
 }

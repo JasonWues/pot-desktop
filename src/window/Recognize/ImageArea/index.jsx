@@ -1,4 +1,3 @@
-import { Card, CardContent, CardFooter, Button, Tooltip } from '@heroui/react';
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 import React, { useEffect, useRef, useState } from 'react';
 import { listen } from '@tauri-apps/api/event';
@@ -26,6 +25,10 @@ export default function ImageArea() {
     const language = useAtomValue(languageAtom);
     const pluginList = useAtomValue(pluginListAtom);
     const [inPlace, setInPlace] = useState({ state: 'idle' });
+    // Read off the decoded image rather than tracked separately: the pane header
+    // states the capture's real pixel size, which is the one fact about it the
+    // window can offer without asking anyone.
+    const [size, setSize] = useState(null);
     const { t } = useTranslation();
 
     const toggleInPlace = async () => {
@@ -75,19 +78,60 @@ export default function ImageArea() {
     }, [hideWindow]);
 
     return (
-        <Card
-            shadow='none'
-            className='bg-surface h-full ml-[12px] mr-[6px]'
-            radius='10'
-        >
-            <CardContent className='bg-surface h-full p-0 relative'>
+        <div className='recognize-pane recognize-pane--left'>
+            {/*
+                The pane says what it holds and how big it is, and carries the
+                two tools that act on it -- copying the image, and translating
+                in place. Both used to sit in a footer under a card; here the
+                header is the only chrome and the image gets the rest.
+            */}
+            <div className='recognize-pane__head'>
+                <div className='recognize-pane__title'>
+                    <span className='flat-label'>{t('recognize.image')}</span>
+                    {size && (
+                        <span className='flat-meta'>
+                            {size.width} × {size.height}
+                        </span>
+                    )}
+                </div>
+                <div className='recognize-pane__tools'>
+                    <button
+                        type='button'
+                        className='flat-iconbtn'
+                        title={t('recognize.copy_img')}
+                        aria-label={t('recognize.copy_img')}
+                        disabled={base64 === ''}
+                        onClick={async () => {
+                            await invoke('copy_img');
+                        }}
+                    >
+                        <MdContentCopy />
+                    </button>
+                    <button
+                        type='button'
+                        className='flat-action'
+                        title={inPlaceLabel}
+                        disabled={base64 === '' || inPlace.state === 'ocr' || inPlace.state === 'translating'}
+                        onClick={toggleInPlace}
+                    >
+                        <HiTranslate />
+                        {inPlaceLabel}
+                    </button>
+                </div>
+            </div>
+            <div className='recognize-pane__body'>
                 {base64 !== '' && (
-                    <>
+                    <div className='recognize-image'>
                         <img
                             ref={imgRef}
                             draggable={false}
-                            className='object-contain h-full w-full'
                             src={'data:image/png;base64,' + base64}
+                            onLoad={(e) =>
+                                setSize({
+                                    width: e.currentTarget.naturalWidth,
+                                    height: e.currentTarget.naturalHeight,
+                                })
+                            }
                         />
                         <InPlaceOverlay
                             ref={overlayRef}
@@ -97,39 +141,14 @@ export default function ImageArea() {
                             pluginList={pluginList}
                             onStatus={setInPlace}
                         />
-                    </>
+                    </div>
                 )}
-            </CardContent>
-            <CardFooter className='bg-surface flex justify-start px-[12px] gap-[4px]'>
-                <Tooltip>
-                    <Tooltip.Trigger>
-                        <Button
-                            isIconOnly
-                            size='sm'
-                            variant='tertiary'
-                            onPress={async () => {
-                                await invoke('copy_img');
-                            }}
-                        >
-                            <MdContentCopy className='text-[16px]' />
-                        </Button>
-                    </Tooltip.Trigger>
-                    <Tooltip.Content>{t('recognize.copy_img')}</Tooltip.Content>
-                </Tooltip>
-                <Button
-                    size='sm'
-                    variant='tertiary'
-                    isPending={inPlace.state === 'ocr' || inPlace.state === 'translating'}
-                    isDisabled={base64 === ''}
-                    onPress={toggleInPlace}
-                >
-                    <HiTranslate className='text-[16px]' />
-                    {inPlaceLabel}
-                </Button>
-                {inPlace.state === 'error' && (
-                    <span className='text-danger text-[12px] truncate'>{inPlace.message}</span>
-                )}
-            </CardFooter>
-        </Card>
+            </div>
+            {inPlace.state === 'error' && (
+                <div className='recognize-pane__head recognize-bar__note--error'>
+                    <span className='flat-meta recognize-bar__note--error'>{inPlace.message}</span>
+                </div>
+            )}
+        </div>
     );
 }

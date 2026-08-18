@@ -1,4 +1,4 @@
-import { Card, CardContent, CardFooter, Button, Skeleton, ButtonGroup, Tooltip } from '@heroui/react';
+import { Skeleton } from '@heroui/react';
 import { sendNotification } from '@tauri-apps/plugin-notification';
 import { writeText } from '@tauri-apps/plugin-clipboard-manager';
 import { atom, useAtom, useAtomValue } from 'jotai';
@@ -34,6 +34,15 @@ export default function TextArea(props) {
     const [error, setError] = useState('');
     const pluginList = useAtomValue(pluginListAtom);
     const { t } = useTranslation();
+
+    // Which service produced the text on screen. The pane header states it, so
+    // the reader can tell a bad result from the wrong engine without opening
+    // the picker in the bar below.
+    const serviceName =
+        currentServiceInstanceKey &&
+        (getServiceSouceType(currentServiceInstanceKey) === ServiceSourceType.PLUGIN
+            ? pluginList?.[getServiceName(currentServiceInstanceKey)]?.display
+            : t(`services.recognize.${getServiceName(currentServiceInstanceKey)}.title`));
 
     useEffect(() => {
         setText('');
@@ -131,23 +140,76 @@ export default function TextArea(props) {
         }
     }, [base64, currentServiceInstanceKey, language, recognizeFlag, autoCopy, deleteNewline, hideWindow]);
 
+    const hasText = !loading && !!text;
+
     return (
-        <Card
-            shadow='none'
-            className='bg-surface h-full ml-[6px] mr-[12px]'
-            radius='10'
-        >
-            <CardContent className='bg-surface p-0 h-full'>
+        <div className='recognize-pane'>
+            {/*
+                Char count and the service that produced the text: the two facts
+                that were previously nowhere, and the reason the bottom bar no
+                longer needs to name the service twice.
+            */}
+            <div className='recognize-pane__head'>
+                <div className='recognize-pane__title'>
+                    <span className='flat-label'>{t('recognize.text')}</span>
+                    <span className='flat-meta'>
+                        {loading
+                            ? t('recognize.recognizing')
+                            : [text ? t('recognize.char_count', { count: text.length }) : null, serviceName]
+                                  .filter(Boolean)
+                                  .join(' · ')}
+                    </span>
+                </div>
+                <div className='recognize-pane__tools'>
+                    <button
+                        type='button'
+                        className='flat-iconbtn'
+                        title={t('recognize.copy_text')}
+                        aria-label={t('recognize.copy_text')}
+                        disabled={!hasText}
+                        onClick={() => {
+                            writeText(text);
+                        }}
+                    >
+                        <MdContentCopy />
+                    </button>
+                    <button
+                        type='button'
+                        className='flat-iconbtn'
+                        title={t('recognize.delete_newline')}
+                        aria-label={t('recognize.delete_newline')}
+                        disabled={!hasText}
+                        onClick={() => {
+                            setText(text.replace(/\-\s+/g, '').replace(/\s+/g, ' '));
+                        }}
+                    >
+                        <MdSmartButton />
+                    </button>
+                    <button
+                        type='button'
+                        className='flat-iconbtn'
+                        title={t('recognize.delete_space')}
+                        aria-label={t('recognize.delete_space')}
+                        disabled={!hasText}
+                        onClick={() => {
+                            setText(text.replaceAll(' ', ''));
+                        }}
+                    >
+                        <CgSpaceBetween />
+                    </button>
+                </div>
+            </div>
+            <div className='recognize-pane__body'>
                 {loading ? (
-                    <div className='space-y-3 m-[12px]'>
-                        <Skeleton className='w-3/5 rounded-lg'>
-                            <div className='h-3 w-3/5 rounded-lg bg-default'></div>
+                    <div className='space-y-3 p-[14px] pt-[18px]'>
+                        <Skeleton className='w-3/5'>
+                            <div className='h-3 w-3/5 bg-default'></div>
                         </Skeleton>
-                        <Skeleton className='w-4/5 rounded-lg'>
-                            <div className='h-3 w-4/5 rounded-lg bg-default'></div>
+                        <Skeleton className='w-4/5'>
+                            <div className='h-3 w-4/5 bg-default'></div>
                         </Skeleton>
-                        <Skeleton className='w-2/5 rounded-lg'>
-                            <div className='h-3 w-2/5 rounded-lg bg-default-300'></div>
+                        <Skeleton className='w-2/5'>
+                            <div className='h-3 w-2/5 bg-default'></div>
                         </Skeleton>
                     </div>
                 ) : (
@@ -155,7 +217,7 @@ export default function TextArea(props) {
                         {text && (
                             <textarea
                                 value={text}
-                                className='bg-surface h-full m-[12px] mb-0 resize-none focus:outline-hidden'
+                                className='recognize-text'
                                 onChange={(e) => {
                                     setText(e.target.value);
                                 }}
@@ -165,64 +227,12 @@ export default function TextArea(props) {
                             <textarea
                                 value={error}
                                 readOnly
-                                className='bg-surface h-full m-[12px] mb-0 resize-none focus:outline-hidden text-red-500'
-                                onChange={(e) => {
-                                    setText(e.target.value);
-                                }}
+                                className='recognize-text recognize-text--error'
                             />
                         )}
                     </>
                 )}
-            </CardContent>
-            <CardFooter className='bg-surface flex justify-start px-[12px]'>
-                <ButtonGroup>
-                    <Tooltip>
-                        <Tooltip.Trigger>
-                            <Button
-                                isIconOnly
-                                size='sm'
-                                variant='tertiary'
-                                onPress={() => {
-                                    writeText(text);
-                                }}
-                            >
-                                <MdContentCopy className='text-[16px]' />
-                            </Button>
-                        </Tooltip.Trigger>
-                        <Tooltip.Content>{t('recognize.copy_text')}</Tooltip.Content>
-                    </Tooltip>
-                    <Tooltip>
-                        <Tooltip.Trigger>
-                            <Button
-                                isIconOnly
-                                variant='tertiary'
-                                size='sm'
-                                onPress={() => {
-                                    setText(text.replace(/\-\s+/g, '').replace(/\s+/g, ' '));
-                                }}
-                            >
-                                <MdSmartButton className='text-[16px]' />
-                            </Button>
-                        </Tooltip.Trigger>
-                        <Tooltip.Content>{t('recognize.delete_newline')}</Tooltip.Content>
-                    </Tooltip>
-                    <Tooltip>
-                        <Tooltip.Trigger>
-                            <Button
-                                isIconOnly
-                                variant='tertiary'
-                                size='sm'
-                                onPress={() => {
-                                    setText(text.replaceAll(' ', ''));
-                                }}
-                            >
-                                <CgSpaceBetween className='text-[16px]' />
-                            </Button>
-                        </Tooltip.Trigger>
-                        <Tooltip.Content>{t('recognize.delete_space')}</Tooltip.Content>
-                    </Tooltip>
-                </ButtonGroup>
-            </CardFooter>
-        </Card>
+            </div>
+        </div>
     );
 }
