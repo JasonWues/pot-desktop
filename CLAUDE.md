@@ -11,6 +11,7 @@ Pot is a cross-platform translation + OCR desktop app: a React 18 frontend (Vite
 ```bash
 pnpm install            # install JS deps
 pnpm tauri dev          # run the app (starts vite on :1420, then cargo)
+pnpm dev:mcp            # run the app (starts vite on :1420, then cargo) with mcp 
 pnpm tauri build        # build installers for the current platform
 pnpm dev                # frontend only — mostly useless, every window calls into Tauri
 npx prettier --write .  # format (config in .prettierrc.json: 4 spaces, single quotes, 120 cols)

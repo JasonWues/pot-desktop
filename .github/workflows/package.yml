@@ -22,16 +22,36 @@ jobs:
                   sudo apt-get install -y git
             - id: outputstep
               run: |
-                  echo "VERSION=$(git describe --tags | sed 's/-[0-9]*-.*//g')" >> "$GITHUB_OUTPUT"
-            - name: Change Version for Windows
+                  # Derived once and reused, rather than re-running `git describe`
+                  # in every substitution below.
+                  #
+                  # The guard is not theoretical: `git describe --tags` exits
+                  # non-zero on a checkout with no tags, and a failing command
+                  # substitution inside an assignment does not trip `set -e`, so
+                  # the old form quietly produced an empty VERSION -- which then
+                  # got written into both manifests as `"version": ""`.
+                  VERSION=$(git describe --tags | sed 's/-[0-9]*-.*//g')
+                  if [ -z "$VERSION" ]; then
+                      echo "::error::git describe --tags produced no version -- does this checkout have tags?"
+                      exit 1
+                  fi
+                  echo "VERSION=$VERSION" >> "$GITHUB_OUTPUT"
+            - name: Change Version
+              env:
+                  VERSION: ${{ steps.outputstep.outputs.VERSION }}
               run: |
-                  sed -i "s/\"version\":.*/\"version\": \"$(git describe --tags | sed 's/-[0-9]*-.*//g')\",/g" package.json
+                  sed -i "s/\"version\":.*/\"version\": \"$VERSION\",/g" package.json
 
-                  sed -i "s/\"version\":.*/\"version\": \"$(git describe --tags | sed 's/-[0-9]*-.*//g')\"/g" src-tauri/tauri.conf.json
+                  # The trailing comma is not optional here. `version` is followed
+                  # by `identifier` in tauri.conf.json, so writing the line without
+                  # one left the file as invalid JSON -- and the `pnpm prettier
+                  # --write .` step that all three build jobs run then died on it
+                  # with "Unexpected token, expected ','", failing every release.
+                  sed -i "s/\"version\":.*/\"version\": \"$VERSION\",/g" src-tauri/tauri.conf.json
 
-                  sed -i "s/version = \"0.0.0\"/version = \"$(git describe --tags | sed 's/-[0-9]*-.*//g')\"/g" src-tauri/Cargo.toml
+                  sed -i "s/version = \"0.0.0\"/version = \"$VERSION\"/g" src-tauri/Cargo.toml
 
-                  echo $(git describe --tags | sed 's/-[0-9]*-.*//g')
+                  echo "$VERSION"
 
             - name: Upload Artifacts for Windows
               uses: actions/upload-artifact@v4
