@@ -9,11 +9,11 @@
   preflight `* { margin: 0 }` lives. That silently ate `.config-item`'s margin
   while leaving its display rules intact.
 
-  `nocturne` sits after `utilities` on purpose -- it is the one layer that has to
-  win against them, because it restyles utility classes themselves. See
-  src/themes/nocturne.css.
+  A theme that needs to restyle utility CLASSES rather than just retint their
+  tokens has to append its own layer after `utilities` here, since nothing in
+  `components` can outrank them.
 */
-@layer theme, base, components, utilities, nocturne;
+@layer theme, base, components, utilities;
 
 /*
   In `components`, not at the top level: Tailwind 4 puts utilities in

@@ -8,8 +8,6 @@
 @import '@heroui/styles';
 @import './themes/light.css';
 @import './themes/dark.css';
-@import './themes/nocturne.css';
-@import './themes/modernist.css';
 
 /*
   The translate window's own component classes. It is imported from here rather
@@ -22,16 +20,16 @@
 
 /*
   v3 selects a theme with `data-theme` on <html> rather than a class, so the
-  `dark:` variant has to follow the attribute. Both dark themes trigger it:
-  Nocturne is a dark theme, and without this every `dark:` utility -- the app's
-  own handful plus the many HeroUI's own components carry -- would fall back to
-  its light value under it.
+  `dark:` variant has to follow the attribute -- without this every `dark:`
+  utility (the app's own handful plus the many HeroUI's own components carry)
+  would fall back to its light value. Any further dark theme has to be added to
+  this list or it inherits the same bug.
 
   `:is()`, not `:where()`. `:where()` scores zero, which would drop every dark:
   utility from 0,2,0 to 0,1,0 and hand ties to whichever plain utility happens to
   be emitted later.
 */
-@custom-variant dark (&:is([data-theme='dark'] *, [data-theme='nocturne'] *));
+@custom-variant dark (&:is([data-theme='dark'] *));
 
 /*
   The default border color changed to `currentcolor` in Tailwind 4, so this keeps

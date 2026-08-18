@@ -69,8 +69,6 @@
                 "theme": {
                     "light": "Light",
                     "dark": "Dark",
-                    "nocturne": "Nocturne",
-                    "modernist": "Modernist",
                     "system": "System"
                 },
                 "transparent": "Transparent Effect",

@@ -1,25 +1,19 @@
 /*
-  The translate window, restyled after the Modernist design system (option 1b of
-  the design study): flat, zero radius, nothing floating. The window is one
-  column of sections butted against each other and separated by rules -- a 2px
-  rule between the major parts (source / languages / the answer) and a 1px
-  divider between minor ones (the collapsed services). Actions are flush-left
-  uppercase word labels rather than icon buttons, and machine facts (latency,
-  progress, failure) are set in the monospace face on the right of a row.
+  The translate window: flat, nothing floating. One column of sections butted
+  against each other and separated by rules -- a strong 2px rule between the
+  major parts (source / languages / the answer) and a 1px divider between minor
+  ones (the collapsed services). Actions are flush-left word labels rather than
+  icon buttons, and machine facts (latency, progress, failure) are set in the
+  monospace face on the right of a row.
 
-  Everything here is painted with v3 theme tokens, so the structure holds under
-  light, dark and nocturne; the Modernist palette itself -- ink rules, the red
-  accent, radius 0 -- is a theme (themes/modernist.css), not a hard-coded look.
-  The two tokens doing the structural work:
+  Nothing here hard-codes a colour. The whole grid rests on two theme tokens --
+  `--border-secondary` for the strong rule and `--border` for the hairline -- so
+  the same markup reads correctly under every theme, including ones added later.
 
-    --border-secondary   the strong 2px rule   (modernist: full ink)
-    --border             the 1px divider       (modernist: 40% ink)
-
-  Type is deliberately NOT specified as a family. Modernist is set in Archivo,
-  but the app font is a user setting applied inline on <html> from App.jsx, and
-  a stylesheet that overrode it would silently override that choice -- the same
-  call nocturne makes. The Modernist voice here comes from weight, tracking and
-  case, which any family carries.
+  Type is deliberately NOT specified as a family either: the app font is a user
+  setting applied inline on <html> from App.jsx, and a stylesheet that overrode
+  it would silently override that choice. The voice comes from weight, tracking
+  and case, which any family carries.
 
   Imported from src/style.css rather than from the window's own index.jsx.
   Import order decides ties inside @layer components, and App.jsx imports the
@@ -89,9 +83,9 @@
     }
 
     /*
-      The close control, drawn as the design draws it: a filled square that takes
-      the accent on hover. It is the one glyph in the window with no word or
-      familiar icon behind it, so title/aria-label carry the meaning.
+      The close control: a filled square that takes the accent on hover. It is
+      the one glyph in the window with no word or familiar icon behind it, so
+      title/aria-label carry the meaning.
     */
     .translate-close {
         width: 11px;
@@ -204,7 +198,7 @@
         align-items: center;
         padding: 0 8px;
         border-left: 1px solid var(--border);
-        color: var(--accent-text, var(--accent));
+        color: var(--accent);
         font-size: 10px;
         font-weight: 600;
         line-height: 1;
@@ -323,7 +317,7 @@
     }
 
     .translate-langbtn--on {
-        color: var(--accent-text, var(--accent));
+        color: var(--accent);
     }
 
     /* -------------------------------------------------------------- services */

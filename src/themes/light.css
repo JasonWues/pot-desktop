@@ -22,8 +22,8 @@
   composited to over an #eeeeee card (0.4 x #999999 + 0.6 x #eeeeee), and it is
   the only value that also stays visible on the #dddddd service rows -- #dddddd
   itself is `--surface-secondary`, so a tertiary button there vanished entirely.
-  The dark and nocturne themes did not have this problem: their `default` scale
-  runs darkest -> lightest, so the same index already landed near the surface.
+  The dark theme did not have this problem: its `default` scale runs
+  darkest -> lightest, so the same index already landed near the surface.
 */
 @layer base {
     :root,
