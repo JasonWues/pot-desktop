@@ -224,3 +224,35 @@ html {
 *::-webkit-scrollbar-thumb:hover {
     background: #c0c1c550;
 }
+
+/*
+  The collapse on each translation result. It used to be a framer-motion
+  `animate={{ height: 'auto' }}`, which was the last thing in the app pulling
+  that package in -- HeroUI v2 peered on it, v3 does not, and one animation is a
+  poor reason to ship 5MB.
+
+  `grid-template-rows: 0fr -> 1fr` is the portable way to animate to a height
+  nobody has measured. `interpolate-size: allow-keywords` would be more direct
+  but is Chromium-only, and this app also runs on WKWebView and WebKitGTK.
+
+  `@starting-style` keeps what framer's `initial={{ height: 0 }}` gave: the card
+  expands as the first result lands rather than appearing at full height.
+*/
+@layer components {
+    .collapsible {
+        display: grid;
+        overflow: hidden;
+        grid-template-rows: 1fr;
+        transition: grid-template-rows 300ms var(--ease-out, ease-out);
+    }
+
+    .collapsible[data-collapsed='true'] {
+        grid-template-rows: 0fr;
+    }
+
+    @starting-style {
+        .collapsible {
+            grid-template-rows: 0fr;
+        }
+    }
+}

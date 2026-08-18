@@ -22,7 +22,6 @@ import { useTranslation } from 'react-i18next';
 import { GiCycle } from 'react-icons/gi';
 import { useAtomValue } from 'jotai';
 import { nanoid } from 'nanoid';
-import { motion } from 'framer-motion';
 
 import * as builtinCollectionServices from '../../../../services/collection';
 import { sourceLanguageAtom, targetLanguageAtom, aiPresetAtom } from '../LanguageArea';
@@ -462,14 +461,16 @@ export default function TargetArea(props) {
                     </Button>
                 </div>
             </CardHeader>
-            {/* `height: auto` is measured by framer-motion itself, which is why this
-                needs neither react-spring nor a measuring hook. */}
-            <motion.div
-                initial={{ height: 0 }}
-                animate={{ height: hide ? 0 : 'auto' }}
-                style={{ overflow: 'hidden' }}
+            {/* The one thing framer-motion was still here for: animating to a height
+                nobody has measured. `grid-template-rows: 0fr -> 1fr` does the same
+                without it, and unlike `interpolate-size` it is not Chromium-only --
+                this app also runs on WKWebView and WebKitGTK. The inner div needs
+                `min-h-0`, or it refuses to shrink below its own content. */}
+            <div
+                className='collapsible'
+                data-collapsed={hide}
             >
-                <div>
+                <div className='min-h-0 overflow-hidden'>
                     {/* result content */}
                     <CardContent className={`p-[12px] pb-0 ${hide ? 'h-0 p-0' : ''}`}>
                         {typeof result === 'string' ? (
@@ -858,7 +859,7 @@ export default function TargetArea(props) {
                         </ButtonGroup>
                     </CardFooter>
                 </div>
-            </motion.div>
+            </div>
         </Card>
     );
 }

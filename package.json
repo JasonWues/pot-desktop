@@ -34,7 +34,6 @@
         "@tauri-apps/plugin-updater": "^2.0.2",
         "crypto-js": "^4.2.0",
         "flag-icons": "^7.5.0",
-        "framer-motion": "^13.1.0",
         "i18next": "^26.3.6",
         "jotai": "^2.10.1",
         "jsqr": "^1.4.0",
