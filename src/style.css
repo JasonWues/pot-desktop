@@ -9,6 +9,16 @@
 @import './themes/light.css';
 @import './themes/dark.css';
 @import './themes/nocturne.css';
+@import './themes/modernist.css';
+
+/*
+  The translate window's own component classes. It is imported from here rather
+  than from `window/Translate/index.jsx` because import order decides ties inside
+  `@layer components`: App.jsx imports the window components ABOVE its
+  `import './style.css'`, so from there the sheet would land before HeroUI's own
+  `.button` and lose to it on every equal-specificity rule.
+*/
+@import './window/Translate/style.css';
 
 /*
   v3 selects a theme with `data-theme` on <html> rather than a class, so the

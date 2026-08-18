@@ -7,7 +7,7 @@
 */
 
 // Values that can end up as a class on <html>.
-export const colorThemes = ['light', 'dark', 'nocturne'];
+export const colorThemes = ['light', 'dark', 'nocturne', 'modernist'];
 
 // What Settings offers. `system` is resolved to light or dark in App.jsx and is
 // never applied as a class itself.

@@ -1,0 +1,106 @@
+/*
+  Modernist -- flat, architectural, a near-mono red on paper.
+
+  A port of the Modernist design system: a light ground (#f3f2f2) with ink text
+  (#201e1d), a single accent (#ec3013), and zero corner radius anywhere. Nothing
+  floats and nothing is decorated; alignment and the strength of the dividers do
+  all the organising. That is why this file is mostly a token block rather than a
+  restyle like nocturne -- the look is carried by two ordinary tokens the whole
+  app already draws with:
+
+    --border-secondary   full ink, the strong 2px rule between major sections
+    --border             40% ink, the hairline between minor ones
+
+  and by --radius/--field-radius at 0. The translate window leans on that pair
+  directly (see window/Translate/style.css); everywhere else the existing
+  `border-border` / `bg-surface` utilities simply resolve to the new values.
+
+  No font is set here. Modernist is set in Archivo, but the app family is a user
+  setting written inline onto <html> by App.jsx, and a theme has no business
+  overriding it -- nocturne makes the same call for the same reason. Weight,
+  tracking and case carry the voice instead.
+*/
+@layer base {
+    [data-theme='modernist'] {
+        color-scheme: light;
+
+        --background: #f3f2f2;
+        --background-secondary: #eae9e9;
+        --background-tertiary: #d7d3d3;
+        --foreground: #201e1d;
+
+        /*
+          The neutral ramp, one step per surface: the source box and result
+          bodies sit on 100 (#f8f4f4, lighter than the ground -- paper on paper),
+          the service headers and the language row on the ground itself, and
+          anything that has to read as raised takes 200/300.
+        */
+        --surface: #f8f4f4;
+        --surface-foreground: #201e1d;
+        --surface-secondary: #eae9e9;
+        --surface-secondary-foreground: #201e1d;
+        --surface-tertiary: #eae7e7;
+        --surface-tertiary-foreground: #201e1d;
+        --surface-hover: #eae7e7;
+
+        --overlay: #f8f4f4;
+        --overlay-foreground: #201e1d;
+
+        --default: #d7d3d3;
+        --default-foreground: #201e1d;
+        --default-hover: #bab6b6;
+        --default-soft: #eae7e7;
+        --default-soft-foreground: #201e1d;
+
+        --muted: #605d5d;
+
+        /*
+          The whole system in two values. `border-secondary` is the system's
+          `--color-text`, not a grey: the 2px rules are drawn in ink at full
+          strength, which is what keeps the grid visible without a single box
+          shadow. `border` is its 40% divider.
+        */
+        --border: color-mix(in srgb, #201e1d 40%, transparent);
+        --border-secondary: #201e1d;
+        --separator: color-mix(in srgb, #201e1d 40%, transparent);
+
+        --accent: #ec3013;
+        --accent-foreground: #ffffff;
+        --accent-hover: #dd2b0f;
+        --focus: #ec3013;
+        --link: #ae1800;
+
+        /*
+          Not a v3 token -- an addition this theme makes and the translate window
+          reads as `var(--accent-text, var(--accent))`, so every other theme just
+          gets its accent. The accent-to-ground pair is tuned to 3:1, which is
+          enough for icons, fills and interface chrome but not for words: text in
+          the accent takes the deep ramp step instead.
+        */
+        --accent-text: #ae1800;
+
+        --field-background: #f8f4f4;
+        --field-foreground: #201e1d;
+        --field-placeholder: #605d5d;
+        --field-border: color-mix(in srgb, #201e1d 40%, transparent);
+
+        /* Do not round a corner anywhere -- the radius is 0 on purpose. */
+        --radius: 0rem;
+        --field-radius: 0rem;
+        --border-width: 1px;
+    }
+
+    /*
+      ...including the window itself. `html` is the themed element, so this has
+      to select it directly rather than descend from the theme.
+
+      The rule it is overriding (`html { border-radius: 10px !important }` in
+      style.css, there for the frameless rounded windows) is unlayered AND
+      important. For important declarations the cascade reverses layer order and
+      unlayered important is the weakest of them, so a layered important wins --
+      which is the only reason this works without a second `!important` race.
+    */
+    html[data-theme='modernist'] {
+        border-radius: 0 !important;
+    }
+}

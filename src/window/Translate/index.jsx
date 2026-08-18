@@ -1,13 +1,11 @@
 import { readDir, BaseDirectory, readTextFile, exists } from '@tauri-apps/plugin-fs';
-import Spacer from '../../components/Spacer';
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 import { currentMonitor } from '@tauri-apps/api/window';
 import { appConfigDir, join } from '@tauri-apps/api/path';
 import { convertFileSrc } from '@tauri-apps/api/core';
-import { Button } from '@heroui/react';
-import { AiFillCloseCircle } from 'react-icons/ai';
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { listen } from '@tauri-apps/api/event';
 import { BsPinFill } from 'react-icons/bs';
 
@@ -87,6 +85,7 @@ export default function Translate() {
     const [pined, setPined] = useState(false);
     const [pluginList, setPluginList] = useState(null);
     const [serviceInstanceConfigMap, setServiceInstanceConfigMap] = useState(null);
+    const { t } = useTranslation();
     const reorder = (list, startIndex, endIndex) => {
         const result = Array.from(list);
         const [removed] = result.splice(startIndex, 1);
@@ -235,111 +234,129 @@ export default function Translate() {
     return (
         pluginList && (
             <div
-                className={`bg-background h-screen w-screen ${osType === 'Linux' ? 'rounded-[10px] border-1 border-border' : ''}`}
+                className={`translate-window bg-background h-screen w-screen ${osType === 'Linux' ? 'rounded-[10px] border-1 border-border' : ''}`}
             >
-                <div
-                    className='fixed top-[5px] left-[5px] right-[5px] h-[30px]'
-                    data-tauri-drag-region='true'
-                />
-                <div className={`h-[35px] w-full flex ${osType === 'Darwin' ? 'justify-end' : 'justify-between'}`}>
-                    <Button
-                        isIconOnly
-                        size='sm'
-                        variant='tertiary'
-                        disableAnimation
-                        className='my-auto bg-transparent'
-                        onPress={() => {
-                            if (pined) {
-                                if (closeOnBlur) {
-                                    unlisten = listenBlur();
-                                }
-                                appWindow.setAlwaysOnTop(false);
-                            } else {
-                                unlistenBlur();
-                                appWindow.setAlwaysOnTop(true);
-                            }
-                            setPined(!pined);
-                        }}
-                    >
-                        <BsPinFill className={`text-[20px] ${pined ? 'text-accent' : 'text-muted'}`} />
-                    </Button>
-                    <Button
-                        isIconOnly
-                        size='sm'
-                        variant='tertiary'
-                        disableAnimation
-                        className={`my-auto ${osType === 'Darwin' ? 'hidden' : ''} bg-transparent`}
-                        onPress={() => {
-                            void appWindow.close();
-                        }}
-                    >
-                        <AiFillCloseCircle className='text-[20px] text-muted' />
-                    </Button>
-                </div>
-                <div className={`${osType === 'Linux' ? 'h-[calc(100vh-37px)]' : 'h-[calc(100vh-35px)]'} px-[8px]`}>
-                    <div className='h-full overflow-y-auto'>
-                        <div>
-                            {serviceInstanceConfigMap !== null && (
-                                <SourceArea
-                                    pluginList={pluginList}
-                                    serviceInstanceConfigMap={serviceInstanceConfigMap}
-                                />
-                            )}
-                        </div>
-                        <div className={`${hideLanguage ? 'hidden' : ''}`}>
-                            <LanguageArea />
-                            <Spacer y={2} />
-                        </div>
-                        <DragDropContext onDragEnd={onDragEnd}>
-                            <Droppable
-                                droppableId='droppable'
-                                direction='vertical'
-                            >
-                                {(provided) => (
-                                    <div
-                                        ref={provided.innerRef}
-                                        {...provided.droppableProps}
-                                    >
-                                        {translateServiceInstanceList !== null &&
-                                            serviceInstanceConfigMap !== null &&
-                                            translateServiceInstanceList.map((serviceInstanceKey, index) => {
-                                                const config = serviceInstanceConfigMap[serviceInstanceKey] ?? {};
-                                                const enable = config['enable'] ?? true;
+                {/*
+                    The titlebar carries the drag region itself rather than an
+                    absolutely positioned strip laid over it. `data-tauri-drag-region`
+                    is matched against the element the click actually landed on, so
+                    the two controls inside stay clickable -- and the brand, which
+                    does carry it, becomes a handle instead of dead space.
 
-                                                return enable ? (
-                                                    <Draggable
-                                                        key={serviceInstanceKey}
-                                                        draggableId={serviceInstanceKey}
-                                                        index={index}
-                                                    >
-                                                        {(provided) => (
-                                                            <div
-                                                                ref={provided.innerRef}
-                                                                {...provided.draggableProps}
-                                                            >
-                                                                <TargetArea
-                                                                    {...provided.dragHandleProps}
-                                                                    index={index}
-                                                                    name={serviceInstanceKey}
-                                                                    translateServiceInstanceList={
-                                                                        translateServiceInstanceList
-                                                                    }
-                                                                    pluginList={pluginList}
-                                                                    serviceInstanceConfigMap={serviceInstanceConfigMap}
-                                                                />
-                                                                <Spacer y={2} />
-                                                            </div>
-                                                        )}
-                                                    </Draggable>
-                                                ) : // `null`, not an empty fragment: a fragment is a
-                                                // child of this list and React wants a key for it.
-                                                null;
-                                            })}
-                                    </div>
-                                )}
-                            </Droppable>
-                        </DragDropContext>
+                    No brand on macOS: `TitleBarStyle::Overlay` floats the native
+                    traffic lights over the top-left corner, which is exactly where
+                    it would sit.
+                */}
+                <header
+                    className='translate-titlebar'
+                    data-tauri-drag-region='true'
+                >
+                    {osType !== 'Darwin' && (
+                        <span
+                            className='translate-brand'
+                            data-tauri-drag-region='true'
+                        >
+                            Pot · {t('translate.translate')}
+                        </span>
+                    )}
+                    <div className='flex items-center gap-[10px] ml-auto'>
+                        <button
+                            type='button'
+                            className='translate-iconbtn'
+                            title={t('config.translate.always_on_top')}
+                            aria-label={t('config.translate.always_on_top')}
+                            aria-pressed={pined}
+                            onClick={() => {
+                                if (pined) {
+                                    if (closeOnBlur) {
+                                        unlisten = listenBlur();
+                                    }
+                                    appWindow.setAlwaysOnTop(false);
+                                } else {
+                                    unlistenBlur();
+                                    appWindow.setAlwaysOnTop(true);
+                                }
+                                setPined(!pined);
+                            }}
+                        >
+                            <BsPinFill className={`text-[13px] ${pined ? 'text-accent' : ''}`} />
+                        </button>
+                        {osType !== 'Darwin' && (
+                            <button
+                                type='button'
+                                className='translate-close'
+                                title={t('common.close')}
+                                aria-label={t('common.close')}
+                                onClick={() => {
+                                    void appWindow.close();
+                                }}
+                            />
+                        )}
                     </div>
+                </header>
+                {/*
+                    One scrolling column of sections with no padding and no spacers
+                    between them: each section draws its own bottom rule, and the
+                    seam between two of them IS that rule.
+                */}
+                <div className='flex-1 min-h-0 overflow-y-auto'>
+                    {serviceInstanceConfigMap !== null && (
+                        <SourceArea
+                            pluginList={pluginList}
+                            serviceInstanceConfigMap={serviceInstanceConfigMap}
+                        />
+                    )}
+                    <div className={`${hideLanguage ? 'hidden' : ''}`}>
+                        <LanguageArea />
+                    </div>
+                    <DragDropContext onDragEnd={onDragEnd}>
+                        <Droppable
+                            droppableId='droppable'
+                            direction='vertical'
+                        >
+                            {(provided) => (
+                                <div
+                                    ref={provided.innerRef}
+                                    {...provided.droppableProps}
+                                >
+                                    {translateServiceInstanceList !== null &&
+                                        serviceInstanceConfigMap !== null &&
+                                        translateServiceInstanceList.map((serviceInstanceKey, index) => {
+                                            const config = serviceInstanceConfigMap[serviceInstanceKey] ?? {};
+                                            const enable = config['enable'] ?? true;
+
+                                            return enable ? (
+                                                <Draggable
+                                                    key={serviceInstanceKey}
+                                                    draggableId={serviceInstanceKey}
+                                                    index={index}
+                                                >
+                                                    {(provided) => (
+                                                        <div
+                                                            ref={provided.innerRef}
+                                                            {...provided.draggableProps}
+                                                        >
+                                                            <TargetArea
+                                                                {...provided.dragHandleProps}
+                                                                index={index}
+                                                                name={serviceInstanceKey}
+                                                                translateServiceInstanceList={
+                                                                    translateServiceInstanceList
+                                                                }
+                                                                pluginList={pluginList}
+                                                                serviceInstanceConfigMap={serviceInstanceConfigMap}
+                                                            />
+                                                        </div>
+                                                    )}
+                                                </Draggable>
+                                            ) : // `null`, not an empty fragment: a fragment is a
+                                            // child of this list and React wants a key for it.
+                                            null;
+                                        })}
+                                </div>
+                            )}
+                        </Droppable>
+                    </DragDropContext>
                 </div>
             </div>
         )

@@ -1,17 +1,10 @@
-import { Button, Card, CardContent, CardFooter, ButtonGroup, Chip, Tooltip } from '@heroui/react';
-import Spacer from '../../../../components/Spacer';
 import { BaseDirectory, readTextFile } from '@tauri-apps/plugin-fs';
 import React, { useEffect, useRef, useState } from 'react';
 import { writeText } from '@tauri-apps/plugin-clipboard-manager';
-import { HiOutlineVolumeUp } from 'react-icons/hi';
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 import toast, { Toaster } from 'react-hot-toast';
 import { listen } from '@tauri-apps/api/event';
-import { MdContentCopy } from 'react-icons/md';
-import { MdSmartButton } from 'react-icons/md';
 import { useTranslation } from 'react-i18next';
-import { HiTranslate } from 'react-icons/hi';
-import { LuDelete } from 'react-icons/lu';
 import { invoke } from '@tauri-apps/api/core';
 import { atom, useAtom } from 'jotai';
 import { getServiceName, getServiceSouceType, ServiceSourceType } from '../../../../utils/service_instance';
@@ -40,7 +33,6 @@ function isComposing(event) {
 
 export default function SourceArea(props) {
     const { pluginList, serviceInstanceConfigMap } = props;
-    const [appFontSize] = useConfig('app_font_size', 16);
     const [sourceText, setSourceText, syncSourceText] = useSyncAtom(sourceTextAtom);
     const [detectLanguage, setDetectLanguage] = useAtom(detectLanguageAtom);
     const [incrementalTranslate] = useConfig('incremental_translate', false);
@@ -403,149 +395,120 @@ export default function SourceArea(props) {
     }, [textAreaRef]);
 
     return (
-        <div className={hideSource && windowType !== '[INPUT_TRANSLATE]' ? 'hidden' : ''}>
-            <Card
-                shadow='none'
-                className='bg-surface rounded-[10px] mt-px p-0 gap-0'
-            >
-                <Toaster />
-                <CardContent className='bg-surface p-[12px] pb-0 max-h-[40vh] overflow-y-auto'>
-                    <textarea
-                        autoFocus
-                        ref={textAreaRef}
-                        className={`text-[${appFontSize}px] bg-surface h-full resize-none outline-hidden`}
-                        value={sourceText}
-                        onKeyDown={keyDown}
-                        onChange={(e) => {
-                            const v = e.target.value;
-                            changeSourceText(v);
-                        }}
-                        onCompositionStart={() => {
-                            isComposingRef.current = true;
-                        }}
-                        onCompositionEnd={(e) => {
-                            isComposingRef.current = false;
-                            // The word is finished, so translate it now rather
-                            // than making the user wait out the debounce -- and
-                            // drop any timer armed before composition started, so
-                            // it cannot land afterwards and detect the language
-                            // from the text as it was then.
-                            if (sourceTextChangeTimerRef.current) {
-                                clearTimeout(sourceTextChangeTimerRef.current);
-                                sourceTextChangeTimerRef.current = null;
-                            }
-                            if (dynamicTranslate) {
-                                detect_language(e.target.value).then(() => {
-                                    syncSourceText();
-                                });
-                            }
-                        }}
-                    />
-                </CardContent>
+        <section
+            className={`translate-section bg-surface ${hideSource && windowType !== '[INPUT_TRANSLATE]' ? 'hidden' : ''}`}
+        >
+            <Toaster />
+            <div className='px-[10px] pt-[10px] pb-[8px] max-h-[40vh] overflow-y-auto'>
+                {/*
+                    No `text-[Npx]` any more. That class was interpolated from
+                    `app_font_size`, and Tailwind 4 only emits utilities it can find
+                    as literal strings in the source -- so it never existed. App.jsx
+                    writes the setting onto <html> as its font-size instead, which
+                    makes `1rem` (`.translate-body`) the size the user actually asked
+                    for.
+                */}
+                <textarea
+                    autoFocus
+                    ref={textAreaRef}
+                    className='translate-body w-full bg-transparent resize-none outline-hidden'
+                    value={sourceText}
+                    onKeyDown={keyDown}
+                    onChange={(e) => {
+                        const v = e.target.value;
+                        changeSourceText(v);
+                    }}
+                    onCompositionStart={() => {
+                        isComposingRef.current = true;
+                    }}
+                    onCompositionEnd={(e) => {
+                        isComposingRef.current = false;
+                        // The word is finished, so translate it now rather
+                        // than making the user wait out the debounce -- and
+                        // drop any timer armed before composition started, so
+                        // it cannot land afterwards and detect the language
+                        // from the text as it was then.
+                        if (sourceTextChangeTimerRef.current) {
+                            clearTimeout(sourceTextChangeTimerRef.current);
+                            sourceTextChangeTimerRef.current = null;
+                        }
+                        if (dynamicTranslate) {
+                            detect_language(e.target.value).then(() => {
+                                syncSourceText();
+                            });
+                        }
+                    }}
+                />
+            </div>
 
-                <CardFooter className='bg-surface rounded-none rounded-b-[10px] flex justify-between px-[12px] p-[5px]'>
-                    <div className='flex justify-start'>
-                        <ButtonGroup className='mr-[5px]'>
-                            <Tooltip>
-                                <Tooltip.Trigger>
-                                    <Button
-                                        isIconOnly
-                                        variant='tertiary'
-                                        size='sm'
-                                        onPress={() => {
-                                            handleSpeak().catch((e) => {
-                                                toast.error(e.toString(), { style: toastStyle });
-                                            });
-                                        }}
-                                    >
-                                        <HiOutlineVolumeUp className='text-[16px]' />
-                                    </Button>
-                                </Tooltip.Trigger>
-                                <Tooltip.Content>{t('translate.speak')}</Tooltip.Content>
-                            </Tooltip>
-                            <Tooltip>
-                                <Tooltip.Trigger>
-                                    <Button
-                                        isIconOnly
-                                        variant='tertiary'
-                                        size='sm'
-                                        onPress={() => {
-                                            writeText(sourceText);
-                                        }}
-                                    >
-                                        <MdContentCopy className='text-[16px]' />
-                                    </Button>
-                                </Tooltip.Trigger>
-                                <Tooltip.Content>{t('translate.copy')}</Tooltip.Content>
-                            </Tooltip>
-                            <Tooltip>
-                                <Tooltip.Trigger>
-                                    <Button
-                                        isIconOnly
-                                        variant='tertiary'
-                                        size='sm'
-                                        onPress={() => {
-                                            const newText = sourceText.replace(/\-\s+/g, '').replace(/\s+/g, ' ');
-                                            setSourceText(newText);
-                                            detect_language(newText).then(() => {
-                                                syncSourceText();
-                                            });
-                                        }}
-                                    >
-                                        <MdSmartButton className='text-[16px]' />
-                                    </Button>
-                                </Tooltip.Trigger>
-                                <Tooltip.Content>{t('translate.delete_newline')}</Tooltip.Content>
-                            </Tooltip>
-                            <Tooltip>
-                                <Tooltip.Trigger>
-                                    <Button
-                                        variant='tertiary'
-                                        size='sm'
-                                        isIconOnly
-                                        isDisabled={sourceText === ''}
-                                        onPress={() => {
-                                            setSourceText('');
-                                        }}
-                                    >
-                                        <LuDelete className='text-[16px]' />
-                                    </Button>
-                                </Tooltip.Trigger>
-                                <Tooltip.Content>{t('common.clear')}</Tooltip.Content>
-                            </Tooltip>
-                        </ButtonGroup>
-                        {detectLanguage !== '' && (
-                            <Chip
-                                size='sm'
-                                color='secondary'
-                                variant='soft'
-                                className='my-auto'
-                            >
-                                {t(`languages.${detectLanguage}`)}
-                            </Chip>
-                        )}
-                    </div>
-                    <Tooltip>
-                        <Tooltip.Trigger>
-                            <Button
-                                size='sm'
-                                variant='tertiary'
-                                isIconOnly
-                                className='text-[14px] font-bold'
-                                onPress={() => {
-                                    detect_language(sourceText).then(() => {
-                                        syncSourceText();
-                                    });
-                                }}
-                            >
-                                <HiTranslate className='text-[16px]' />
-                            </Button>
-                        </Tooltip.Trigger>
-                        <Tooltip.Content>{t('translate.translate')}</Tooltip.Content>
-                    </Tooltip>
-                </CardFooter>
-            </Card>
-            <Spacer y={2} />
-        </div>
+            {/*
+                Words, not icons. The four source actions used to be a segmented
+                ButtonGroup of glyphs whose meaning lived in a tooltip; in this
+                system the label IS the control, so the tooltips are gone with the
+                icons -- there is nothing left for them to explain.
+            */}
+            <div className='translate-bar'>
+                <div className='translate-bar__actions'>
+                    <button
+                        type='button'
+                        className='translate-action'
+                        onClick={() => {
+                            handleSpeak().catch((e) => {
+                                toast.error(e.toString(), { style: toastStyle });
+                            });
+                        }}
+                    >
+                        {t('translate.speak')}
+                    </button>
+                    <button
+                        type='button'
+                        className='translate-action'
+                        onClick={() => {
+                            writeText(sourceText);
+                        }}
+                    >
+                        {t('translate.copy')}
+                    </button>
+                    <button
+                        type='button'
+                        className='translate-action'
+                        title={t('translate.delete_newline')}
+                        onClick={() => {
+                            const newText = sourceText.replace(/\-\s+/g, '').replace(/\s+/g, ' ');
+                            setSourceText(newText);
+                            detect_language(newText).then(() => {
+                                syncSourceText();
+                            });
+                        }}
+                    >
+                        {t('translate.unwrap')}
+                    </button>
+                    <button
+                        type='button'
+                        className='translate-action'
+                        disabled={sourceText === ''}
+                        onClick={() => {
+                            setSourceText('');
+                        }}
+                    >
+                        {t('common.clear')}
+                    </button>
+                </div>
+                {detectLanguage !== '' && (
+                    <span className='translate-detected'>{t(`languages.${detectLanguage}`)}</span>
+                )}
+                <button
+                    type='button'
+                    className='translate-primary'
+                    onClick={() => {
+                        detect_language(sourceText).then(() => {
+                            syncSourceText();
+                        });
+                    }}
+                >
+                    {t('translate.translate')}
+                </button>
+            </div>
+        </section>
     );
 }

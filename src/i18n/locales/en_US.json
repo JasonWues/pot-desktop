@@ -7,7 +7,8 @@
             "write_clipboard": "Write to Clipboard",
             "plugin": "Plugin",
             "coming": "Coming soon…",
-            "clear": "Clear"
+            "clear": "Clear",
+            "close": "Close"
         },
         "languages": {
             "auto": "Auto Detect",
@@ -69,6 +70,7 @@
                     "light": "Light",
                     "dark": "Dark",
                     "nocturne": "Nocturne",
+                    "modernist": "Modernist",
                     "system": "System"
                 },
                 "transparent": "Transparent Effect",
@@ -512,6 +514,15 @@
             "retry": "Try again",
             "delete_newline": "Delete Newline",
             "translate_back": "Translation back to the original",
+            "unwrap": "Unwrap",
+            "back": "Back",
+            "collect": "Collect",
+            "status": {
+                "translating": "translating…",
+                "collapsed": "collapsed",
+                "failed": "failed",
+                "cached": "cached"
+            },
             "ai_preset": {
                 "translate": "Translate",
                 "polish": "Polish",

@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { info } from '@tauri-apps/plugin-log';
-import { LuSun, LuMoon, LuMonitor, LuSparkles } from 'react-icons/lu';
+import { LuSun, LuMoon, LuMonitor, LuSparkles, LuSquare } from 'react-icons/lu';
 import { invoke } from '@tauri-apps/api/core';
 import { useTheme } from 'next-themes';
 
@@ -22,6 +22,7 @@ const themeIcon = {
     light: LuSun,
     dark: LuMoon,
     nocturne: LuSparkles,
+    modernist: LuSquare,
 };
 
 function ThemeIcon({ name }) {

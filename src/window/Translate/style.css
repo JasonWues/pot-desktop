@@ -1,0 +1,404 @@
+/*
+  The translate window, restyled after the Modernist design system (option 1b of
+  the design study): flat, zero radius, nothing floating. The window is one
+  column of sections butted against each other and separated by rules -- a 2px
+  rule between the major parts (source / languages / the answer) and a 1px
+  divider between minor ones (the collapsed services). Actions are flush-left
+  uppercase word labels rather than icon buttons, and machine facts (latency,
+  progress, failure) are set in the monospace face on the right of a row.
+
+  Everything here is painted with v3 theme tokens, so the structure holds under
+  light, dark and nocturne; the Modernist palette itself -- ink rules, the red
+  accent, radius 0 -- is a theme (themes/modernist.css), not a hard-coded look.
+  The two tokens doing the structural work:
+
+    --border-secondary   the strong 2px rule   (modernist: full ink)
+    --border             the 1px divider       (modernist: 40% ink)
+
+  Type is deliberately NOT specified as a family. Modernist is set in Archivo,
+  but the app font is a user setting applied inline on <html> from App.jsx, and
+  a stylesheet that overrode it would silently override that choice -- the same
+  call nocturne makes. The Modernist voice here comes from weight, tracking and
+  case, which any family carries.
+
+  Imported from src/style.css rather than from the window's own index.jsx.
+  Import order decides ties inside @layer components, and App.jsx imports the
+  window components before it imports the stylesheet -- so from there these
+  rules would land BEFORE HeroUI's own .button and lose every tie to it.
+*/
+
+@layer components {
+    /*
+      Chrome is sized in px and content in rem, on purpose. App.jsx writes
+      `app_font_size` onto <html> as its font-size, so 1rem IS the user's chosen
+      text size -- the source box and every result track it, while the rules,
+      labels and status text stay at the size the design draws them.
+    */
+    .translate-window {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    /* -------------------------------------------------------------- titlebar */
+
+    .translate-titlebar {
+        flex: none;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 32px;
+        padding: 0 10px;
+        border-bottom: 2px solid var(--border-secondary);
+    }
+
+    .translate-brand {
+        font-size: 10px;
+        font-weight: 800;
+        line-height: 1;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+
+    /*
+      A hit target big enough to click without a box drawn around it -- the
+      system has no ghost button, so the affordance is the hover tint.
+    */
+    .translate-iconbtn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 22px;
+        height: 22px;
+        flex: none;
+        cursor: pointer;
+        border: 0;
+        padding: 0;
+        color: var(--muted);
+        background: transparent;
+    }
+
+    .translate-iconbtn:hover {
+        color: var(--accent);
+    }
+
+    .translate-iconbtn:focus-visible {
+        outline: 2px solid var(--focus);
+        outline-offset: -1px;
+    }
+
+    /*
+      The close control, drawn as the design draws it: a filled square that takes
+      the accent on hover. It is the one glyph in the window with no word or
+      familiar icon behind it, so title/aria-label carry the meaning.
+    */
+    .translate-close {
+        width: 11px;
+        height: 11px;
+        flex: none;
+        background: var(--foreground);
+        cursor: pointer;
+        border: 0;
+        padding: 0;
+    }
+
+    .translate-close:hover {
+        background: var(--accent);
+    }
+
+    .translate-close:focus-visible {
+        outline: 2px solid var(--focus);
+        outline-offset: 2px;
+    }
+
+    /* -------------------------------------------------------------- sections */
+
+    /*
+      The strong rule between the major parts. Every section carries its own
+      bottom edge, which is what lets the stack drop the spacers it used to have
+      between cards: in this system the seam IS the rule.
+    */
+    .translate-section {
+        border-bottom: 2px solid var(--border-secondary);
+    }
+
+    .translate-section--quiet {
+        border-bottom-width: 1px;
+        border-bottom-color: var(--border);
+    }
+
+    /* Body copy: the source box and every result. */
+    .translate-body {
+        font: inherit;
+        font-size: 1rem;
+        line-height: 1.5;
+    }
+
+    /* ----------------------------------------------------------- action strip */
+
+    /*
+      The row of word-labels under a block of text. `align-items: stretch` so the
+      cells that carry a left divider -- the detected language, the translate
+      button -- rule the full height of the strip instead of floating in it.
+    */
+    .translate-bar {
+        display: flex;
+        align-items: stretch;
+        min-height: 28px;
+        border-top: 1px solid var(--border);
+    }
+
+    .translate-bar__actions {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 0 10px;
+        overflow: hidden;
+    }
+
+    .translate-action {
+        flex: none;
+        background: transparent;
+        border: 0;
+        padding: 0;
+        cursor: pointer;
+        color: var(--muted);
+        font: inherit;
+        font-size: 10px;
+        font-weight: 600;
+        line-height: 1;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+
+    .translate-action:hover:not(:disabled) {
+        color: var(--accent);
+    }
+
+    .translate-action:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+    }
+
+    .translate-action:focus-visible {
+        outline: 2px solid var(--focus);
+        outline-offset: 3px;
+    }
+
+    /* An action that is an icon rather than a word: the collection services,
+       which are identified by their own logo. */
+    .translate-action img {
+        height: 13px;
+        width: 13px;
+        display: block;
+    }
+
+    /* The detected source language, flush against the primary action. */
+    .translate-detected {
+        flex: none;
+        display: flex;
+        align-items: center;
+        padding: 0 8px;
+        border-left: 1px solid var(--border);
+        color: var(--accent-text, var(--accent));
+        font-size: 10px;
+        font-weight: 600;
+        line-height: 1;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+
+    /* The one filled control in the window. */
+    .translate-primary {
+        flex: none;
+        display: flex;
+        align-items: center;
+        padding: 0 10px;
+        border: 0;
+        cursor: pointer;
+        background: var(--accent);
+        color: var(--accent-foreground);
+        font: inherit;
+        font-size: 10px;
+        font-weight: 800;
+        line-height: 1;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+
+    .translate-primary:hover {
+        background: var(--accent-hover);
+    }
+
+    .translate-primary:focus-visible {
+        outline: 2px solid var(--focus);
+        outline-offset: -3px;
+    }
+
+    /* ----------------------------------------------------------- language row */
+
+    /*
+      Preset, source, swap, target -- cells divided by hairlines. The two
+      language cells share the leftover width, so a long language name truncates
+      instead of pushing the swap control off centre.
+    */
+    .translate-languages {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr) 34px minmax(0, 1fr);
+        align-items: stretch;
+    }
+
+    .translate-languages > * + * {
+        border-left: 1px solid var(--border);
+    }
+
+    /*
+      Flush left, like every label in this system -- including the ones inside a
+      control wider than their own text.
+
+      This one and `.translate-service__name` below are worn by a HeroUI Button,
+      because that is what a Dropdown presses; a bare <button> never receives the
+      trigger's handlers. So both have to undo the component rather than replace
+      it. `background` alone is not enough: `.button` paints
+      `background-color: var(--button-bg)` and its hover paints
+      `var(--button-bg-hover)`, which the default `primary` variant points at the
+      accent -- the tokens are the only way to reach the hover state. `transform`
+      is v3's press bounce, and nothing in this system moves.
+    */
+    .translate-langbtn {
+        --button-bg: transparent;
+        --button-bg-hover: transparent;
+        --button-bg-pressed: transparent;
+        --button-fg: currentColor;
+        display: flex;
+        border-radius: 0;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 6px;
+        width: 100%;
+        min-width: 0;
+        height: 100%;
+        min-height: 30px;
+        padding: 0 10px;
+        border: 0;
+        background: transparent;
+        color: inherit;
+        cursor: pointer;
+        font: inherit;
+        font-size: 12px;
+        font-weight: 800;
+        line-height: 1;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+    }
+
+    .translate-langbtn > span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .translate-langbtn:hover {
+        background: var(--surface-hover);
+    }
+
+    .translate-langbtn:focus-visible {
+        outline: 2px solid var(--focus);
+        outline-offset: -2px;
+    }
+
+    .translate-langbtn:active {
+        transform: none;
+    }
+
+    .translate-langbtn--icon {
+        justify-content: center;
+        padding: 0 9px;
+    }
+
+    .translate-langbtn--on {
+        color: var(--accent-text, var(--accent));
+    }
+
+    /* -------------------------------------------------------------- services */
+
+    .translate-service {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-height: 30px;
+        padding: 6px 10px;
+    }
+
+    /* Also a HeroUI Button -- see `.translate-langbtn` for why the tokens are
+       set rather than just the background. */
+    .translate-service__name {
+        --button-bg: transparent;
+        --button-bg-hover: transparent;
+        --button-bg-pressed: transparent;
+        --button-fg: currentColor;
+        display: flex;
+        border-radius: 0;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+        height: auto;
+        background: transparent;
+        border: 0;
+        padding: 0;
+        cursor: pointer;
+        color: inherit;
+        font: inherit;
+        font-size: 10px;
+        font-weight: 800;
+        line-height: 1;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+    }
+
+    .translate-service__name > span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .translate-service__name img {
+        height: 15px;
+        width: 15px;
+        flex: none;
+    }
+
+    .translate-service__name:hover {
+        color: var(--accent);
+    }
+
+    .translate-service__name:focus-visible {
+        outline: 2px solid var(--focus);
+        outline-offset: 3px;
+    }
+
+    .translate-service__name:active {
+        transform: none;
+    }
+
+    /* Machine facts -- latency, progress, failure -- in the monospace face. */
+    .translate-meta {
+        margin-left: auto;
+        flex: none;
+        font-family: var(--font-mono, ui-monospace, Menlo, monospace);
+        font-size: 10px;
+        line-height: 1;
+        color: var(--muted);
+        white-space: nowrap;
+    }
+
+    .translate-meta--error {
+        color: var(--danger, var(--accent));
+    }
+}

@@ -1,25 +1,12 @@
-import {
-    Card,
-    CardContent,
-    CardHeader,
-    CardFooter,
-    Button,
-    ButtonGroup,
-    Dropdown,
-    Spinner,
-    Tooltip,
-} from '@heroui/react';
+import { Button, Dropdown } from '@heroui/react';
 import { BiCollapseVertical, BiExpandVertical } from 'react-icons/bi';
 import { BaseDirectory, readTextFile } from '@tauri-apps/plugin-fs';
 import { sendNotification } from '@tauri-apps/plugin-notification';
 import React, { useEffect, useState, useRef } from 'react';
 import { writeText } from '@tauri-apps/plugin-clipboard-manager';
-import { TbTransformFilled } from 'react-icons/tb';
 import { HiOutlineVolumeUp } from 'react-icons/hi';
 import toast, { Toaster } from 'react-hot-toast';
-import { MdContentCopy } from 'react-icons/md';
 import { useTranslation } from 'react-i18next';
-import { GiCycle } from 'react-icons/gi';
 import { useAtomValue } from 'jotai';
 import { nanoid } from 'nanoid';
 
@@ -54,7 +41,6 @@ export default function TargetArea(props) {
         return getDisplayInstanceName(instanceConfig[INSTANCE_NAME_CONFIG_KEY], serviceNameSupplier);
     }
 
-    const [appFontSize] = useConfig('app_font_size', 16);
     const [collectionServiceList] = useConfig('collection_service_list', []);
     const [ttsServiceList] = useConfig('tts_service_list', ['lingva_tts']);
     const [translateSecondLanguage] = useConfig('translate_second_language', 'en');
@@ -66,6 +52,13 @@ export default function TargetArea(props) {
 
     const [result, setResult] = useState('');
     const [error, setError] = useState('');
+    /*
+        What the mono status on the right of the service row reports. The design
+        puts a machine fact there rather than a spinner, so the row says how long
+        the service took -- or that the answer never left the machine.
+    */
+    const [latencyMs, setLatencyMs] = useState(null);
+    const [fromCache, setFromCache] = useState(false);
 
     const sourceText = useAtomValue(sourceTextAtom);
     const sourceLanguage = useAtomValue(sourceLanguageAtom);
@@ -92,6 +85,8 @@ export default function TargetArea(props) {
     useEffect(() => {
         setResult('');
         setError('');
+        setLatencyMs(null);
+        setFromCache(false);
         if (
             sourceText.trim() !== '' &&
             sourceLanguage &&
@@ -136,6 +131,7 @@ export default function TargetArea(props) {
     const translate = async () => {
         let id = nanoid();
         translateID[index] = id;
+        const startedAt = Date.now();
 
         const translateServiceName = getServiceName(currentTranslateServiceInstanceKey);
         const isPluginService = whetherPluginService(currentTranslateServiceInstanceKey);
@@ -177,6 +173,7 @@ export default function TargetArea(props) {
         // came back from the service or straight out of the cache.
         const finishTranslate = (v) => {
             setResult(typeof v === 'string' ? v.trim() : v);
+            setLatencyMs(Date.now() - startedAt);
             setIsLoading(false);
             if (v !== '') {
                 setHideOnce(false);
@@ -235,6 +232,9 @@ export default function TargetArea(props) {
             if (cached !== null) {
                 if (translateID[index] !== id) return;
                 info(`[${currentTranslateServiceInstanceKey}]cache hit`);
+                // The elapsed time of a cache read is not the service's latency,
+                // so the row reports where the answer came from instead.
+                setFromCache(true);
                 finishTranslate(cached);
                 return;
             }
@@ -340,127 +340,97 @@ export default function TargetArea(props) {
         }
     };
 
+    // The service icon, whether it comes from a builtin or from an installed
+    // `.potext` plugin. Both spellings appear four times below; this is the one
+    // place the difference is decided.
+    const serviceIcon = (instanceKey) =>
+        whetherPluginService(instanceKey)
+            ? pluginList['translate'][getServiceName(instanceKey)].icon
+            : builtinServices[getServiceName(instanceKey)].info.icon;
+
+    const serviceLabel = (instanceKey) =>
+        whetherPluginService(instanceKey)
+            ? getInstanceName(instanceKey, () => pluginList['translate'][getServiceName(instanceKey)].display)
+            : getInstanceName(instanceKey, () => t(`services.translate.${getServiceName(instanceKey)}.title`));
+
+    /*
+        The mono fact on the right of the row, in the order the design reads it:
+        what went wrong, what is happening, how long it took, or -- for a service
+        that has not been asked anything yet -- that it is folded away.
+    */
+    const status = () => {
+        if (error !== '') return t('translate.status.failed');
+        if (isLoading) return t('translate.status.translating');
+        if (fromCache) return t('translate.status.cached');
+        if (latencyMs !== null) return `${(latencyMs / 1000).toFixed(2)}s`;
+        if (hide) return t('translate.status.collapsed');
+        return '';
+    };
+
+    const hasText = typeof result === 'string' && result !== '';
+
     return (
-        <Card
-            shadow='none'
-            className='rounded-[10px] p-0 gap-0'
-        >
+        <section className={`translate-section ${hide ? 'translate-section--quiet' : ''}`}>
             <Toaster />
-            {/* `flex-row items-center` is not decoration. v3's Card.Header is a
-                column -- it is built to stack a Title above a Description -- where
-                v2's was a row. This one is a toolbar, so without the override its
-                two halves stack: the service dropdown on one line and the collapse
-                button below it, both full width, overflowing the 30px header. */}
-            <CardHeader
-                className={`flex flex-row items-center justify-between py-1 px-0 bg-surface-secondary h-[30px] ${hide ? 'rounded-[10px]' : 'rounded-t-[10px]'}`}
+            {/*
+                The row is the drag handle for reordering, so the collapse control
+                stays a separate target rather than the whole header being clickable.
+            */}
+            <div
+                className={`translate-service ${hide ? '' : 'bg-surface-secondary'}`}
                 {...drag}
             >
                 {/* current service instance and available service instance to change */}
-                <div className='flex'>
-                    <Dropdown>
-                        <Button
-                            size='sm'
-                            variant='primary'
-                            className='bg-transparent'
-                        >
-                            {whetherPluginService(currentTranslateServiceInstanceKey) ? (
-                                <img
-                                    src={
-                                        pluginList['translate'][getServiceName(currentTranslateServiceInstanceKey)].icon
-                                    }
-                                    className='h-[20px] my-auto'
-                                />
-                            ) : (
-                                <img
-                                    src={builtinServices[getServiceName(currentTranslateServiceInstanceKey)].info.icon}
-                                    className='h-[20px] my-auto'
-                                />
-                            )}
-                            {whetherPluginService(currentTranslateServiceInstanceKey) ? (
-                                <div className='my-auto'>{`${getInstanceName(currentTranslateServiceInstanceKey, () => pluginList['translate'][getServiceName(currentTranslateServiceInstanceKey)].display)} `}</div>
-                            ) : (
-                                <div className='my-auto'>
-                                    {getInstanceName(currentTranslateServiceInstanceKey, () =>
-                                        t(
-                                            `services.translate.${getServiceName(currentTranslateServiceInstanceKey)}.title`
-                                        )
-                                    )}
-                                </div>
-                            )}
-                        </Button>
-                        <Dropdown.Popover>
-                            <Dropdown.Menu
-                                aria-label='app language'
-                                className='max-h-[40vh] overflow-y-auto'
-                                onAction={(key) => {
-                                    setCurrentTranslateServiceInstanceKey(key);
-                                }}
-                            >
-                                {translateServiceInstanceList.map((instanceKey) => {
-                                    return (
-                                        <Dropdown.Item
-                                            key={instanceKey}
-                                            id={instanceKey}
-                                        >
-                                            {whetherPluginService(instanceKey) ? (
-                                                <img
-                                                    src={pluginList['translate'][getServiceName(instanceKey)].icon}
-                                                    className='h-[20px] my-auto'
-                                                />
-                                            ) : (
-                                                <img
-                                                    src={builtinServices[getServiceName(instanceKey)].info.icon}
-                                                    className='h-[20px] my-auto'
-                                                />
-                                            )}
-                                            {whetherPluginService(instanceKey) ? (
-                                                <div className='my-auto'>{`${getInstanceName(instanceKey, () => pluginList['translate'][getServiceName(instanceKey)].display)} `}</div>
-                                            ) : (
-                                                <div className='my-auto'>
-                                                    {getInstanceName(instanceKey, () =>
-                                                        t(`services.translate.${getServiceName(instanceKey)}.title`)
-                                                    )}
-                                                </div>
-                                            )}
-                                        </Dropdown.Item>
-                                    );
-                                })}
-                            </Dropdown.Menu>
-                        </Dropdown.Popover>
-                    </Dropdown>
-                    {/* v3's Spinner is one spinning SVG: no `variant`, no slots, no
-                        `classNames`. The dots and every class in that object were being
-                        dropped, leaving a bare 24px circle in a 30px header, so this is
-                        the plain form -- `sm` is 16px, and the colour is inherited.
-
-                        `isPending` here was a rename too far. The v2 -> v3 pass renamed
-                        Button's `isLoading` prop, and caught this `loading={isLoading}`
-                        on the way past; the state is still called `isLoading`, so the
-                        reference threw and took the whole TargetArea down with it. */}
-                    {isLoading && (
-                        <Spinner
-                            size='sm'
-                            className='my-auto ml-[20px] text-muted'
-                        />
-                    )}
-                </div>
-                {/* content collapse */}
-                <div className='flex'>
-                    <Button
-                        size='sm'
-                        isIconOnly
-                        variant='tertiary'
-                        className='h-[20px] w-[20px]'
-                        onPress={() => setHide(!hide)}
-                    >
-                        {hide ? (
-                            <BiExpandVertical className='text-[16px]' />
-                        ) : (
-                            <BiCollapseVertical className='text-[16px]' />
-                        )}
+                <Dropdown>
+                    <Button className='translate-service__name'>
+                        <img src={serviceIcon(currentTranslateServiceInstanceKey)} />
+                        <span>{serviceLabel(currentTranslateServiceInstanceKey)}</span>
                     </Button>
-                </div>
-            </CardHeader>
+                    <Dropdown.Popover>
+                        <Dropdown.Menu
+                            aria-label='translate service'
+                            className='max-h-[40vh] overflow-y-auto'
+                            onAction={(key) => {
+                                setCurrentTranslateServiceInstanceKey(key);
+                            }}
+                        >
+                            {translateServiceInstanceList.map((instanceKey) => {
+                                return (
+                                    <Dropdown.Item
+                                        key={instanceKey}
+                                        id={instanceKey}
+                                    >
+                                        <img
+                                            src={serviceIcon(instanceKey)}
+                                            className='h-[20px] my-auto'
+                                        />
+                                        <div className='my-auto'>{serviceLabel(instanceKey)}</div>
+                                    </Dropdown.Item>
+                                );
+                            })}
+                        </Dropdown.Menu>
+                    </Dropdown.Popover>
+                </Dropdown>
+                {/*
+                    What used to be a Spinner. The design reports progress as a word
+                    in the same slot that later reports the latency, so the row never
+                    changes shape between asking and answering.
+                */}
+                <span className={`translate-meta ${error !== '' ? 'translate-meta--error' : ''}`}>{status()}</span>
+                {/* content collapse */}
+                <button
+                    type='button'
+                    className='translate-iconbtn'
+                    aria-expanded={!hide}
+                    onClick={() => setHide(!hide)}
+                >
+                    {hide ? (
+                        <BiExpandVertical className='text-[14px]' />
+                    ) : (
+                        <BiCollapseVertical className='text-[14px]' />
+                    )}
+                </button>
+            </div>
             {/* The one thing framer-motion was still here for: animating to a height
                 nobody has measured. `grid-template-rows: 0fr -> 1fr` does the same
                 without it, and unlike `interpolate-size` it is not Chromium-only --
@@ -472,11 +442,11 @@ export default function TargetArea(props) {
             >
                 <div className='min-h-0 overflow-hidden'>
                     {/* result content */}
-                    <CardContent className={`p-[12px] pb-0 ${hide ? 'h-0 p-0' : ''}`}>
+                    <div className={`translate-body ${hide ? 'p-0' : 'px-[10px] pt-[8px]'}`}>
                         {typeof result === 'string' ? (
                             <textarea
                                 ref={textAreaRef}
-                                className={`text-[${appFontSize}px] h-0 resize-none bg-transparent select-text outline-hidden`}
+                                className='translate-body w-full h-0 resize-none bg-transparent select-text outline-hidden'
                                 readOnly
                                 value={result}
                             />
@@ -487,18 +457,18 @@ export default function TargetArea(props) {
                                         return (
                                             <div key={nanoid()}>
                                                 {pronunciation['region'] && (
-                                                    <span className={`text-[${appFontSize}px] mr-[12px] text-muted`}>
+                                                    <span className='mr-[12px] text-muted'>
                                                         {pronunciation['region']}
                                                     </span>
                                                 )}
                                                 {pronunciation['symbol'] && (
-                                                    <span className={`text-[${appFontSize}px] mr-[12px] text-muted`}>
+                                                    <span className='mr-[12px] text-muted'>
                                                         {pronunciation['symbol']}
                                                     </span>
                                                 )}
                                                 {pronunciation['voice'] && pronunciation['voice'] !== '' && (
                                                     <HiOutlineVolumeUp
-                                                        className={`text-[${appFontSize}px] inline-block my-auto cursor-pointer`}
+                                                        className='inline-block my-auto cursor-pointer'
                                                         onClick={() => {
                                                             speak(pronunciation['voice']);
                                                         }}
@@ -517,21 +487,17 @@ export default function TargetArea(props) {
                                                             <span key={nanoid()}>
                                                                 {index === 0 ? (
                                                                     <>
-                                                                        <span
-                                                                            className={`text-[${appFontSize - 2}px] text-muted mr-[12px]`}
-                                                                        >
+                                                                        <span className='text-[0.875em] text-muted mr-[12px]'>
                                                                             {explanations['trait']}
                                                                         </span>
-                                                                        <span
-                                                                            className={`font-bold text-[${appFontSize}px] select-text`}
-                                                                        >
+                                                                        <span className='font-bold select-text'>
                                                                             {explain}
                                                                         </span>
                                                                         <br />
                                                                     </>
                                                                 ) : (
                                                                     <span
-                                                                        className={`text-[${appFontSize - 2}px] text-muted select-text mr-1`}
+                                                                        className='text-[0.875em] text-muted select-text mr-1'
                                                                         key={nanoid()}
                                                                     >
                                                                         {explain}
@@ -548,9 +514,7 @@ export default function TargetArea(props) {
                                     result['associations'].map((association) => {
                                         return (
                                             <div key={nanoid()}>
-                                                <span className={`text-[${appFontSize}px] text-muted`}>
-                                                    {association}
-                                                </span>
+                                                <span className='text-muted'>{association}</span>
                                             </div>
                                         );
                                     })}
@@ -558,13 +522,11 @@ export default function TargetArea(props) {
                                     result['sentence'].map((sentence, index) => {
                                         return (
                                             <div key={nanoid()}>
-                                                <span className={`text-[${appFontSize - 2}px] mr-[12px]`}>
-                                                    {index + 1}.
-                                                </span>
+                                                <span className='text-[0.875em] mr-[12px]'>{index + 1}.</span>
                                                 <>
                                                     {sentence['source'] && (
                                                         <span
-                                                            className={`text-[${appFontSize}px] select-text`}
+                                                            className='select-text'
                                                             dangerouslySetInnerHTML={{
                                                                 __html: sentence['source'],
                                                             }}
@@ -574,7 +536,7 @@ export default function TargetArea(props) {
                                                 <>
                                                     {sentence['target'] && (
                                                         <div
-                                                            className={`text-[${appFontSize}px] select-text text-muted`}
+                                                            className='select-text text-muted'
                                                             dangerouslySetInnerHTML={{
                                                                 __html: sentence['target'],
                                                             }}
@@ -591,7 +553,7 @@ export default function TargetArea(props) {
                                 return (
                                     <p
                                         key={v}
-                                        className={`text-[${appFontSize}px] text-red-500`}
+                                        className='text-danger'
                                     >
                                         {v}
                                     </p>
@@ -600,201 +562,175 @@ export default function TargetArea(props) {
                         ) : (
                             <></>
                         )}
-                    </CardContent>
-                    <CardFooter
-                        className={`bg-surface rounded-none rounded-b-[10px] flex px-[12px] p-[5px] ${hide ? 'hidden' : ''}`}
-                    >
-                        <ButtonGroup>
-                            {/* speak button */}
-                            <Tooltip>
-                                <Tooltip.Trigger>
-                                    <Button
-                                        isIconOnly
-                                        variant='tertiary'
-                                        size='sm'
-                                        isDisabled={typeof result !== 'string' || result === ''}
-                                        onPress={() => {
-                                            handleSpeak().catch((e) => {
-                                                toast.error(e.toString(), { style: toastStyle });
-                                            });
-                                        }}
-                                    >
-                                        <HiOutlineVolumeUp className='text-[16px]' />
-                                    </Button>
-                                </Tooltip.Trigger>
-                                <Tooltip.Content>{t('translate.speak')}</Tooltip.Content>
-                            </Tooltip>
+                    </div>
+                    <div className={`translate-bar ${hide ? 'hidden' : ''}`}>
+                        <div className='translate-bar__actions'>
                             {/* copy button */}
-                            <Tooltip>
-                                <Tooltip.Trigger>
-                                    <Button
-                                        isIconOnly
-                                        variant='tertiary'
-                                        size='sm'
-                                        isDisabled={typeof result !== 'string' || result === ''}
-                                        onPress={() => {
-                                            writeText(result);
-                                        }}
-                                    >
-                                        <MdContentCopy className='text-[16px]' />
-                                    </Button>
-                                </Tooltip.Trigger>
-                                <Tooltip.Content>{t('translate.copy')}</Tooltip.Content>
-                            </Tooltip>
+                            <button
+                                type='button'
+                                className='translate-action'
+                                disabled={!hasText}
+                                onClick={() => {
+                                    writeText(result);
+                                }}
+                            >
+                                {t('translate.copy')}
+                            </button>
+                            {/* speak button */}
+                            <button
+                                type='button'
+                                className='translate-action'
+                                disabled={!hasText}
+                                onClick={() => {
+                                    handleSpeak().catch((e) => {
+                                        toast.error(e.toString(), { style: toastStyle });
+                                    });
+                                }}
+                            >
+                                {t('translate.speak')}
+                            </button>
                             {/* translate back button */}
-                            <Tooltip>
-                                <Tooltip.Trigger>
-                                    <Button
-                                        isIconOnly
-                                        variant='tertiary'
-                                        size='sm'
-                                        isDisabled={typeof result !== 'string' || result === ''}
-                                        onPress={async () => {
-                                            setError('');
-                                            let newTargetLanguage = sourceLanguage;
-                                            if (sourceLanguage === 'auto') {
-                                                newTargetLanguage = detectLanguage;
-                                            }
-                                            let newSourceLanguage = targetLanguage;
-                                            if (sourceLanguage === 'auto') {
-                                                newSourceLanguage = 'auto';
-                                            }
-                                            if (whetherPluginService(currentTranslateServiceInstanceKey)) {
-                                                const pluginInfo =
-                                                    pluginList['translate'][
-                                                        getServiceName(currentTranslateServiceInstanceKey)
-                                                    ];
-                                                if (
-                                                    newSourceLanguage in pluginInfo.language &&
-                                                    newTargetLanguage in pluginInfo.language
-                                                ) {
-                                                    setIsLoading(true);
-                                                    setHide(true);
-                                                    const instanceConfig =
-                                                        serviceInstanceConfigMap[currentTranslateServiceInstanceKey];
-                                                    instanceConfig['enable'] = 'true';
-                                                    const setHideOnce = invokeOnce(setHide);
-                                                    let [func, utils] = await invoke_plugin(
-                                                        'translate',
-                                                        getServiceName(currentTranslateServiceInstanceKey)
-                                                    );
-                                                    func(
-                                                        result.trim(),
-                                                        pluginInfo.language[newSourceLanguage],
-                                                        pluginInfo.language[newTargetLanguage],
-                                                        {
-                                                            config: instanceConfig,
-                                                            detect: detectLanguage,
-                                                            setResult: (v) => {
-                                                                setResult(v);
-                                                                setHideOnce(false);
-                                                            },
-                                                            utils,
-                                                        }
-                                                    ).then(
-                                                        (v) => {
-                                                            if (v === result) {
-                                                                setResult(v + ' ');
-                                                            } else {
-                                                                setResult(v.trim());
-                                                            }
-                                                            setIsLoading(false);
-                                                            if (v !== '') {
-                                                                setHideOnce(false);
-                                                            }
+                            <button
+                                type='button'
+                                className='translate-action'
+                                disabled={!hasText}
+                                title={t('translate.translate_back')}
+                                onClick={async () => {
+                                    setError('');
+                                    let newTargetLanguage = sourceLanguage;
+                                    if (sourceLanguage === 'auto') {
+                                        newTargetLanguage = detectLanguage;
+                                    }
+                                    let newSourceLanguage = targetLanguage;
+                                    if (sourceLanguage === 'auto') {
+                                        newSourceLanguage = 'auto';
+                                    }
+                                    if (whetherPluginService(currentTranslateServiceInstanceKey)) {
+                                        const pluginInfo =
+                                            pluginList['translate'][getServiceName(currentTranslateServiceInstanceKey)];
+                                        if (
+                                            newSourceLanguage in pluginInfo.language &&
+                                            newTargetLanguage in pluginInfo.language
+                                        ) {
+                                            setIsLoading(true);
+                                            setHide(true);
+                                            const instanceConfig =
+                                                serviceInstanceConfigMap[currentTranslateServiceInstanceKey];
+                                            instanceConfig['enable'] = 'true';
+                                            const setHideOnce = invokeOnce(setHide);
+                                            let [func, utils] = await invoke_plugin(
+                                                'translate',
+                                                getServiceName(currentTranslateServiceInstanceKey)
+                                            );
+                                            func(
+                                                result.trim(),
+                                                pluginInfo.language[newSourceLanguage],
+                                                pluginInfo.language[newTargetLanguage],
+                                                {
+                                                    config: instanceConfig,
+                                                    detect: detectLanguage,
+                                                    setResult: (v) => {
+                                                        setResult(v);
+                                                        setHideOnce(false);
+                                                    },
+                                                    utils,
+                                                }
+                                            ).then(
+                                                (v) => {
+                                                    if (v === result) {
+                                                        setResult(v + ' ');
+                                                    } else {
+                                                        setResult(v.trim());
+                                                    }
+                                                    setIsLoading(false);
+                                                    if (v !== '') {
+                                                        setHideOnce(false);
+                                                    }
+                                                },
+                                                (e) => {
+                                                    setError(e.toString());
+                                                    setIsLoading(false);
+                                                }
+                                            );
+                                        } else {
+                                            setError('Language not supported');
+                                        }
+                                    } else {
+                                        const LanguageEnum =
+                                            builtinServices[getServiceName(currentTranslateServiceInstanceKey)]
+                                                .Language;
+                                        if (newSourceLanguage in LanguageEnum && newTargetLanguage in LanguageEnum) {
+                                            setIsLoading(true);
+                                            setHide(true);
+                                            const instanceConfig =
+                                                serviceInstanceConfigMap[currentTranslateServiceInstanceKey];
+                                            const setHideOnce = invokeOnce(setHide);
+                                            builtinServices[getServiceName(currentTranslateServiceInstanceKey)]
+                                                .translate(
+                                                    result.trim(),
+                                                    LanguageEnum[newSourceLanguage],
+                                                    LanguageEnum[newTargetLanguage],
+                                                    {
+                                                        config: instanceConfig,
+                                                        detect: newSourceLanguage,
+                                                        setResult: (v) => {
+                                                            setResult(v);
+                                                            setHideOnce(false);
                                                         },
-                                                        (e) => {
-                                                            setError(e.toString());
-                                                            setIsLoading(false);
+                                                    }
+                                                )
+                                                .then(
+                                                    (v) => {
+                                                        if (v === result) {
+                                                            setResult(v + ' ');
+                                                        } else {
+                                                            setResult(v.trim());
                                                         }
-                                                    );
-                                                } else {
-                                                    setError('Language not supported');
-                                                }
-                                            } else {
-                                                const LanguageEnum =
-                                                    builtinServices[getServiceName(currentTranslateServiceInstanceKey)]
-                                                        .Language;
-                                                if (
-                                                    newSourceLanguage in LanguageEnum &&
-                                                    newTargetLanguage in LanguageEnum
-                                                ) {
-                                                    setIsLoading(true);
-                                                    setHide(true);
-                                                    const instanceConfig =
-                                                        serviceInstanceConfigMap[currentTranslateServiceInstanceKey];
-                                                    const setHideOnce = invokeOnce(setHide);
-                                                    builtinServices[getServiceName(currentTranslateServiceInstanceKey)]
-                                                        .translate(
-                                                            result.trim(),
-                                                            LanguageEnum[newSourceLanguage],
-                                                            LanguageEnum[newTargetLanguage],
-                                                            {
-                                                                config: instanceConfig,
-                                                                detect: newSourceLanguage,
-                                                                setResult: (v) => {
-                                                                    setResult(v);
-                                                                    setHideOnce(false);
-                                                                },
-                                                            }
-                                                        )
-                                                        .then(
-                                                            (v) => {
-                                                                if (v === result) {
-                                                                    setResult(v + ' ');
-                                                                } else {
-                                                                    setResult(v.trim());
-                                                                }
-                                                                setIsLoading(false);
-                                                                if (v !== '') {
-                                                                    setHideOnce(false);
-                                                                }
-                                                            },
-                                                            (e) => {
-                                                                setError(e.toString());
-                                                                setIsLoading(false);
-                                                            }
-                                                        );
-                                                } else {
-                                                    setError('Language not supported');
-                                                }
-                                            }
-                                        }}
-                                    >
-                                        <TbTransformFilled className='text-[16px]' />
-                                    </Button>
-                                </Tooltip.Trigger>
-                                <Tooltip.Content>{t('translate.translate_back')}</Tooltip.Content>
-                            </Tooltip>
+                                                        setIsLoading(false);
+                                                        if (v !== '') {
+                                                            setHideOnce(false);
+                                                        }
+                                                    },
+                                                    (e) => {
+                                                        setError(e.toString());
+                                                        setIsLoading(false);
+                                                    }
+                                                );
+                                        } else {
+                                            setError('Language not supported');
+                                        }
+                                    }
+                                }}
+                            >
+                                {t('translate.back')}
+                            </button>
                             {/* error retry button */}
-                            <Tooltip>
-                                <Tooltip.Trigger>
-                                    <Button
-                                        isIconOnly
-                                        variant='tertiary'
-                                        size='sm'
-                                        className={`${error === '' ? 'hidden' : ''}`}
-                                        onPress={() => {
-                                            setError('');
-                                            setResult('');
-                                            translate();
-                                        }}
-                                    >
-                                        <GiCycle className='text-[16px]' />
-                                    </Button>
-                                </Tooltip.Trigger>
-                                <Tooltip.Content>{t('translate.retry')}</Tooltip.Content>
-                            </Tooltip>
-                            {/* available collection service instance */}
+                            {error !== '' && (
+                                <button
+                                    type='button'
+                                    className='translate-action'
+                                    onClick={() => {
+                                        setError('');
+                                        setResult('');
+                                        translate();
+                                    }}
+                                >
+                                    {t('translate.retry')}
+                                </button>
+                            )}
+                            {/* available collection service instance -- the only
+                                actions still identified by an icon, because the icon
+                                IS the service's name here. */}
                             {collectionServiceList &&
                                 collectionServiceList.map((collectionServiceInstanceName) => {
                                     return (
-                                        <Button
+                                        <button
+                                            type='button'
                                             key={collectionServiceInstanceName}
-                                            isIconOnly
-                                            variant='tertiary'
-                                            size='sm'
-                                            onPress={async () => {
+                                            className='translate-action'
+                                            title={t('translate.collect')}
+                                            aria-label={t('translate.collect')}
+                                            onClick={async () => {
                                                 if (
                                                     getServiceSouceType(collectionServiceInstanceName) ===
                                                     ServiceSourceType.PLUGIN
@@ -851,15 +787,14 @@ export default function TargetArea(props) {
                                                               getServiceName(collectionServiceInstanceName)
                                                           ].info.icon
                                                 }
-                                                className='h-[16px] w-[16px]'
                                             />
-                                        </Button>
+                                        </button>
                                     );
                                 })}
-                        </ButtonGroup>
-                    </CardFooter>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </Card>
+        </section>
     );
 }

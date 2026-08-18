@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-Pot is a cross-platform translation + OCR desktop app: a React 18 frontend (Vite, NextUI, Tailwind) inside a Tauri 2 shell. Package manager is **pnpm** (Node >= 18, see `.node-version`).
+Pot is a cross-platform translation + OCR desktop app: a React 18 frontend (Vite, HeroUI v3, Tailwind 4) inside a Tauri 2 shell. Package manager is **pnpm** (Node >= 18, see `.node-version`).
 
 ## Commands
 
@@ -63,7 +63,7 @@ Users can configure **multiple instances of the same service**. The key is `name
 
 ### The Tauri 1 compatibility layer (important)
 
-This branch migrated from Tauri 1.8 to Tauri 2 (`d44c7bb`). Two shims deliberately preserve the v1 surface, because ~37 service files *and every third-party plugin* are written against it — **don't "modernize" call sites into raw v2 APIs**:
+This branch migrated from Tauri 1.8 to Tauri 2 (`d44c7bb`). Two shims deliberately preserve the v1 surface, because ~37 service files _and every third-party plugin_ are written against it — **don't "modernize" call sites into raw v2 APIs**:
 
 - `src/utils/http.js` — exports `fetch`/`Body`/`ResponseType` with the v1 shape (`res.ok`/`res.status`/`res.data`, `Body.json|text|form`, `query`, `responseType`) on top of `@tauri-apps/plugin-http`.
 - `src/utils/env.js` — remaps v2's `linux|macos|windows` back to `Linux|Darwin|Windows_NT`, which the UI, `public/logo/*.svg` and plugins expect.
@@ -74,17 +74,32 @@ Other v2 consequences worth knowing: core APIs are now 15 separate plugins (see 
 
 Tailwind 4 emits its utilities inside `@layer utilities`, and **unlayered CSS beats every cascade layer regardless of specificity**. Any plain rule in `src/style.css` or a component `style.css` therefore silently overrides the utility classes it collides with — this is not a specificity problem and adding classes will not fix it. Put app CSS in `@layer base` (resets) or `@layer components` (component classes), which is where `* { margin: 0 }` and `.config-item` now live. Under Tailwind 3 the same code was fine, because v3 emitted unlayered utilities that simply outranked `*` on specificity.
 
+Two consequences of that, both load-bearing:
+
+- **Inside `@layer components` nothing but source order separates your rule from HeroUI's.** `@heroui/styles` puts every `.button` / `.input` / `.modal__*` rule in that same layer, so a class of yours at the same specificity wins only if it is emitted later. That is why window stylesheets are `@import`ed from `src/style.css` **after** `@import '@heroui/styles'` (`src/window/Translate/style.css`) rather than from the window's own `index.jsx` — App.jsx imports the window components above its `import './style.css'`, so from there they would land first and lose every tie. When overriding a HeroUI component, also prefer its own custom properties over the declarations they feed: `.button` paints `background-color: var(--button-bg)` and hovers to `var(--button-bg-hover)`, so setting `background` alone leaves the hover state pointing at the accent.
+- **For `!important` declarations the layer order reverses, and unlayered is the weakest.** `src/style.css` ends with an unlayered `html { border-radius: 10px !important }` for the frameless windows; a rule in `@layer base` overrides it with a plain `!important` and no specificity race (`themes/modernist.css` does exactly that to square the window off).
+
 ### Themes
 
-A theme is a HeroUI theme in `tailwind.config.cjs` plus an entry in `src/utils/theme.js` (which keeps the Settings dropdown and the `next-themes` provider in sync — next-themes only strips the classes it was told about, so a name missing from `colorThemes` gets added to `<html>` and never removed) and a `config.general.theme.<name>` string in `en_US.json`/`zh_CN.json`. Because every surface in the app is painted with HeroUI tokens (`bg-content1`, `text-default-500`, `border-default-100`), a colours-only theme needs no component changes at all.
+HeroUI v3 is CSS-first: there is no `tailwind.config.cjs` and no HeroUI plugin any more. A theme is four things:
 
-`nocturne` goes further and adds `src/themes/nocturne.css`, which is the **one stylesheet allowed in a layer after `utilities`** (`@layer theme, base, components, utilities, nocturne;`) — it restyles utility classes themselves, which nothing in `components` could do. Two traps it documents in place: `backdrop-filter` establishes a containing block for `position: fixed` descendants, so it must not go on the `bg-background` shells that hold the `data-tauri-drag-region` strips; and lightningcss merges a property with its own prefixed forms, so hand-writing `-webkit-backdrop-filter` makes it emit *only* the legacy property, which Chrome 151/WebView2 no longer supports.
+1. `src/themes/<name>.css` — a `@layer base { [data-theme='<name>'] { … } }` block of token values, modelled on `light.css` (which documents how the old v2 scale maps onto v3's names).
+2. an `@import` for it in `src/style.css`.
+3. an entry in `colorThemes` (`src/utils/theme.js`), which keeps the Settings dropdown and the `next-themes` provider in sync — next-themes only strips the themes it was told about, so a name missing from that list gets written onto `<html>` and never removed.
+4. a `config.general.theme.<name>` string in `en_US.json`/`zh_CN.json`, plus an icon in the `themeIcon` map in `src/window/Config/pages/General/index.jsx` (it falls back to the monitor glyph, so a missing entry is silent).
 
-Anything reading a theme colour from JS should pass `hsl(var(--heroui-…))` through as a string rather than branching on the theme name against `semanticColors` — the var resolves against whatever class is on `<html>`, so it stays correct for themes added later.
+Because every surface in the app is painted with v3 tokens (`bg-surface`, `text-muted`, `border-border`, `text-accent`), a colours-only theme needs no component changes at all. Two tokens are worth knowing about beyond the palette:
+
+- `--radius` is the root of Tailwind's whole radius scale here — `@heroui/styles` defines `--radius-xs … --radius-4xl` as multiples of it — so a single `--radius: 0rem` squares off every component in the app, including the `rounded-3xl` baked into `.button`.
+- `--border` / `--border-secondary` are the hairline and the strong rule. The translate window's Modernist layout is built entirely on that pair (`src/window/Translate/style.css`), which is what lets the same markup read correctly under every theme.
+
+`light`, `dark` and `modernist` are token blocks and nothing else. `nocturne` goes further: on top of its palette it declares **the one layer in the app allowed to sit after `utilities`** (`@layer theme, base, components, utilities, nocturne;`) — it restyles utility classes themselves, which nothing in `components` could do. Two traps it documents in place: `backdrop-filter` establishes a containing block for `position: fixed` descendants, so it must not go on the `bg-background` shells that hold the `data-tauri-drag-region` strips; and lightningcss merges a property with its own prefixed forms, so hand-writing `-webkit-backdrop-filter` makes it emit _only_ the legacy property, which Chrome 151/WebView2 no longer supports.
+
+Anything reading a theme colour from JS should pass the var through as a string (`'var(--surface)'`) rather than branching on the theme name — it resolves against whatever `data-theme` is on `<html>` at paint time, so it stays correct for themes added later and needs no re-render on a theme switch. Note that v3's tokens are **complete colour values**, where v2's `--heroui-*` were bare HSL triplets meant to be wrapped: `hsl(var(--heroui-content1))` is now an invalid colour that silently falls back, and translucency is `color-mix(in oklab, var(--x) N%, transparent)` rather than `hsl(var(--x) / 0.N)`.
 
 ### Rust module map (`src-tauri/src/`)
 
-`main.rs` wires plugins, the global `APP: OnceCell<AppHandle>`, and the `invoke_handler` list — a new `#[tauri::command]` must be added there *and* usually needs a capability entry. `cmd.rs` misc commands (screenshot cropping, proxy, plugin install, fonts). `system_ocr.rs` per-OS native OCR (Windows.Media.Ocr / macOS Vision / Linux tesseract binary). `tts.rs` per-OS offline speech (Windows.Media.SpeechSynthesis / macOS `say` / Linux `espeak-ng`), returning base64 WAV because the IPC layer would otherwise serialize the audio as a JSON number array. `lang_detect.rs` offline detection via `lingua`. `backup.rs` WebDAV/Aliyun/local config backup. `updater.rs` + `updater_window`.
+`main.rs` wires plugins, the global `APP: OnceCell<AppHandle>`, and the `invoke_handler` list — a new `#[tauri::command]` must be added there _and_ usually needs a capability entry. `cmd.rs` misc commands (screenshot cropping, proxy, plugin install, fonts). `system_ocr.rs` per-OS native OCR (Windows.Media.Ocr / macOS Vision / Linux tesseract binary). `tts.rs` per-OS offline speech (Windows.Media.SpeechSynthesis / macOS `say` / Linux `espeak-ng`), returning base64 WAV because the IPC layer would otherwise serialize the audio as a JSON number array. `lang_detect.rs` offline detection via `lingua`. `backup.rs` WebDAV/Aliyun/local config backup. `updater.rs` + `updater_window`.
 
 Windows are created hidden and shown once React mounts, so **anything that throws before `root.render` leaves an invisible window**. `main.jsx` therefore never lets init failures escape and mirrors the webview console into the Rust log (`attachConsole`) — check the log dir (tray → View Log) when a window fails to appear.
 

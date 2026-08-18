@@ -1,4 +1,4 @@
-import { Card, Button, CardFooter, Dropdown, Label } from '@heroui/react';
+import { Button, Dropdown, Label } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 import { BiTransferAlt } from 'react-icons/bi';
 import React, { useEffect } from 'react';
@@ -45,144 +45,140 @@ export default function LanguageArea() {
         }
     }, [sourceLanguage, targetLanguage, rememberLanguage]);
 
+    /*
+        Four cells divided by hairlines rather than a card of pills: preset,
+        source, the swap control, target. The two dropdown triggers keep HeroUI's
+        Button -- it is what the Dropdown presses -- but are flattened to a cell by
+        `.translate-langbtn`, whose rules are loaded after HeroUI's own `.button`
+        and so win every tie with it.
+    */
     return (
-        <Card
-            shadow='none'
-            className='bg-surface-secondary h-[35px] rounded-[10px] p-0 gap-0'
-        >
-            <CardFooter className='bg-surface-secondary flex justify-between p-0 rounded-[10px]'>
-                <div className='flex'>
-                    {/* The preset only reaches the LLM-backed services; the rest
-                        ignore it, so it sits with the languages rather than in
-                        any one service's header. */}
-                    <Dropdown>
-                        <Button
-                            isIconOnly={aiPreset === DEFAULT_PRESET}
-                            variant='tertiary'
-                            className={`rounded-md ${aiPreset === DEFAULT_PRESET ? '' : 'text-accent'}`}
-                        >
-                            {aiPreset === DEFAULT_PRESET ? null : <LuWand className='text-[16px]' />}
-                            {aiPreset === DEFAULT_PRESET ? (
-                                <LuWand className='text-[16px] text-muted' />
-                            ) : (
-                                t(`translate.ai_preset.${aiPreset}`)
-                            )}
-                        </Button>
-                        <Dropdown.Popover>
-                            <Dropdown.Menu
-                                aria-label='AI preset'
-                                onAction={(key) => {
-                                    setAiPreset(key);
-                                }}
-                            >
-                                {AI_PRESETS.map((preset) => (
-                                    <Dropdown.Item
-                                        key={preset.id}
-                                        id={preset.id}
-                                    >
-                                        {t(`translate.ai_preset.${preset.id}`)}
-                                    </Dropdown.Item>
-                                ))}
-                            </Dropdown.Menu>
-                        </Dropdown.Popover>
-                    </Dropdown>
-                    <Dropdown>
-                        <Button
-                            className='rounded-md'
-                            variant='tertiary'
-                        >
-                            {t(`languages.${sourceLanguage}`)}
-                        </Button>
-                        <Dropdown.Popover>
-                            <Dropdown.Menu
-                                aria-label='Source Language'
-                                className='max-h-[50vh] overflow-y-auto'
-                                onAction={(key) => {
-                                    setSourceLanguage(key);
-                                }}
-                            >
-                                <Dropdown.Item
-                                    key='auto'
-                                    id='auto'
-                                >
-                                    <Label>{t('languages.auto')}</Label>
-                                </Dropdown.Item>
-                                {languageList.map((x) => {
-                                    return (
-                                        <Dropdown.Item
-                                            key={x}
-                                            id={x}
-                                        >
-                                            {t(`languages.${x}`)}
-                                        </Dropdown.Item>
-                                    );
-                                })}
-                            </Dropdown.Menu>
-                        </Dropdown.Popover>
-                    </Dropdown>
-                </div>
-                <div className='flex'>
+        <section className='translate-section translate-languages'>
+            <div>
+                {/* The preset only reaches the LLM-backed services; the rest
+                    ignore it, so it sits with the languages rather than in any
+                    one service's header. */}
+                <Dropdown>
                     <Button
-                        isIconOnly
-                        size='sm'
-                        variant='tertiary'
-                        className='text-[20px]'
-                        onPress={async () => {
-                            if (sourceLanguage !== 'auto') {
-                                const oldSourceLanguage = sourceLanguage;
-                                setSourceLanguage(targetLanguage);
-                                setTargetLanguage(oldSourceLanguage);
-                            } else {
-                                if (detectLanguage !== '') {
-                                    if (targetLanguage === translateTargetLanguage) {
-                                        setTargetLanguage(detectLanguage);
-                                    } else {
-                                        setTargetLanguage(translateTargetLanguage);
-                                    }
+                        className={`translate-langbtn ${
+                            aiPreset === DEFAULT_PRESET ? 'translate-langbtn--icon' : 'translate-langbtn--on'
+                        }`}
+                        aria-label='AI preset'
+                    >
+                        {aiPreset === DEFAULT_PRESET ? (
+                            <LuWand className='text-[14px]' />
+                        ) : (
+                            <span>{t(`translate.ai_preset.${aiPreset}`)}</span>
+                        )}
+                    </Button>
+                    <Dropdown.Popover>
+                        <Dropdown.Menu
+                            aria-label='AI preset'
+                            onAction={(key) => {
+                                setAiPreset(key);
+                            }}
+                        >
+                            {AI_PRESETS.map((preset) => (
+                                <Dropdown.Item
+                                    key={preset.id}
+                                    id={preset.id}
+                                >
+                                    {t(`translate.ai_preset.${preset.id}`)}
+                                </Dropdown.Item>
+                            ))}
+                        </Dropdown.Menu>
+                    </Dropdown.Popover>
+                </Dropdown>
+            </div>
+            <div>
+                <Dropdown>
+                    <Button className='translate-langbtn'>
+                        <span>{t(`languages.${sourceLanguage}`)}</span>
+                    </Button>
+                    <Dropdown.Popover>
+                        <Dropdown.Menu
+                            aria-label='Source Language'
+                            className='max-h-[50vh] overflow-y-auto'
+                            onAction={(key) => {
+                                setSourceLanguage(key);
+                            }}
+                        >
+                            <Dropdown.Item
+                                key='auto'
+                                id='auto'
+                            >
+                                <Label>{t('languages.auto')}</Label>
+                            </Dropdown.Item>
+                            {languageList.map((x) => {
+                                return (
+                                    <Dropdown.Item
+                                        key={x}
+                                        id={x}
+                                    >
+                                        {t(`languages.${x}`)}
+                                    </Dropdown.Item>
+                                );
+                            })}
+                        </Dropdown.Menu>
+                    </Dropdown.Popover>
+                </Dropdown>
+            </div>
+            <div>
+                <button
+                    type='button'
+                    className='translate-langbtn translate-langbtn--icon'
+                    onClick={() => {
+                        if (sourceLanguage !== 'auto') {
+                            const oldSourceLanguage = sourceLanguage;
+                            setSourceLanguage(targetLanguage);
+                            setTargetLanguage(oldSourceLanguage);
+                        } else {
+                            if (detectLanguage !== '') {
+                                if (targetLanguage === translateTargetLanguage) {
+                                    setTargetLanguage(detectLanguage);
                                 } else {
-                                    if (targetLanguage === translateSecondLanguage) {
-                                        setTargetLanguage(translateTargetLanguage);
-                                    } else {
-                                        setTargetLanguage(translateSecondLanguage);
-                                    }
+                                    setTargetLanguage(translateTargetLanguage);
+                                }
+                            } else {
+                                if (targetLanguage === translateSecondLanguage) {
+                                    setTargetLanguage(translateTargetLanguage);
+                                } else {
+                                    setTargetLanguage(translateSecondLanguage);
                                 }
                             }
-                        }}
-                    >
-                        <BiTransferAlt />
+                        }
+                    }}
+                >
+                    <BiTransferAlt className='text-[16px]' />
+                </button>
+            </div>
+            <div>
+                <Dropdown>
+                    <Button className='translate-langbtn'>
+                        <span>{t(`languages.${targetLanguage}`)}</span>
                     </Button>
-                </div>
-                <div className='flex'>
-                    <Dropdown>
-                        <Button
-                            className='rounded-md'
-                            variant='tertiary'
+                    <Dropdown.Popover>
+                        <Dropdown.Menu
+                            aria-label='Target Language'
+                            className='max-h-[50vh] overflow-y-auto'
+                            onAction={(key) => {
+                                setTargetLanguage(key);
+                            }}
                         >
-                            {t(`languages.${targetLanguage}`)}
-                        </Button>
-                        <Dropdown.Popover>
-                            <Dropdown.Menu
-                                aria-label='Target Language'
-                                className='max-h-[50vh] overflow-y-auto'
-                                onAction={(key) => {
-                                    setTargetLanguage(key);
-                                }}
-                            >
-                                {languageList.map((x) => {
-                                    return (
-                                        <Dropdown.Item
-                                            key={x}
-                                            id={x}
-                                        >
-                                            {t(`languages.${x}`)}
-                                        </Dropdown.Item>
-                                    );
-                                })}
-                            </Dropdown.Menu>
-                        </Dropdown.Popover>
-                    </Dropdown>
-                </div>
-            </CardFooter>
-        </Card>
+                            {languageList.map((x) => {
+                                return (
+                                    <Dropdown.Item
+                                        key={x}
+                                        id={x}
+                                    >
+                                        {t(`languages.${x}`)}
+                                    </Dropdown.Item>
+                                );
+                            })}
+                        </Dropdown.Menu>
+                    </Dropdown.Popover>
+                </Dropdown>
+            </div>
+        </section>
     );
 }

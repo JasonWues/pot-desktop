@@ -7,7 +7,8 @@
             "write_clipboard": "写入剪贴板",
             "plugin": "插件",
             "coming": "敬请期待…",
-            "clear": "清空"
+            "clear": "清空",
+            "close": "关闭"
         },
         "languages": {
             "auto": "自动检测",
@@ -69,6 +70,7 @@
                     "light": "浅色",
                     "dark": "深色",
                     "nocturne": "夜曲",
+                    "modernist": "现代主义",
                     "system": "跟随系统"
                 },
                 "transparent": "透明效果",
@@ -512,6 +514,15 @@
             "retry": "重试",
             "delete_newline": "删除换行",
             "translate_back": "翻译回原文",
+            "unwrap": "去换行",
+            "back": "回译",
+            "collect": "收藏",
+            "status": {
+                "translating": "翻译中…",
+                "collapsed": "已折叠",
+                "failed": "失败",
+                "cached": "缓存"
+            },
             "ai_preset": {
                 "translate": "翻译",
                 "polish": "润色",
