@@ -4,20 +4,24 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-Pot is a cross-platform translation + OCR desktop app: a React 18 frontend (Vite, HeroUI v3, Tailwind 4) inside a Tauri 2 shell. Package manager is **pnpm** (Node >= 18, see `.node-version`).
+Pot is a cross-platform translation + OCR desktop app: a React 19 frontend (Vite, HeroUI v3, Tailwind 4) inside a Tauri 2 shell. Package manager is **pnpm** (Node 22, see `.node-version` — pnpm 11 refuses to run below 22.13). pnpm >= 10 needs every dependency build script decided explicitly, so a new dep with a postinstall goes in the `allowBuilds` map in `pnpm-workspace.yaml` or it is silently skipped.
 
 ## Commands
 
 ```bash
 pnpm install            # install JS deps
 pnpm tauri dev          # run the app (starts vite on :1420, then cargo)
-pnpm dev:mcp            # run the app (starts vite on :1420, then cargo) with mcp 
+pnpm dev:mcp            # same, but merges src-tauri/tauri.dev.conf.json (withGlobalTauri: true)
 pnpm tauri build        # build installers for the current platform
 pnpm dev                # frontend only — mostly useless, every window calls into Tauri
 npx prettier --write .  # format (config in .prettierrc.json: 4 spaces, single quotes, 120 cols)
 ```
 
-Linux dev also needs (per `.github/actions/build-for-linux/entrypoint.sh` — note the README still lists the Tauri 1 webkit 4.0 packages): `libgtk-3-dev libwebkit2gtk-4.1-dev libjavascriptcoregtk-4.1-dev libsoup-3.0-dev libayatana-appindicator3-dev librsvg2-dev patchelf libxdo-dev libxcb1 libxrandr2 libdbus-1-3`.
+`dev:mcp` exists for the two MCP servers in `.mcp.json`: `tauri` (`@hypothesi/tauri-mcp-server`, drives the running app — windows, DOM, screenshots, IPC — and needs `withGlobalTauri`) and `heroui` (`@heroui/mcp`, v3 component docs/props/source). Reach for the HeroUI one before guessing at a v3 prop; the v2→v3 migration here has already been bitten by props v3 accepts and ignores.
+
+Linux dev also needs (per `.github/actions/build-for-linux/entrypoint.sh` — note the README still lists the Tauri 1 webkit 4.0 packages): `libgtk-3-dev libwebkit2gtk-4.1-dev libjavascriptcoregtk-4.1-dev libsoup-3.0-dev libayatana-appindicator3-dev librsvg2-dev patchelf libxdo-dev libxcb1 libxrandr2 libdbus-1-3 libpipewire-0.3-dev libspa-0.2-dev clang libclang-dev`.
+
+The last four are for `xcap`, the screenshot backend: it depends on `pipewire` unconditionally on Linux (that is its Wayland capture path, and it is not behind a feature), which drags in `libspa-sys` — a crate that both probes `libpipewire-0.3.pc` through pkg-config and runs bindgen over its headers. Its `build.rs` never passes `--target` to clang, so **cross builds must set `BINDGEN_EXTRA_CLANG_ARGS`** with the target triple and multiarch include dir or bindgen silently sizes the bindings for the host.
 
 There is **no test suite and no lint script** — verification is running the app. Rust side: `cargo check`/`cargo clippy` from `src-tauri/`.
 
@@ -62,6 +66,15 @@ Register a new service by adding it to the barrel `src/services/<type>/index.jsx
 
 Users can configure **multiple instances of the same service**. The key is `name@randomId` (`src/utils/service_instance.ts`: `createServiceInstanceKey`, `getServiceName`, `whetherPluginService`); that key is both the config-store key and the list entry. Keys starting with `plugin` are third-party `.potext` plugins installed into `$APPCONFIG/plugins/<type>/<name>/`, loaded at call time by `invoke_plugin()` (`src/utils/invoke_plugin.js`), which `eval`s the plugin's `main.js` and hands it a `utils` object. `config.rs::check_service_available` prunes configured services whose builtin/plugin backing has disappeared.
 
+The `tesseract` recognize service is the one with a runtime that is **not** in the JS bundle: it points `workerPath`/`corePath` at `public/worker.min.js` and `public/tesseract-core-simd-lstm.wasm.js`, which are vendored copies of `tesseract.js`'s `dist/worker.min.js` and `tesseract.js-core`'s SIMD+LSTM core. Bumping the npm dep alone changes only the main-thread half and leaves the worker behind — they had silently drifted apart (dep 5.1.1, vendored worker 5.0.0) until the 7.0.0 bump re-synced them. So upgrading means all three together:
+
+```bash
+cp node_modules/tesseract.js/dist/worker.min.js public/worker.min.js
+cp node_modules/.pnpm/tesseract.js-core@<v>/node_modules/tesseract.js-core/tesseract-core-simd-lstm.wasm.js public/
+```
+
+Only the one SIMD+LSTM core is vendored (~3.9 MB, wasm embedded in the `.js`); pointing `corePath` at a directory instead would make tesseract.js pick a variant per device and require shipping all six (~25 MB), and since v7 that set includes relaxed-SIMD builds that older WebViews cannot run. `langPath` is pot's own R2 mirror of the traineddata, unrelated to the npm version.
+
 ### The Tauri 1 compatibility layer (important)
 
 This branch migrated from Tauri 1.8 to Tauri 2 (`d44c7bb`). Two shims deliberately preserve the v1 surface, because ~37 service files _and every third-party plugin_ are written against it — **don't "modernize" call sites into raw v2 APIs**:
@@ -96,13 +109,25 @@ Because every surface in the app is painted with v3 tokens (`bg-surface`, `text-
 - `--radius` is the root of Tailwind's whole radius scale here — `@heroui/styles` defines `--radius-xs … --radius-4xl` as multiples of it — so a single `--radius: 0rem` squares off every component in the app, including the `rounded-3xl` baked into `.button`.
 - `--border` / `--border-secondary` are the hairline and the strong rule. The translate window's layout is built entirely on that pair (`src/window/Translate/style.css`), which is what lets the same markup read correctly under every theme.
 
-A theme that wants to restyle utility **classes** rather than just retint the tokens behind them needs its own cascade layer after `utilities` (`@layer theme, base, components, utilities, <name>;`, declared in `src/window/Config/style.css` — see the comment there for why that file owns the statement). Nothing in `components` can outrank a utility. Two traps that path has hit before: `backdrop-filter` establishes a containing block for `position: fixed` descendants, so it must not go on the `bg-background` shells that hold the `data-tauri-drag-region` strips; and lightningcss merges a property with its own prefixed forms, so hand-writing `-webkit-backdrop-filter` makes it emit _only_ the legacy property, which Chrome 151/WebView2 no longer supports.
+Only `light` and `dark` ship (the `nocturne` and `modernist` experiments were removed in `2835314`), so `src/window/Config/style.css` currently declares the plain `@layer theme, base, components, utilities;` — see the comment there for why that file, not `src/style.css`, has to own the statement. A theme that wants to restyle utility **classes** rather than just retint the tokens behind them has to append its own layer after `utilities` in that same statement, because nothing in `components` can outrank a utility. Two traps that path has hit before: `backdrop-filter` establishes a containing block for `position: fixed` descendants, so it must not go on the `bg-background` shells that hold the `data-tauri-drag-region` strips; and lightningcss merges a property with its own prefixed forms, so hand-writing `-webkit-backdrop-filter` makes it emit _only_ the legacy property, which Chrome 151/WebView2 no longer supports.
 
 Anything reading a theme colour from JS should pass the var through as a string (`'var(--surface)'`) rather than branching on the theme name — it resolves against whatever `data-theme` is on `<html>` at paint time, so it stays correct for themes added later and needs no re-render on a theme switch. Note that v3's tokens are **complete colour values**, where v2's `--heroui-*` were bare HSL triplets meant to be wrapped: `hsl(var(--heroui-content1))` is now an invalid colour that silently falls back, and translucency is `color-mix(in oklab, var(--x) N%, transparent)` rather than `hsl(var(--x) / 0.N)`.
 
+### The flat surfaces
+
+`src/styles/flat.css` holds the shared primitives for the redesigned surfaces — no cards or fills, rules doing the dividing, flush-left uppercase actions, machine facts (dimensions, char counts, service names) in a quieter face. The Recognize window and the Service settings page are built from it; **`src/window/Translate/style.css` predates it and carries its own copies of the same three ideas** (`.translate-action` / `.translate-meta` / `.translate-primary`), so a change touching both surfaces should converge them into `flat.css` rather than edit two sets.
+
+Chrome there is sized in `px` and content in `rem` deliberately: `App.jsx` writes the user's `app_font_size` onto `<html>`, so `1rem` _is_ their chosen reading size — body copy tracks it while rules, labels and status text stay at the size the design draws them.
+
+### In-place image translation
+
+The Recognize window can paint a translation back over the captured image (`src/window/Recognize/ImageArea/InPlaceOverlay.jsx`). It is the one feature that goes around the normal translate path: it calls `system_ocr_layout` for per-line boxes, groups lines that are plainly one paragraph (adjacent, similar height, horizontally overlapping) so wrapped sentences translate as prose, then dispatches to the builtin service or `invoke_plugin()` and reads/writes the same `db.js` cache itself. So it duplicates the service-dispatch logic that `TargetArea` owns, and **Windows-only** — `ocr_layout.rs` is the only backend that reports geometry.
+
+`src/utils/ai_presets.js` is the other thing layered onto translation: named prompt presets (`polish`, `summarize`, `grammar`, `explain_code`) that swap an LLM service's `promptList` for one request without touching its saved config. Only the services listed in `PROMPT_SERVICES` read a prompt at all; the rest take a language pair and have nowhere to put an instruction.
+
 ### Rust module map (`src-tauri/src/`)
 
-`main.rs` wires plugins, the global `APP: OnceCell<AppHandle>`, and the `invoke_handler` list — a new `#[tauri::command]` must be added there _and_ usually needs a capability entry. `cmd.rs` misc commands (screenshot cropping, proxy, plugin install, fonts). `system_ocr.rs` per-OS native OCR (Windows.Media.Ocr / macOS Vision / Linux tesseract binary). `tts.rs` per-OS offline speech (Windows.Media.SpeechSynthesis / macOS `say` / Linux `espeak-ng`), returning base64 WAV because the IPC layer would otherwise serialize the audio as a JSON number array. `lang_detect.rs` offline detection via `lingua`. `backup.rs` WebDAV/Aliyun/local config backup. `updater.rs` + `updater_window`.
+`main.rs` wires plugins, the global `APP: OnceCell<AppHandle>`, and the `invoke_handler` list — a new `#[tauri::command]` must be added there _and_ usually needs a capability entry. `cmd.rs` misc commands (image cropping, clipboard image, plugin install, fonts, history export, devtools). `screenshot.rs` the capture itself; `proxy.rs` per-OS system proxy discovery. `system_ocr.rs` per-OS native OCR (Windows.Media.Ocr / macOS Vision / Linux tesseract binary), text only. `ocr_layout.rs` the same engine but returning a box per line — Windows only, because none of the other backends report geometry. `tts.rs` per-OS offline speech (Windows.Media.SpeechSynthesis / macOS `say` / Linux `espeak-ng`) and `edge_tts.rs` Edge's read-aloud voices, which live in Rust because the WebSocket handshake needs `Origin`/`User-Agent` headers a webview cannot set; both return base64 WAV because the IPC layer would otherwise serialize the audio as a JSON number array. `lang_detect.rs` offline detection via `lingua`. `backup.rs` WebDAV/Aliyun/local config backup. `updater.rs` + `updater_window`. `error.rs` the one `thiserror` enum every command returns.
 
 Windows are created hidden and shown once React mounts, so **anything that throws before `root.render` leaves an invisible window**. `main.jsx` therefore never lets init failures escape and mirrors the webview console into the Rust log (`attachConsole`) — check the log dir (tray → View Log) when a window fails to appear.
 
