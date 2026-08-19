@@ -98,7 +98,27 @@
                     "disable": "Disable",
                     "ocr_recognize": "Text Recognition",
                     "ocr_translate": "Screenshot Translation"
-                }
+                },
+                "section": {
+                    "startup": "Startup",
+                    "startup_note": "What happens when the machine boots, and how other apps reach pot.",
+                    "appearance": "Appearance",
+                    "appearance_note": "Everything that changes how the five windows look.",
+                    "network": "Network",
+                    "network_note": "Applies to translation, OCR and TTS alike."
+                },
+                "auto_start_desc": "Launch pot when you sign in.",
+                "check_update_desc": "Look for a new release on launch.",
+                "server_port_desc": "The local port the PopClip and SnipDo extensions call.",
+                "app_language_desc": "Language of the interface, not of translation.",
+                "app_theme_desc": "Follow the system or pin one appearance.",
+                "app_font_desc": "Typeface for every window.",
+                "app_fallback_font_desc": "Used for glyphs the main font is missing.",
+                "font_size_desc": "Sets 1rem, so body copy in every window scales with it.",
+                "tray_click_event_desc": "What a left click on the tray icon opens.",
+                "transparent_desc": "Translucent window backgrounds where the OS supports it.",
+                "dev_mode_desc": "Enables devtools and verbose logging.",
+                "proxy_desc": "Applied to every service request."
             },
             "translate": {
                 "label": "Translate",
@@ -148,7 +168,35 @@
                 "google": "Google",
                 "bing": "Bing",
                 "yandex": "Yandex",
-                "local": "Local"
+                "local": "Local",
+                "section": {
+                    "languages": "Languages",
+                    "languages_note": "What gets translated into what, and who decides the source.",
+                    "behaviour": "Behaviour",
+                    "behaviour_note": "What happens around a translation: caching, history, how text arrives.",
+                    "window": "Window",
+                    "window_note": "How the translate window places and shows itself."
+                },
+                "source_language_desc": "Leave on auto to have the source detected per request.",
+                "target_language_desc": "What text is translated into.",
+                "second_language_desc": "Used instead when the text is already in the target language.",
+                "detect_engine_desc": "Which engine decides the source language when it is set to auto.",
+                "auto_copy_desc": "Put the source or the result on the clipboard once a translation lands.",
+                "history_disable_desc": "Stop recording translations. Existing entries are kept.",
+                "cache_enable_desc": "Reuse a stored result instead of calling the service again.",
+                "cache_ttl_desc": "How long a cached result stays valid.",
+                "cache_clear_desc": "Drop every stored result. Services will be called afresh.",
+                "incremental_translate_desc": "Append new text to the box instead of replacing what is there.",
+                "dynamic_translate_desc": "Translate while you type, rather than waiting for Enter.",
+                "delete_newline_desc": "Join wrapped lines into one paragraph before translating.",
+                "remember_language_desc": "Reopen with the pair you last used rather than the configured one.",
+                "window_position_desc": "Where the window opens: at the mouse, or where you last left it.",
+                "remember_window_size_desc": "Reopen at the size you last resized it to.",
+                "close_on_blur_desc": "Close the window as soon as it loses focus.",
+                "always_on_top_desc": "Keep the window above other applications.",
+                "hide_source_desc": "Open with the source pane collapsed.",
+                "hide_language_desc": "Open with the language bar collapsed.",
+                "hide_window_desc": "Translate without showing the window; the result goes to the clipboard."
             },
             "recognize": {
                 "label": "Recognize",
@@ -157,7 +205,18 @@
                 "delete_newline": "Auto Delete Newline",
                 "auto_copy": "Auto Copy",
                 "close_on_blur": "Close window when focus lost",
-                "hide_window": "Hide Recognition Window"
+                "hide_window": "Hide Recognition Window",
+                "section": {
+                    "reading": "Reading",
+                    "reading_note": "What the OCR engine is told to look for, and what happens to the text.",
+                    "window": "Window",
+                    "window_note": "How the recognize window behaves once it is open."
+                },
+                "language_desc": "The language the engine expects. Auto lets it decide.",
+                "delete_newline_desc": "Join wrapped lines into one paragraph after reading.",
+                "auto_copy_desc": "Put the recognized text on the clipboard straight away.",
+                "close_on_blur_desc": "Close the window as soon as it loses focus.",
+                "hide_window_desc": "Recognize without showing the window."
             },
             "hotkey": {
                 "label": "Hotkey",
@@ -168,7 +227,15 @@
                 "ocr_translate": "Screenshot Translation",
                 "is_register": "The hotkey is already registered",
                 "success": "Hotkey register success",
-                "set_hotkey": "Press to Set Hotkey"
+                "set_hotkey": "Press to Set Hotkey",
+                "section": {
+                    "global": "Global",
+                    "global_note": "System-wide shortcuts, live even when pot has no window focused."
+                },
+                "selection_translate_desc": "Translate whatever text is selected right now.",
+                "input_translate_desc": "Open the translate window with an empty box to type into.",
+                "ocr_recognize_desc": "Screenshot a region and read the text out of it.",
+                "ocr_translate_desc": "Screenshot a region, read it, then translate what it found."
             },
             "service": {
                 "label": "Service",
@@ -204,7 +271,11 @@
                 "export_json": "Export JSON",
                 "export_success": "Exported",
                 "delete": "Delete",
-                "title": "History"
+                "title": "History",
+                "clear_confirm": "Clear all {{count}} history entries? This cannot be undone.",
+                "empty": "No history yet.",
+                "entry_count": "{{count}} entries",
+                "showing": "Showing {{shown}} of {{total}}"
             },
             "backup": {
                 "label": "Backup",
@@ -224,7 +295,16 @@
                 "list": "Backup List",
                 "load_success": "Load Backup Success",
                 "backup_success": "Backup Success",
-                "empty": "You have not backed up yet"
+                "empty": "You have not backed up yet",
+                "section": {
+                    "target": "Target",
+                    "target_note": "Where a copy of the config goes, and the credentials to reach it."
+                },
+                "type_desc": "WebDAV, Aliyun Drive or a folder on this machine.",
+                "webdav_url_desc": "Full collection URL, including the path to back up into.",
+                "webdav_username_desc": "The WebDAV account, not your pot account.",
+                "webdav_password_desc": "Stored in the local config file as written.",
+                "aliyun_account_desc": "Signed in. Click the avatar to sign out and scan again."
             },
             "about": {
                 "label": "About",

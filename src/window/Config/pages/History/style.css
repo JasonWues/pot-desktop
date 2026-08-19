@@ -1,0 +1,201 @@
+/*
+  The History page in the flat vocabulary: no table chrome, no row of column
+  dividers, rules doing the dividing. Built on the primitives in
+  src/styles/flat.css -- see that file's header for why chrome is sized in px
+  and content in rem.
+
+  The list is grouped by day rather than paged into a grid, because the thing a
+  reader scans for here is "what did I translate this afternoon", not a cell.
+  Each entry states its service, language pair and time once across the top,
+  then gives source and result equal width underneath.
+*/
+
+@layer components {
+    /* ------------------------------------------------------------- the bar */
+
+    .history-bar {
+        flex: none;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 12px 0;
+        border-bottom: 2px solid var(--border-secondary);
+    }
+
+    /* The search field and the two filters share the squared outline. */
+    .history-bar .search-field,
+    .history-bar .button {
+        --button-bg: transparent;
+        --button-bg-hover: var(--surface);
+        --button-bg-pressed: var(--surface-secondary);
+        --button-fg: var(--foreground);
+        border-radius: 0;
+        min-height: 34px;
+        height: 34px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .history-bar .button {
+        border: 2px solid var(--border-secondary);
+        padding: 0 12px;
+    }
+
+    .history-bar__count {
+        flex: none;
+        margin-left: auto;
+        font-size: 11px;
+        font-weight: 700;
+        line-height: 1;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--muted);
+        white-space: nowrap;
+    }
+
+    /* --------------------------------------------------------- the entries */
+
+    .history-list {
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    /*
+      The day heading. Filled rather than ruled -- it is the one place on the
+      page where a band reads faster than a line, because it has to survive
+      being scrolled past at speed.
+    */
+    .history-day {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+        padding: 12px 18px 8px;
+        background: var(--surface);
+        border-bottom: 1px solid var(--border);
+    }
+
+    .history-day__label {
+        font-size: 11px;
+        font-weight: 700;
+        line-height: 1;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+    }
+
+    .history-day__count {
+        font-size: 11px;
+        line-height: 1;
+        letter-spacing: 0.06em;
+        color: var(--muted);
+    }
+
+    .history-entry {
+        display: block;
+        width: 100%;
+        text-align: left;
+        border: 0;
+        border-bottom: 1px solid var(--border);
+        background: transparent;
+        padding: 14px 18px;
+        cursor: pointer;
+        font: inherit;
+        color: inherit;
+    }
+
+    .history-entry:hover {
+        background: var(--surface);
+    }
+
+    .history-entry:focus-visible {
+        outline: 2px solid var(--focus);
+        outline-offset: -2px;
+    }
+
+    /* Service, language pair and timestamp: the machine facts, stated once. */
+    .history-entry__head {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 8px;
+    }
+
+    .history-entry__logo {
+        width: 15px;
+        height: 15px;
+        flex: none;
+        object-fit: contain;
+    }
+
+    .history-entry__service {
+        font-size: 11px;
+        font-weight: 600;
+        line-height: 1;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+
+    .history-entry__pair {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 11px;
+        line-height: 1;
+        letter-spacing: 0.06em;
+        color: var(--muted);
+    }
+
+    .history-entry__stamp {
+        margin-left: auto;
+        font-size: 11px;
+        line-height: 1;
+        letter-spacing: 0.06em;
+        color: var(--muted);
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+    }
+
+    /*
+      Source and result at equal width, the hairline between them carrying the
+      "becomes" that a column header would otherwise have to say. Body copy, so
+      it tracks the reader's own font size.
+    */
+    .history-entry__body {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+        align-items: start;
+        font-size: 1rem;
+        line-height: 1.5;
+    }
+
+    /*
+      Clamped rather than ellipsed on one line: two lines is enough to tell two
+      entries apart, and the modal has the rest.
+    */
+    .history-entry__text,
+    .history-entry__result {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        overflow: hidden;
+        text-wrap: pretty;
+        overflow-wrap: anywhere;
+    }
+
+    .history-entry__result {
+        border-left: 1px solid var(--border);
+        padding-left: 18px;
+    }
+
+    .history-empty {
+        padding: 28px 18px;
+        color: var(--muted);
+        font-size: 12px;
+    }
+}

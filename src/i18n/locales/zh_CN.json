@@ -98,7 +98,27 @@
                     "disable": "禁用",
                     "ocr_recognize": "文字识别",
                     "ocr_translate": "截图翻译"
-                }
+                },
+                "section": {
+                    "startup": "启动",
+                    "startup_note": "开机时的行为，以及其它应用如何访问 pot。",
+                    "appearance": "外观",
+                    "appearance_note": "影响五个窗口外观的全部设置。",
+                    "network": "网络",
+                    "network_note": "对翻译、文字识别和语音合成同样生效。"
+                },
+                "auto_start_desc": "登录系统后自动启动 pot。",
+                "check_update_desc": "启动时检查是否有新版本。",
+                "server_port_desc": "PopClip 与 SnipDo 扩展调用的本地端口。",
+                "app_language_desc": "界面语言，不是翻译语言。",
+                "app_theme_desc": "跟随系统，或固定为某一种外观。",
+                "app_font_desc": "所有窗口使用的字体。",
+                "app_fallback_font_desc": "主字体缺字时用它补上。",
+                "font_size_desc": "决定 1rem 的大小，所有窗口的正文随之缩放。",
+                "tray_click_event_desc": "左键点击托盘图标时打开什么。",
+                "transparent_desc": "在系统支持的情况下使用半透明窗口背景。",
+                "dev_mode_desc": "启用开发者工具和详细日志。",
+                "proxy_desc": "对每一个服务请求生效。"
             },
             "translate": {
                 "label": "翻译设置",
@@ -148,7 +168,35 @@
                 "google": "谷歌",
                 "bing": "必应",
                 "yandex": "Yandex",
-                "local": "本地"
+                "local": "本地",
+                "section": {
+                    "languages": "语言",
+                    "languages_note": "从什么语言译到什么语言，以及由谁判断源语言。",
+                    "behaviour": "行为",
+                    "behaviour_note": "翻译前后发生的事：缓存、历史记录、文本如何进入。",
+                    "window": "窗口",
+                    "window_note": "翻译窗口如何定位和显示自己。"
+                },
+                "source_language_desc": "保持自动，则每次请求都单独检测源语言。",
+                "target_language_desc": "文本被译成的语言。",
+                "second_language_desc": "当原文已经是目标语言时，改用这一个。",
+                "detect_engine_desc": "源语言为自动时，由哪个引擎判断语种。",
+                "auto_copy_desc": "翻译完成后，把原文或译文写入剪贴板。",
+                "history_disable_desc": "不再记录翻译。已有的记录会保留。",
+                "cache_enable_desc": "复用已存的结果，不再重复调用服务。",
+                "cache_ttl_desc": "一条缓存结果的有效时长。",
+                "cache_clear_desc": "清掉全部已存结果，之后将重新调用服务。",
+                "incremental_translate_desc": "新文本追加到输入框，而不是覆盖原有内容。",
+                "dynamic_translate_desc": "边输入边翻译，不必等回车。",
+                "delete_newline_desc": "翻译前先把折行合并成一段。",
+                "remember_language_desc": "按上次用过的语言对打开，而不是配置里的那一组。",
+                "window_position_desc": "窗口在哪里打开：跟随鼠标，或上次所在的位置。",
+                "remember_window_size_desc": "按上次调整后的大小打开。",
+                "close_on_blur_desc": "窗口一失去焦点就关闭。",
+                "always_on_top_desc": "让窗口始终位于其它应用之上。",
+                "hide_source_desc": "打开时折叠原文区。",
+                "hide_language_desc": "打开时折叠语言栏。",
+                "hide_window_desc": "不显示窗口直接翻译，结果写入剪贴板。"
             },
             "recognize": {
                 "label": "文字识别",
@@ -157,7 +205,18 @@
                 "delete_newline": "自动删除换行",
                 "auto_copy": "自动复制",
                 "close_on_blur": "失去焦点时关闭窗口",
-                "hide_window": "隐藏识别窗口"
+                "hide_window": "隐藏识别窗口",
+                "section": {
+                    "reading": "识别",
+                    "reading_note": "告诉 OCR 引擎该找什么，以及识别出的文字如何处理。",
+                    "window": "窗口",
+                    "window_note": "识别窗口打开后的行为。"
+                },
+                "language_desc": "引擎预期的语言。选自动则由它自行判断。",
+                "delete_newline_desc": "识别后把折行合并成一段。",
+                "auto_copy_desc": "识别完成后立即把文字写入剪贴板。",
+                "close_on_blur_desc": "窗口一失去焦点就关闭。",
+                "hide_window_desc": "不显示窗口直接识别。"
             },
             "hotkey": {
                 "label": "热键设置",
@@ -168,7 +227,15 @@
                 "ocr_translate": "截图翻译",
                 "is_register": "快捷键已被注册",
                 "success": "快捷键注册成功",
-                "set_hotkey": "按下按键设置快捷键"
+                "set_hotkey": "按下按键设置快捷键",
+                "section": {
+                    "global": "全局",
+                    "global_note": "系统级快捷键，pot 没有窗口在前台时同样生效。"
+                },
+                "selection_translate_desc": "翻译当前选中的文本。",
+                "input_translate_desc": "打开翻译窗口，直接输入要翻译的内容。",
+                "ocr_recognize_desc": "截取一块区域并识别其中的文字。",
+                "ocr_translate_desc": "截取一块区域，识别文字后再翻译。"
             },
             "service": {
                 "label": "服务设置",
@@ -204,7 +271,11 @@
                 "export_json": "导出 JSON",
                 "export_success": "已导出",
                 "delete": "删除",
-                "title": "历史记录"
+                "title": "历史记录",
+                "clear_confirm": "确定要清空全部 {{count}} 条历史记录吗？此操作无法撤销。",
+                "empty": "暂无历史记录。",
+                "entry_count": "{{count}} 条",
+                "showing": "显示 {{shown}} / {{total}}"
             },
             "backup": {
                 "label": "备份设置",
@@ -224,7 +295,16 @@
                 "list": "备份列表",
                 "load_success": "载入备份成功",
                 "backup_success": "备份成功",
-                "empty": "您还没有备份"
+                "empty": "您还没有备份",
+                "section": {
+                    "target": "目标",
+                    "target_note": "配置备份到哪里，以及访问它所需的凭据。"
+                },
+                "type_desc": "WebDAV、阿里云盘，或本机的一个文件夹。",
+                "webdav_url_desc": "完整的集合 URL，包含备份到的路径。",
+                "webdav_username_desc": "WebDAV 服务的账号，不是 pot 的账号。",
+                "webdav_password_desc": "以明文形式存放在本地配置文件中。",
+                "aliyun_account_desc": "已登录。点击头像可退出并重新扫码。"
             },
             "about": {
                 "label": "关于应用",

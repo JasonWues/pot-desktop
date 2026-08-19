@@ -1,12 +1,13 @@
 import { unregister, isRegistered } from '@tauri-apps/plugin-global-shortcut';
 import toast, { Toaster } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { CardContent, Button, Input, Card, InputGroup } from '@heroui/react';
+import { Button, Input, InputGroup } from '@heroui/react';
 import React from 'react';
 
 import { useConfig } from '../../../../hooks/useConfig';
 import { useToastStyle } from '../../../../hooks';
 import { osType } from '../../../../utils/env';
+import { Section, Row } from '../../components/Section';
 import { invoke } from '@tauri-apps/api/core';
 
 const keyMap = {
@@ -111,11 +112,16 @@ export default function Hotkey() {
     }
 
     return (
-        <Card>
+        <>
             <Toaster />
-            <CardContent>
-                <div className='config-item'>
-                    <h3 className='my-auto'>{t('config.hotkey.selection_translate')}</h3>
+            <Section
+                name={t('config.hotkey.section.global')}
+                note={t('config.hotkey.section.global_note')}
+            >
+                <Row
+                    label={t('config.hotkey.selection_translate')}
+                    desc={t('config.hotkey.selection_translate_desc')}
+                >
                     {/* InputGroup, not Input with children: v3's Input renders a real
                         <input>, which is a void element and cannot hold the OK button.
                         `label` is not a v3 Input prop either. It carried the only
@@ -127,7 +133,7 @@ export default function Hotkey() {
                         warns on a `value` with no `onChange`. The same shape repeats
                         for the three hotkey fields below. */}
                     {selectionTranslate !== null && (
-                        <InputGroup className='max-w-[50%]'>
+                        <InputGroup className='w-[240px]'>
                             <InputGroup.Input
                                 type='hotkey'
                                 aria-label={t('config.hotkey.set_hotkey')}
@@ -156,11 +162,13 @@ export default function Hotkey() {
                             </InputGroup.Suffix>
                         </InputGroup>
                     )}
-                </div>
-                <div className='config-item'>
-                    <h3 className='my-auto'>{t('config.hotkey.input_translate')}</h3>
+                </Row>
+                <Row
+                    label={t('config.hotkey.input_translate')}
+                    desc={t('config.hotkey.input_translate_desc')}
+                >
                     {inputTranslate !== null && (
-                        <InputGroup className='max-w-[50%]'>
+                        <InputGroup className='w-[240px]'>
                             <InputGroup.Input
                                 type='hotkey'
                                 aria-label={t('config.hotkey.set_hotkey')}
@@ -189,11 +197,13 @@ export default function Hotkey() {
                             </InputGroup.Suffix>
                         </InputGroup>
                     )}
-                </div>
-                <div className='config-item'>
-                    <h3 className='my-auto'>{t('config.hotkey.ocr_recognize')}</h3>
+                </Row>
+                <Row
+                    label={t('config.hotkey.ocr_recognize')}
+                    desc={t('config.hotkey.ocr_recognize_desc')}
+                >
                     {ocrRecognize !== null && (
-                        <InputGroup className='max-w-[50%]'>
+                        <InputGroup className='w-[240px]'>
                             <InputGroup.Input
                                 type='hotkey'
                                 aria-label={t('config.hotkey.set_hotkey')}
@@ -222,11 +232,13 @@ export default function Hotkey() {
                             </InputGroup.Suffix>
                         </InputGroup>
                     )}
-                </div>
-                <div className='config-item'>
-                    <h3 className='my-auto'>{t('config.hotkey.ocr_translate')}</h3>
+                </Row>
+                <Row
+                    label={t('config.hotkey.ocr_translate')}
+                    desc={t('config.hotkey.ocr_translate_desc')}
+                >
                     {ocrTranslate !== null && (
-                        <InputGroup className='max-w-[50%]'>
+                        <InputGroup className='w-[240px]'>
                             <InputGroup.Input
                                 type='hotkey'
                                 aria-label={t('config.hotkey.set_hotkey')}
@@ -255,8 +267,8 @@ export default function Hotkey() {
                             </InputGroup.Suffix>
                         </InputGroup>
                     )}
-                </div>
-            </CardContent>
-        </Card>
+                </Row>
+            </Section>
+        </>
     );
 }

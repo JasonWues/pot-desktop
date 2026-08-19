@@ -8,120 +8,51 @@ import { MdKeyboardAlt } from 'react-icons/md';
 import { MdExtension } from 'react-icons/md';
 import { AiFillCloud } from 'react-icons/ai';
 import { FaHistory } from 'react-icons/fa';
-import { Button } from '@heroui/react';
 import React from 'react';
+
+/*
+  The eight entries, in the order they are drawn. They were eight copies of the
+  same twelve-line block before; the only thing that ever varied between them is
+  in this table.
+*/
+const NAV = [
+    { path: '/general', icon: AiFillAppstore, label: 'config.general.label' },
+    { path: '/translate', icon: PiTranslateFill, label: 'config.translate.label' },
+    { path: '/recognize', icon: PiTextboxFill, label: 'config.recognize.label' },
+    { path: '/hotkey', icon: MdKeyboardAlt, label: 'config.hotkey.label' },
+    { path: '/service', icon: MdExtension, label: 'config.service.label' },
+    { path: '/history', icon: FaHistory, label: 'config.history.label' },
+    { path: '/backup', icon: AiFillCloud, label: 'config.backup.label' },
+    { path: '/about', icon: BsInfoSquareFill, label: 'config.about.label' },
+];
 
 export default function SideBar() {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const location = useLocation();
 
-    // v2 names. The variant remap was a search-and-replace over literal props, so
-    // it never saw these -- and an unknown variant is not an error in v3, it just
-    // emits no `button--*` class at all, which left every entry drawn the same
-    // and the sidebar with no current-page marker.
-    function setStyle(pathname) {
-        return location.pathname.includes(pathname) ? 'tertiary' : 'ghost';
-    }
-
     return (
-        <div className='mx-[12px] overflow-y-auto'>
-            <Button
-                fullWidth
-                size='lg'
-                variant={setStyle('/general')}
-                className='mb-[5px]'
-                onPress={() => {
-                    navigate('/general');
-                }}
-            >
-                <AiFillAppstore className='text-[24px]' />
-                <div className='w-full'>{t('config.general.label')}</div>
-            </Button>
-            <Button
-                fullWidth
-                size='lg'
-                variant={setStyle('/translate')}
-                className='mb-[5px]'
-                onPress={() => {
-                    navigate('/translate');
-                }}
-            >
-                <PiTranslateFill className='text-[24px]' />
-                <div className='w-full'>{t('config.translate.label')}</div>
-            </Button>
-            <Button
-                fullWidth
-                size='lg'
-                variant={setStyle('/recognize')}
-                className='mb-[5px]'
-                onPress={() => {
-                    navigate('/recognize');
-                }}
-            >
-                <PiTextboxFill className='text-[24px]' />
-                <div className='w-full'>{t('config.recognize.label')}</div>
-            </Button>
-            <Button
-                fullWidth
-                size='lg'
-                variant={setStyle('/hotkey')}
-                className='mb-[5px]'
-                onPress={() => {
-                    navigate('/hotkey');
-                }}
-            >
-                <MdKeyboardAlt className='text-[24px]' />
-                <div className='w-full'>{t('config.hotkey.label')}</div>
-            </Button>
-            <Button
-                fullWidth
-                size='lg'
-                variant={setStyle('/service')}
-                className='mb-[5px]'
-                onPress={() => {
-                    navigate('/service');
-                }}
-            >
-                <MdExtension className='text-[24px]' />
-                <div className='w-full'>{t('config.service.label')}</div>
-            </Button>
-            <Button
-                fullWidth
-                size='lg'
-                variant={setStyle('/history')}
-                className='mb-[5px]'
-                onPress={() => {
-                    navigate('/history');
-                }}
-            >
-                <FaHistory className='text-[24px]' />
-                <div className='w-full'>{t('config.history.label')}</div>
-            </Button>
-            <Button
-                fullWidth
-                size='lg'
-                variant={setStyle('/backup')}
-                className='mb-[5px]'
-                onPress={() => {
-                    navigate('/backup');
-                }}
-            >
-                <AiFillCloud className='text-[24px]' />
-                <div className='w-full'>{t('config.backup.label')}</div>
-            </Button>
-            <Button
-                fullWidth
-                size='lg'
-                variant={setStyle('/about')}
-                className='mb-[5px]'
-                onPress={() => {
-                    navigate('/about');
-                }}
-            >
-                <BsInfoSquareFill className='text-[24px]' />
-                <div className='w-full'>{t('config.about.label')}</div>
-            </Button>
-        </div>
+        <nav className='config-nav'>
+            {NAV.map(({ path, icon: Icon, label }) => {
+                const current = location.pathname.includes(path);
+                return (
+                    <button
+                        type='button'
+                        key={path}
+                        className={`config-nav__item ${current ? 'config-nav__item--on' : ''}`}
+                        // The rows are no longer HeroUI Buttons, so the current
+                        // page is stated for a screen reader rather than implied
+                        // by the variant.
+                        aria-current={current ? 'page' : undefined}
+                        onClick={() => {
+                            navigate(path);
+                        }}
+                    >
+                        <Icon className='config-nav__icon' />
+                        <span className='config-nav__label'>{t(label)}</span>
+                    </button>
+                );
+            })}
+        </nav>
     );
 }

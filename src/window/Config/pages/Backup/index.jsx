@@ -1,5 +1,6 @@
 import { readTextFile, BaseDirectory } from '@tauri-apps/plugin-fs';
-import { CardContent, Dropdown, Button, Input, Card, Avatar, Tooltip, Label, TextField } from '@heroui/react';
+import { Dropdown, Button, Input, Avatar, Tooltip, Label, TextField } from '@heroui/react';
+import { Section, Row } from '../../components/Section';
 
 import toast, { Toaster } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -171,11 +172,16 @@ export default function Backup() {
     }, [backupType]);
 
     return (
-        <Card className='mb-[10px]'>
+        <>
             <Toaster />
-            <CardContent>
-                <div className='config-item'>
-                    <h3 className='my-auto'>{t('config.backup.type')}</h3>
+            <Section
+                name={t('config.backup.section.target')}
+                note={t('config.backup.section.target_note')}
+            >
+                <Row
+                    label={t('config.backup.type')}
+                    desc={t('config.backup.type_desc')}
+                >
                     {backupType !== null && (
                         <Dropdown>
                             <Button variant='outline'>{t(`config.backup.${backupType}`)}</Button>
@@ -208,7 +214,7 @@ export default function Backup() {
                             </Dropdown.Popover>
                         </Dropdown>
                     )}
-                </div>
+                </Row>
                 <div className={backupType !== 'webdav' ? 'hidden' : ''}>
                     {/* aria-label rather than a <Label> child, for all three rows below.
                         These already name themselves with the <h3> to their left; v2 named
@@ -217,12 +223,14 @@ export default function Backup() {
                         placeholder and vanished on input. v3's Label is a real sibling
                         element, which put a second full-size label between the heading and
                         the box. */}
-                    <div className='config-item'>
-                        <h3 className='my-auto'>{t('config.backup.webdav_url')}</h3>
+                    <Row
+                        label={t('config.backup.webdav_url')}
+                        desc={t('config.backup.webdav_url_desc')}
+                    >
                         {davUrl !== null && (
                             <TextField
                                 aria-label={t('config.backup.webdav_url')}
-                                className='flex w-full flex-row items-center justify-end max-w-[300px]'
+                                className='w-[300px]'
                                 value={davUrl}
                                 onChange={(v) => {
                                     setDavUrl(v);
@@ -231,13 +239,15 @@ export default function Backup() {
                                 <Input />
                             </TextField>
                         )}
-                    </div>
-                    <div className='config-item'>
-                        <h3 className='my-auto'>{t('config.backup.username')}</h3>
+                    </Row>
+                    <Row
+                        label={t('config.backup.username')}
+                        desc={t('config.backup.webdav_username_desc')}
+                    >
                         {davUserName !== null && (
                             <TextField
                                 aria-label={t('config.backup.username')}
-                                className='flex w-full flex-row items-center justify-end max-w-[300px]'
+                                className='w-[300px]'
                                 value={davUserName}
                                 onChange={(v) => {
                                     setDavUserName(v);
@@ -246,13 +256,15 @@ export default function Backup() {
                                 <Input />
                             </TextField>
                         )}
-                    </div>
-                    <div className='config-item'>
-                        <h3 className='my-auto'>{t('config.backup.password')}</h3>
+                    </Row>
+                    <Row
+                        label={t('config.backup.password')}
+                        desc={t('config.backup.webdav_password_desc')}
+                    >
                         {davPassword !== null && (
                             <TextField
                                 aria-label={t('config.backup.password')}
-                                className='flex w-full flex-row items-center justify-end max-w-[300px]'
+                                className='w-[300px]'
                                 value={davPassword}
                                 onChange={(v) => {
                                     setDavPassword(v);
@@ -261,58 +273,58 @@ export default function Backup() {
                                 <Input type='password' />
                             </TextField>
                         )}
-                    </div>
+                    </Row>
                 </div>
-                <div className={`flex justify-center ${backupType !== 'aliyun' ? 'hidden' : ''}`}>
+                <div className={`flat-row justify-center ${backupType !== 'aliyun' ? 'hidden' : ''}`}>
                     <img
                         src={aliyunQrCodeUrl}
                         className={`h-[200px] mb-2 ${aliyunQrCodeUrl === '' ? 'hidden' : ''}`}
                     />
                 </div>
-                <div className={`config-item ${backupType !== 'aliyun' ? 'hidden' : ''}`}>
-                    {aliyunUserInfo !== null && (
-                        <>
-                            <h3 className='my-auto'>{t('config.backup.username')}</h3>
-
-                            <Tooltip>
-                                <Tooltip.Trigger>
-                                    <Button
-                                        variant='tertiary'
-                                        onClick={() => {
-                                            setAliyunAccessToken('');
-                                            // setAliyunRefreshToken('');
-                                            setAliyunUserInfo(null);
-                                            refreshQrCode();
-                                        }}
-                                    >
-                                        <Avatar
-                                            src={aliyunUserInfo.avatar}
-                                            size='sm'
-                                        />
-                                        <h3 className='my-auto'>{aliyunUserInfo.name}</h3>
-                                    </Button>
-                                </Tooltip.Trigger>
-                                <Tooltip.Content placement='bottom-end'>{t('config.backup.logout')}</Tooltip.Content>
-                            </Tooltip>
-                        </>
-                    )}
-                </div>
-                <div className='flex justify-around'>
-                    <Button
-                        variant='tertiary'
-                        isPending={uploading}
-                        onPress={onBackup}
+                {aliyunUserInfo !== null && (
+                    <Row
+                        className={backupType !== 'aliyun' ? 'hidden' : ''}
+                        label={t('config.backup.username')}
+                        desc={t('config.backup.aliyun_account_desc')}
                     >
-                        {t('config.backup.backup')}
-                    </Button>
-                    <Button
-                        variant='tertiary'
-                        onPress={onBackupListOpen}
-                    >
-                        {t('config.backup.restore')}
-                    </Button>
-                </div>
-            </CardContent>
+                        <Tooltip>
+                            <Tooltip.Trigger>
+                                <Button
+                                    variant='tertiary'
+                                    onClick={() => {
+                                        setAliyunAccessToken('');
+                                        // setAliyunRefreshToken('');
+                                        setAliyunUserInfo(null);
+                                        refreshQrCode();
+                                    }}
+                                >
+                                    <Avatar
+                                        src={aliyunUserInfo.avatar}
+                                        size='sm'
+                                    />
+                                    <h3 className='my-auto'>{aliyunUserInfo.name}</h3>
+                                </Button>
+                            </Tooltip.Trigger>
+                            <Tooltip.Content placement='bottom-end'>{t('config.backup.logout')}</Tooltip.Content>
+                        </Tooltip>
+                    </Row>
+                )}
+            </Section>
+            <div className='flat-foot'>
+                <Button
+                    variant='tertiary'
+                    isPending={uploading}
+                    onPress={onBackup}
+                >
+                    {t('config.backup.backup')}
+                </Button>
+                <Button
+                    variant='tertiary'
+                    onPress={onBackupListOpen}
+                >
+                    {t('config.backup.restore')}
+                </Button>
+            </div>
             <WebDavModal
                 isOpen={isWebDavListOpen}
                 onOpenChange={onWebDavListOpenChange}
@@ -326,6 +338,6 @@ export default function Backup() {
                 accessToken={aliyunAccessToken}
                 // refreshToken={aliyunRefreshToken}
             />
-        </Card>
+        </>
     );
 }

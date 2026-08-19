@@ -84,13 +84,17 @@
         outline-offset: 3px;
     }
 
-    /* The destructive one. Red is reserved for this and for the primary fill. */
+    /*
+      The destructive one. It has to read as different from `.flat-action`'s
+      hover, which is the accent -- a delete that paints itself the same colour
+      as every other action is not a warning, it is decoration.
+    */
     .flat-action--danger {
-        color: var(--accent);
+        color: var(--danger);
     }
 
     .flat-action--danger:hover:not(:disabled) {
-        color: var(--accent-hover);
+        color: var(--danger-hover);
     }
 
     /* An action carrying a glyph rather than a word: pane tools, service logos. */
@@ -215,5 +219,214 @@
     .flat-iconbtn:focus-visible {
         outline: 2px solid var(--focus);
         outline-offset: -1px;
+    }
+
+    /* ------------------------------------------------- annotated sections */
+
+    /*
+      A settings section as a named gutter beside its rows. The gutter carries
+      the section's name and one line saying what the whole group is for, so a
+      row underneath only has to explain itself -- which is what lets the rows
+      drop the cards they used to sit in.
+
+      The gutter is a fixed 118px because it holds one short word set at 11px;
+      the rows take the rest. Both columns are sized in px: this is chrome, and
+      it must not reflow when the user picks a larger `app_font_size`.
+    */
+    .flat-section {
+        display: grid;
+        grid-template-columns: 118px 1fr;
+        border-top: 2px solid var(--border-secondary);
+    }
+
+    .flat-section__gutter {
+        padding: 18px 0 18px 18px;
+    }
+
+    .flat-section__name {
+        font-size: 11px;
+        font-weight: 700;
+        line-height: 1.3;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+    }
+
+    .flat-section__note {
+        margin-top: 6px;
+        font-size: 11px;
+        line-height: 1.5;
+        color: var(--muted);
+    }
+
+    /* The hairline here is the only thing separating gutter from content. */
+    .flat-section__rows {
+        border-left: 1px solid var(--border);
+        min-width: 0;
+    }
+
+    /*
+      One setting: label and its help line on the left, the control hard right.
+      `align-items: flex-start` rather than centre -- once a row carries two
+      lines of help, a vertically centred switch drifts away from the label it
+      belongs to.
+    */
+    .flat-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 16px;
+        padding: 14px 18px;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .flat-row__main {
+        flex: 1;
+        min-width: 0;
+    }
+
+    /* Body copy, so this one tracks the user's reading size. */
+    .flat-row__label {
+        font-size: 1rem;
+        font-weight: 600;
+        line-height: 1.3;
+    }
+
+    .flat-row__desc {
+        margin-top: 4px;
+        font-size: 12px;
+        line-height: 1.45;
+        color: var(--muted);
+        text-wrap: pretty;
+    }
+
+    /* Holds whatever control the row ends in, kept off the label's baseline. */
+    .flat-row__control {
+        flex: none;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    /*
+      The value control: a squared 2px outline, not HeroUI's pill. Only the
+      buttons and text fields are squared -- the switch stays a rounded track,
+      which is what the design draws too.
+
+      `--button-bg` and friends rather than `background`: `.button` paints from
+      those variables and hovers to `--button-bg-hover`, so setting the
+      declaration alone would leave the hover reaching for the accent.
+    */
+    .flat-row__control .button,
+    .flat-row__control .input,
+    .flat-row__control .input-group {
+        --button-bg: transparent;
+        --button-bg-hover: var(--surface);
+        --button-bg-pressed: var(--surface-secondary);
+        --button-fg: var(--foreground);
+        border-radius: 0;
+        border: 2px solid var(--border-secondary);
+        min-height: 32px;
+        height: 32px;
+        padding: 0 12px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    /*
+      A destructive control keeps saying so. The rule above paints every button
+      in the row neutral, which quietly stripped the danger colour off "clear
+      the cache" -- the one button on these pages that throws work away.
+    */
+    .flat-row__control .button--danger,
+    .flat-row__control .button--danger-soft {
+        --button-fg: var(--danger);
+        --button-bg-hover: color-mix(in oklab, var(--danger) 12%, transparent);
+        border-color: var(--danger);
+    }
+
+    /*
+      An InputGroup's own <input> claims its full intrinsic width, which pushed
+      the suffix (the hotkey rows' OK button) straight out of the group and off
+      the row. Let it shrink so the suffix keeps its place inside the box.
+    */
+    .flat-row__control .input-group {
+        padding: 0;
+    }
+
+    .flat-row__control .input-group__input {
+        min-width: 0;
+        flex: 1;
+    }
+
+    .flat-row__control .button:focus-visible,
+    .flat-row__control .input:focus-visible {
+        outline: 2px solid var(--focus);
+        outline-offset: 2px;
+    }
+
+    /*
+      A row of fields that label themselves -- the manual proxy pairs, where the
+      caption belongs to each input rather than to the row. It keeps the rule and
+      the padding and drops the label column.
+    */
+    .flat-row--fields {
+        align-items: center;
+    }
+
+    .flat-row--fields > * {
+        flex: 1;
+        min-width: 0;
+    }
+
+    /*
+      The strip of page-level actions under the last section, held off the rows
+      by the same 2px rule that separates the sections themselves.
+    */
+    .flat-foot {
+        flex: none;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 0 0;
+        border-top: 2px solid var(--border-secondary);
+    }
+
+    /*
+      Nothing on these surfaces is rounded except a switch track. The
+      `.button-group` selector is not redundant: a group rounds its outer
+      corners with a per-corner rule of higher specificity than `.flat-foot
+      .button`, so squaring the ends needs to be said there too.
+    */
+    .flat-foot .button,
+    .flat-foot .button-group .button,
+    .flat-foot .pagination__link {
+        border-radius: 0;
+    }
+
+    /*
+      The neutral actions read as outlines; a `primary` or `danger` button in
+      the same strip keeps its fill, which is the only thing separating "export
+      this" from "delete all of it".
+    */
+    .flat-foot .button--tertiary {
+        --button-bg: transparent;
+        --button-bg-hover: var(--surface);
+        --button-bg-pressed: var(--surface-secondary);
+        --button-fg: var(--foreground);
+        border: 2px solid var(--border-secondary);
+        min-height: 32px;
+        height: 32px;
+        padding: 0 12px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    /* A line of machine-reported fact under the row it qualifies. */
+    .flat-note {
+        padding: 10px 18px;
+        border-bottom: 1px solid var(--border);
+        font-size: 12px;
+        line-height: 1.5;
+        color: var(--muted);
+        white-space: pre-line;
     }
 }

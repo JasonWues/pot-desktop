@@ -1,5 +1,5 @@
 import { enable, isEnabled, disable } from '@tauri-apps/plugin-autostart';
-import { CardContent, Dropdown, Button, Switch, Input, Card, Label, TextField, InputGroup } from '@heroui/react';
+import { Dropdown, Button, Switch, Input, Label, TextField, InputGroup } from '@heroui/react';
 import React, { useState, useEffect } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -14,6 +14,7 @@ import Flag from '../../../../components/Flag';
 import { themeOptions } from '../../../../utils/theme';
 import { useToastStyle } from '../../../../hooks';
 import { osType } from '../../../../utils/env';
+import { Section, Row } from '../../components/Section';
 
 // react-icons ships the Lucide set as `lu`, so the icons cost no extra
 // dependency. Keyed by the same names as `themeOptions`.
@@ -98,24 +99,47 @@ export default function General() {
     return (
         <>
             <Toaster />
-            <Card className='mb-[10px]'>
-                <CardContent>
-                    <div className='config-item'>
-                        <h3>{t('config.general.auto_start')}</h3>
+            <Section
+                name={t('config.general.section.startup')}
+                note={t('config.general.section.startup_note')}
+            >
+                <Row
+                    label={t('config.general.auto_start')}
+                    desc={t('config.general.auto_start_desc')}
+                >
+                    <Switch
+                        className='justify-center items-center'
+                        isSelected={autoStart}
+                        onChange={(v) => {
+                            setAutoStart(v);
+                            if (v) {
+                                enable().then(() => {
+                                    info('Auto start enabled');
+                                });
+                            } else {
+                                disable().then(() => {
+                                    info('Auto start disabled');
+                                });
+                            }
+                        }}
+                    >
+                        <Switch.Content>
+                            <Switch.Control>
+                                <Switch.Thumb />
+                            </Switch.Control>
+                        </Switch.Content>
+                    </Switch>
+                </Row>
+                <Row
+                    label={t('config.general.check_update')}
+                    desc={t('config.general.check_update_desc')}
+                >
+                    {checkUpdate !== null && (
                         <Switch
                             className='justify-center items-center'
-                            isSelected={autoStart}
+                            isSelected={checkUpdate}
                             onChange={(v) => {
-                                setAutoStart(v);
-                                if (v) {
-                                    enable().then(() => {
-                                        info('Auto start enabled');
-                                    });
-                                } else {
-                                    disable().then(() => {
-                                        info('Auto start disabled');
-                                    });
-                                }
+                                setCheckUpdate(v);
                             }}
                         >
                             <Switch.Content>
@@ -124,647 +148,653 @@ export default function General() {
                                 </Switch.Control>
                             </Switch.Content>
                         </Switch>
-                    </div>
-                    <div className='config-item'>
-                        <h3>{t('config.general.check_update')}</h3>
-                        {checkUpdate !== null && (
-                            <Switch
-                                className='justify-center items-center'
-                                isSelected={checkUpdate}
-                                onChange={(v) => {
-                                    setCheckUpdate(v);
+                    )}
+                </Row>
+                <Row
+                    label={t('config.general.server_port')}
+                    desc={t('config.general.server_port_desc')}
+                >
+                    {serverPort !== null && (
+                        <TextField
+                            className='flex w-full flex-row items-center justify-between max-w-[100px]'
+                            value={serverPort}
+                            onChange={(v) => {
+                                if (parseInt(v) !== serverPort) {
+                                    if (timer) {
+                                        clearTimeout(timer);
+                                    }
+                                    timer = setTimeout(() => {
+                                        toast.success(t('config.general.server_port_change'), {
+                                            duration: 3000,
+                                            style: toastStyle,
+                                        });
+                                    }, 1000);
+                                }
+                                if (v === '') {
+                                    setServerPort(0);
+                                } else if (parseInt(v) > 65535) {
+                                    setServerPort(65535);
+                                } else if (parseInt(v) < 0) {
+                                    setServerPort(0);
+                                } else {
+                                    setServerPort(parseInt(v));
+                                }
+                            }}
+                            aria-label={t('config.general.server_port')}
+                        >
+                            <Input type='number' />
+                        </TextField>
+                    )}
+                </Row>
+            </Section>
+            <Section
+                name={t('config.general.section.appearance')}
+                note={t('config.general.section.appearance_note')}
+            >
+                <Row
+                    label={t('config.general.app_language')}
+                    desc={t('config.general.app_language_desc')}
+                >
+                    {appLanguage !== null && (
+                        <Dropdown>
+                            <Button variant='outline'>
+                                <Flag code={LanguageFlag[appLanguage]} />
+                                {languageName[appLanguage]}
+                            </Button>
+                            <Dropdown.Popover>
+                                <Dropdown.Menu
+                                    aria-label='app language'
+                                    className='max-h-[40vh] overflow-y-auto'
+                                    onAction={(key) => {
+                                        setAppLanguage(key);
+                                        i18n.changeLanguage(key);
+                                        invoke('update_tray', { language: key, copyMode: '' });
+                                    }}
+                                >
+                                    <Dropdown.Item
+                                        key='zh_cn'
+                                        id='zh_cn'
+                                    >
+                                        <Flag code={LanguageFlag.zh_cn} />
+                                        简体中文
+                                    </Dropdown.Item>
+                                    <Dropdown.Item
+                                        key='zh_tw'
+                                        id='zh_tw'
+                                    >
+                                        <Flag code={LanguageFlag.zh_cn} />
+                                        繁體中文
+                                    </Dropdown.Item>
+                                    <Dropdown.Item
+                                        key='en'
+                                        id='en'
+                                    >
+                                        <Flag code={LanguageFlag.en} />
+                                        English
+                                    </Dropdown.Item>
+                                    <Dropdown.Item
+                                        key='ja'
+                                        id='ja'
+                                    >
+                                        <Flag code={LanguageFlag.ja} />
+                                        日本語
+                                    </Dropdown.Item>
+                                    <Dropdown.Item
+                                        key='ko'
+                                        id='ko'
+                                    >
+                                        <Flag code={LanguageFlag.ko} />
+                                        한국어
+                                    </Dropdown.Item>
+                                    <Dropdown.Item
+                                        key='fr'
+                                        id='fr'
+                                    >
+                                        <Flag code={LanguageFlag.fr} />
+                                        Français
+                                    </Dropdown.Item>
+                                    <Dropdown.Item
+                                        key='de'
+                                        id='de'
+                                    >
+                                        <Flag code={LanguageFlag.de} />
+                                        Deutsch
+                                    </Dropdown.Item>
+                                    <Dropdown.Item
+                                        key='es'
+                                        id='es'
+                                    >
+                                        <Flag code={LanguageFlag.es} />
+                                        Español
+                                    </Dropdown.Item>
+                                    <Dropdown.Item
+                                        key='ru'
+                                        id='ru'
+                                    >
+                                        <Flag code={LanguageFlag.ru} />
+                                        Русский
+                                    </Dropdown.Item>
+                                    <Dropdown.Item
+                                        key='it'
+                                        id='it'
+                                    >
+                                        <Flag code={LanguageFlag.it} />
+                                        Italiano
+                                    </Dropdown.Item>
+                                    <Dropdown.Item
+                                        key='tr'
+                                        id='tr'
+                                    >
+                                        <Flag code={LanguageFlag.tr} />
+                                        Türkçe
+                                    </Dropdown.Item>
+                                    <Dropdown.Item
+                                        key='pt_pt'
+                                        id='pt_pt'
+                                    >
+                                        <Flag code={LanguageFlag.pt_pt} />
+                                        Português
+                                    </Dropdown.Item>
+                                    <Dropdown.Item
+                                        key='pt_br'
+                                        id='pt_br'
+                                    >
+                                        <Flag code={LanguageFlag.pt_br} />
+                                        Português (Brasil)
+                                    </Dropdown.Item>
+                                    <Dropdown.Item
+                                        key='nb_no'
+                                        id='nb_no'
+                                    >
+                                        <Flag code={LanguageFlag.nb_no} />
+                                        Norsk Bokmål
+                                    </Dropdown.Item>
+                                    <Dropdown.Item
+                                        key='nn_no'
+                                        id='nn_no'
+                                    >
+                                        <Flag code={LanguageFlag.nn_no} />
+                                        Norsk Nynorsk
+                                    </Dropdown.Item>
+                                    <Dropdown.Item
+                                        key='fa'
+                                        id='fa'
+                                    >
+                                        <Flag code={LanguageFlag.fa} />
+                                        فارسی
+                                    </Dropdown.Item>
+                                    <Dropdown.Item
+                                        key='uk'
+                                        id='uk'
+                                    >
+                                        <Flag code={LanguageFlag.uk} />
+                                        Українська
+                                    </Dropdown.Item>
+                                    <Dropdown.Item
+                                        key='ar'
+                                        id='ar'
+                                    >
+                                        <Flag code={LanguageFlag.ar} />
+                                        العربية
+                                    </Dropdown.Item>
+                                    <Dropdown.Item
+                                        key='he'
+                                        id='he'
+                                    >
+                                        <Flag code={LanguageFlag.he} />
+                                        עִבְרִית
+                                    </Dropdown.Item>
+                                </Dropdown.Menu>
+                            </Dropdown.Popover>
+                        </Dropdown>
+                    )}
+                </Row>
+                <Row
+                    label={t('config.general.app_theme')}
+                    desc={t('config.general.app_theme_desc')}
+                >
+                    {appTheme !== null && (
+                        <Dropdown>
+                            <Button variant='outline'>
+                                <ThemeIcon name={appTheme} />
+                                {t(`config.general.theme.${appTheme}`)}
+                            </Button>
+                            <Dropdown.Popover>
+                                <Dropdown.Menu
+                                    aria-label='app theme'
+                                    onAction={(key) => {
+                                        setAppTheme(key);
+                                        if (key !== 'system') {
+                                            setTheme(key);
+                                        } else {
+                                            if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                                                setTheme('dark');
+                                            } else {
+                                                setTheme('light');
+                                            }
+                                            window
+                                                .matchMedia('(prefers-color-scheme: dark)')
+                                                .addEventListener('change', (e) => {
+                                                    if (e.matches) {
+                                                        setTheme('dark');
+                                                    } else {
+                                                        setTheme('light');
+                                                    }
+                                                });
+                                        }
+                                    }}
+                                >
+                                    {themeOptions.map((name) => (
+                                        <Dropdown.Item
+                                            key={name}
+                                            id={name}
+                                        >
+                                            <ThemeIcon name={name} />
+                                            {t(`config.general.theme.${name}`)}
+                                        </Dropdown.Item>
+                                    ))}
+                                </Dropdown.Menu>
+                            </Dropdown.Popover>
+                        </Dropdown>
+                    )}
+                </Row>
+                <Row
+                    label={t('config.general.app_font')}
+                    desc={t('config.general.app_font_desc')}
+                >
+                    {appFont !== null && fontList !== null && (
+                        <Dropdown>
+                            <Button
+                                variant='outline'
+                                style={{
+                                    fontFamily: appFont === 'default' ? 'sans-serif' : appFont,
                                 }}
                             >
-                                <Switch.Content>
-                                    <Switch.Control>
-                                        <Switch.Thumb />
-                                    </Switch.Control>
-                                </Switch.Content>
-                            </Switch>
-                        )}
-                    </div>
-                    <div className='config-item'>
-                        <h3 className='my-auto'>{t('config.general.server_port')}</h3>
-                        {serverPort !== null && (
-                            <TextField
-                                className='flex w-full flex-row items-center justify-between max-w-[100px]'
-                                value={serverPort}
-                                onChange={(v) => {
-                                    if (parseInt(v) !== serverPort) {
-                                        if (timer) {
-                                            clearTimeout(timer);
-                                        }
-                                        timer = setTimeout(() => {
-                                            toast.success(t('config.general.server_port_change'), {
+                                {appFont === 'default' ? t('config.general.default_font') : appFont}
+                            </Button>
+                            <Dropdown.Popover>
+                                <Dropdown.Menu
+                                    aria-label='app font'
+                                    className='max-h-[50vh] overflow-y-auto'
+                                    onAction={(key) => {
+                                        document.documentElement.style.fontFamily = `"${
+                                            key === 'default' ? 'sans-serif' : key
+                                        }","${appFallbackFont === 'default' ? 'sans-serif' : appFallbackFont}"`;
+                                        setAppFont(key);
+                                    }}
+                                >
+                                    <Dropdown.Item
+                                        style={{ fontFamily: 'sans-serif' }}
+                                        key='default'
+                                        id='default'
+                                    >
+                                        {t('config.general.default_font')}
+                                    </Dropdown.Item>
+                                    {fontList.map((x) => {
+                                        return (
+                                            <Dropdown.Item
+                                                style={{ fontFamily: x }}
+                                                key={x}
+                                                id={x}
+                                            >
+                                                {x}
+                                            </Dropdown.Item>
+                                        );
+                                    })}
+                                </Dropdown.Menu>
+                            </Dropdown.Popover>
+                        </Dropdown>
+                    )}
+                </Row>
+                <Row
+                    label={t('config.general.app_fallback_font')}
+                    desc={t('config.general.app_fallback_font_desc')}
+                >
+                    {appFallbackFont !== null && fontList !== null && (
+                        <Dropdown>
+                            <Button
+                                variant='outline'
+                                style={{
+                                    fontFamily: appFallbackFont === 'default' ? 'sans-serif' : appFallbackFont,
+                                }}
+                            >
+                                {appFallbackFont === 'default' ? t('config.general.default_font') : appFallbackFont}
+                            </Button>
+                            <Dropdown.Popover>
+                                <Dropdown.Menu
+                                    aria-label='app font'
+                                    className='max-h-[50vh] overflow-y-auto'
+                                    onAction={(key) => {
+                                        document.documentElement.style.fontFamily = `"${
+                                            appFont === 'default' ? 'sans-serif' : appFont
+                                        }","${key === 'default' ? 'sans-serif' : key}"`;
+                                        setAppFallbackFont(key);
+                                    }}
+                                >
+                                    <Dropdown.Item
+                                        style={{ fontFamily: 'sans-serif' }}
+                                        key='default'
+                                        id='default'
+                                    >
+                                        {t('config.general.default_font')}
+                                    </Dropdown.Item>
+                                    {fontList.map((x) => {
+                                        return (
+                                            <Dropdown.Item
+                                                style={{ fontFamily: x }}
+                                                key={x}
+                                                id={x}
+                                            >
+                                                {x}
+                                            </Dropdown.Item>
+                                        );
+                                    })}
+                                </Dropdown.Menu>
+                            </Dropdown.Popover>
+                        </Dropdown>
+                    )}
+                </Row>
+                <Row
+                    label={t('config.general.font_size.title')}
+                    desc={t('config.general.font_size_desc')}
+                >
+                    {appFontSize !== null && (
+                        <Dropdown>
+                            <Button variant='outline'>{t(`config.general.font_size.${appFontSize}`)}</Button>
+                            <Dropdown.Popover>
+                                <Dropdown.Menu
+                                    aria-label='window position'
+                                    className='max-h-[50vh] overflow-y-auto'
+                                    onAction={(key) => {
+                                        document.documentElement.style.fontSize = `${key}px`;
+                                        setAppFontSize(key);
+                                    }}
+                                >
+                                    <Dropdown.Item
+                                        key={10}
+                                        id={10}
+                                    >
+                                        <Label>{t(`config.general.font_size.10`)}</Label>
+                                    </Dropdown.Item>
+                                    <Dropdown.Item
+                                        key={12}
+                                        id={12}
+                                    >
+                                        <Label>{t(`config.general.font_size.12`)}</Label>
+                                    </Dropdown.Item>
+                                    <Dropdown.Item
+                                        key={14}
+                                        id={14}
+                                    >
+                                        <Label>{t(`config.general.font_size.14`)}</Label>
+                                    </Dropdown.Item>
+                                    <Dropdown.Item
+                                        key={16}
+                                        id={16}
+                                    >
+                                        <Label>{t(`config.general.font_size.16`)}</Label>
+                                    </Dropdown.Item>
+                                    <Dropdown.Item
+                                        key={18}
+                                        id={18}
+                                    >
+                                        <Label>{t(`config.general.font_size.18`)}</Label>
+                                    </Dropdown.Item>
+                                    <Dropdown.Item
+                                        key={20}
+                                        id={20}
+                                    >
+                                        <Label>{t(`config.general.font_size.20`)}</Label>
+                                    </Dropdown.Item>
+                                    <Dropdown.Item
+                                        key={24}
+                                        id={24}
+                                    >
+                                        <Label>{t(`config.general.font_size.24`)}</Label>
+                                    </Dropdown.Item>
+                                </Dropdown.Menu>
+                            </Dropdown.Popover>
+                        </Dropdown>
+                    )}
+                </Row>
+                <Row
+                    className={osType !== 'Windows_NT' ? 'hidden' : ''}
+                    label={t('config.general.tray_click_event')}
+                    desc={t('config.general.tray_click_event_desc')}
+                >
+                    {trayClickEvent !== null && (
+                        <Dropdown>
+                            <Button variant='outline'>{t(`config.general.event.${trayClickEvent}`)}</Button>
+                            <Dropdown.Popover>
+                                <Dropdown.Menu
+                                    aria-label='tray click event'
+                                    onAction={(key) => {
+                                        setTrayClickEvent(key);
+                                    }}
+                                >
+                                    <Dropdown.Item
+                                        key='config'
+                                        id='config'
+                                    >
+                                        <Label>{t('config.general.event.config')}</Label>
+                                    </Dropdown.Item>
+                                    <Dropdown.Item
+                                        key='translate'
+                                        id='translate'
+                                    >
+                                        <Label>{t('config.general.event.translate')}</Label>
+                                    </Dropdown.Item>
+                                    <Dropdown.Item
+                                        key='ocr_recognize'
+                                        id='ocr_recognize'
+                                    >
+                                        {t('config.general.event.ocr_recognize')}
+                                    </Dropdown.Item>
+                                    <Dropdown.Item
+                                        key='ocr_translate'
+                                        id='ocr_translate'
+                                    >
+                                        {t('config.general.event.ocr_translate')}
+                                    </Dropdown.Item>
+                                    <Dropdown.Item
+                                        key='disable'
+                                        id='disable'
+                                    >
+                                        <Label>{t('config.general.event.disable')}</Label>
+                                    </Dropdown.Item>
+                                </Dropdown.Menu>
+                            </Dropdown.Popover>
+                        </Dropdown>
+                    )}
+                </Row>
+                <Row
+                    className={osType === 'Darwin' ? 'hidden' : ''}
+                    label={t('config.general.transparent')}
+                    desc={t('config.general.transparent_desc')}
+                >
+                    {transparent !== null && (
+                        <Switch
+                            className='justify-center items-center'
+                            isSelected={transparent}
+                            onChange={(v) => {
+                                setTransparent(v);
+                            }}
+                        >
+                            <Switch.Content>
+                                <Switch.Control>
+                                    <Switch.Thumb />
+                                </Switch.Control>
+                            </Switch.Content>
+                        </Switch>
+                    )}
+                </Row>
+                <Row
+                    label={t('config.general.dev_mode')}
+                    desc={t('config.general.dev_mode_desc')}
+                >
+                    {devMode !== null && (
+                        <Switch
+                            className='justify-center items-center'
+                            isSelected={devMode}
+                            onChange={(v) => {
+                                setDevMode(v);
+                            }}
+                        >
+                            <Switch.Content>
+                                <Switch.Control>
+                                    <Switch.Thumb />
+                                </Switch.Control>
+                            </Switch.Content>
+                        </Switch>
+                    )}
+                </Row>
+            </Section>
+            <Section
+                name={t('config.general.section.network')}
+                note={t('config.general.section.network_note')}
+            >
+                <Row
+                    label={t('config.general.proxy.title')}
+                    desc={t('config.general.proxy_desc')}
+                >
+                    {proxyMode !== null && (
+                        <Dropdown>
+                            <Button variant='outline'>{t(`config.general.proxy.mode.${proxyMode}`)}</Button>
+                            <Dropdown.Popover>
+                                <Dropdown.Menu
+                                    aria-label='proxy mode'
+                                    onAction={async (key) => {
+                                        if (key === 'manual' && (proxyHost === '' || proxyPort === '')) {
+                                            toast.error(t('config.general.proxy_error'), {
                                                 duration: 3000,
                                                 style: toastStyle,
                                             });
-                                        }, 1000);
-                                    }
-                                    if (v === '') {
-                                        setServerPort(0);
-                                    } else if (parseInt(v) > 65535) {
-                                        setServerPort(65535);
-                                    } else if (parseInt(v) < 0) {
-                                        setServerPort(0);
-                                    } else {
-                                        setServerPort(parseInt(v));
-                                    }
-                                }}
-                                aria-label={t('config.general.server_port')}
-                            >
-                                <Input type='number' />
-                            </TextField>
-                        )}
-                    </div>
-                </CardContent>
-            </Card>
-            <Card className='mb-[10px]'>
-                <CardContent>
-                    <div className='config-item'>
-                        <h3 className='my-auto'>{t('config.general.app_language')}</h3>
-                        {appLanguage !== null && (
-                            <Dropdown>
-                                <Button variant='outline'>
-                                    <Flag code={LanguageFlag[appLanguage]} />
-                                    {languageName[appLanguage]}
-                                </Button>
-                                <Dropdown.Popover>
-                                    <Dropdown.Menu
-                                        aria-label='app language'
-                                        className='max-h-[40vh] overflow-y-auto'
-                                        onAction={(key) => {
-                                            setAppLanguage(key);
-                                            i18n.changeLanguage(key);
-                                            invoke('update_tray', { language: key, copyMode: '' });
-                                        }}
-                                    >
-                                        <Dropdown.Item
-                                            key='zh_cn'
-                                            id='zh_cn'
-                                        >
-                                            <Flag code={LanguageFlag.zh_cn} />
-                                            简体中文
-                                        </Dropdown.Item>
-                                        <Dropdown.Item
-                                            key='zh_tw'
-                                            id='zh_tw'
-                                        >
-                                            <Flag code={LanguageFlag.zh_cn} />
-                                            繁體中文
-                                        </Dropdown.Item>
-                                        <Dropdown.Item
-                                            key='en'
-                                            id='en'
-                                        >
-                                            <Flag code={LanguageFlag.en} />
-                                            English
-                                        </Dropdown.Item>
-                                        <Dropdown.Item
-                                            key='ja'
-                                            id='ja'
-                                        >
-                                            <Flag code={LanguageFlag.ja} />
-                                            日本語
-                                        </Dropdown.Item>
-                                        <Dropdown.Item
-                                            key='ko'
-                                            id='ko'
-                                        >
-                                            <Flag code={LanguageFlag.ko} />
-                                            한국어
-                                        </Dropdown.Item>
-                                        <Dropdown.Item
-                                            key='fr'
-                                            id='fr'
-                                        >
-                                            <Flag code={LanguageFlag.fr} />
-                                            Français
-                                        </Dropdown.Item>
-                                        <Dropdown.Item
-                                            key='de'
-                                            id='de'
-                                        >
-                                            <Flag code={LanguageFlag.de} />
-                                            Deutsch
-                                        </Dropdown.Item>
-                                        <Dropdown.Item
-                                            key='es'
-                                            id='es'
-                                        >
-                                            <Flag code={LanguageFlag.es} />
-                                            Español
-                                        </Dropdown.Item>
-                                        <Dropdown.Item
-                                            key='ru'
-                                            id='ru'
-                                        >
-                                            <Flag code={LanguageFlag.ru} />
-                                            Русский
-                                        </Dropdown.Item>
-                                        <Dropdown.Item
-                                            key='it'
-                                            id='it'
-                                        >
-                                            <Flag code={LanguageFlag.it} />
-                                            Italiano
-                                        </Dropdown.Item>
-                                        <Dropdown.Item
-                                            key='tr'
-                                            id='tr'
-                                        >
-                                            <Flag code={LanguageFlag.tr} />
-                                            Türkçe
-                                        </Dropdown.Item>
-                                        <Dropdown.Item
-                                            key='pt_pt'
-                                            id='pt_pt'
-                                        >
-                                            <Flag code={LanguageFlag.pt_pt} />
-                                            Português
-                                        </Dropdown.Item>
-                                        <Dropdown.Item
-                                            key='pt_br'
-                                            id='pt_br'
-                                        >
-                                            <Flag code={LanguageFlag.pt_br} />
-                                            Português (Brasil)
-                                        </Dropdown.Item>
-                                        <Dropdown.Item
-                                            key='nb_no'
-                                            id='nb_no'
-                                        >
-                                            <Flag code={LanguageFlag.nb_no} />
-                                            Norsk Bokmål
-                                        </Dropdown.Item>
-                                        <Dropdown.Item
-                                            key='nn_no'
-                                            id='nn_no'
-                                        >
-                                            <Flag code={LanguageFlag.nn_no} />
-                                            Norsk Nynorsk
-                                        </Dropdown.Item>
-                                        <Dropdown.Item
-                                            key='fa'
-                                            id='fa'
-                                        >
-                                            <Flag code={LanguageFlag.fa} />
-                                            فارسی
-                                        </Dropdown.Item>
-                                        <Dropdown.Item
-                                            key='uk'
-                                            id='uk'
-                                        >
-                                            <Flag code={LanguageFlag.uk} />
-                                            Українська
-                                        </Dropdown.Item>
-                                        <Dropdown.Item
-                                            key='ar'
-                                            id='ar'
-                                        >
-                                            <Flag code={LanguageFlag.ar} />
-                                            العربية
-                                        </Dropdown.Item>
-                                        <Dropdown.Item
-                                            key='he'
-                                            id='he'
-                                        >
-                                            <Flag code={LanguageFlag.he} />
-                                            עִבְרִית
-                                        </Dropdown.Item>
-                                    </Dropdown.Menu>
-                                </Dropdown.Popover>
-                            </Dropdown>
-                        )}
-                    </div>
-                    <div className='config-item'>
-                        <h3 className='my-auto'>{t('config.general.app_theme')}</h3>
-                        {appTheme !== null && (
-                            <Dropdown>
-                                <Button variant='outline'>
-                                    <ThemeIcon name={appTheme} />
-                                    {t(`config.general.theme.${appTheme}`)}
-                                </Button>
-                                <Dropdown.Popover>
-                                    <Dropdown.Menu
-                                        aria-label='app theme'
-                                        onAction={(key) => {
-                                            setAppTheme(key);
-                                            if (key !== 'system') {
-                                                setTheme(key);
-                                            } else {
-                                                if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                                                    setTheme('dark');
-                                                } else {
-                                                    setTheme('light');
-                                                }
-                                                window
-                                                    .matchMedia('(prefers-color-scheme: dark)')
-                                                    .addEventListener('change', (e) => {
-                                                        if (e.matches) {
-                                                            setTheme('dark');
-                                                        } else {
-                                                            setTheme('light');
-                                                        }
-                                                    });
-                                            }
-                                        }}
-                                    >
-                                        {themeOptions.map((name) => (
-                                            <Dropdown.Item
-                                                key={name}
-                                                id={name}
-                                            >
-                                                <ThemeIcon name={name} />
-                                                {t(`config.general.theme.${name}`)}
-                                            </Dropdown.Item>
-                                        ))}
-                                    </Dropdown.Menu>
-                                </Dropdown.Popover>
-                            </Dropdown>
-                        )}
-                    </div>
-                    <div className='config-item'>
-                        <h3 className='my-auto'>{t('config.general.app_font')}</h3>
-                        {appFont !== null && fontList !== null && (
-                            <Dropdown>
-                                <Button
-                                    variant='outline'
-                                    style={{
-                                        fontFamily: appFont === 'default' ? 'sans-serif' : appFont,
+                                            return;
+                                        }
+                                        setProxyMode(key);
+                                        toast.success(t('config.general.proxy_change'), {
+                                            duration: 1000,
+                                            style: toastStyle,
+                                        });
                                     }}
                                 >
-                                    {appFont === 'default' ? t('config.general.default_font') : appFont}
-                                </Button>
-                                <Dropdown.Popover>
-                                    <Dropdown.Menu
-                                        aria-label='app font'
-                                        className='max-h-[50vh] overflow-y-auto'
-                                        onAction={(key) => {
-                                            document.documentElement.style.fontFamily = `"${
-                                                key === 'default' ? 'sans-serif' : key
-                                            }","${appFallbackFont === 'default' ? 'sans-serif' : appFallbackFont}"`;
-                                            setAppFont(key);
-                                        }}
+                                    <Dropdown.Item
+                                        key='system'
+                                        id='system'
                                     >
-                                        <Dropdown.Item
-                                            style={{ fontFamily: 'sans-serif' }}
-                                            key='default'
-                                            id='default'
-                                        >
-                                            {t('config.general.default_font')}
-                                        </Dropdown.Item>
-                                        {fontList.map((x) => {
-                                            return (
-                                                <Dropdown.Item
-                                                    style={{ fontFamily: x }}
-                                                    key={x}
-                                                    id={x}
-                                                >
-                                                    {x}
-                                                </Dropdown.Item>
-                                            );
-                                        })}
-                                    </Dropdown.Menu>
-                                </Dropdown.Popover>
-                            </Dropdown>
-                        )}
-                    </div>
-                    <div className='config-item'>
-                        <h3 className='my-auto'>{t('config.general.app_fallback_font')}</h3>
-                        {appFallbackFont !== null && fontList !== null && (
-                            <Dropdown>
-                                <Button
-                                    variant='outline'
-                                    style={{
-                                        fontFamily: appFallbackFont === 'default' ? 'sans-serif' : appFallbackFont,
-                                    }}
-                                >
-                                    {appFallbackFont === 'default' ? t('config.general.default_font') : appFallbackFont}
-                                </Button>
-                                <Dropdown.Popover>
-                                    <Dropdown.Menu
-                                        aria-label='app font'
-                                        className='max-h-[50vh] overflow-y-auto'
-                                        onAction={(key) => {
-                                            document.documentElement.style.fontFamily = `"${
-                                                appFont === 'default' ? 'sans-serif' : appFont
-                                            }","${key === 'default' ? 'sans-serif' : key}"`;
-                                            setAppFallbackFont(key);
-                                        }}
+                                        <Label>{t('config.general.proxy.mode.system')}</Label>
+                                    </Dropdown.Item>
+                                    <Dropdown.Item
+                                        key='manual'
+                                        id='manual'
                                     >
-                                        <Dropdown.Item
-                                            style={{ fontFamily: 'sans-serif' }}
-                                            key='default'
-                                            id='default'
-                                        >
-                                            {t('config.general.default_font')}
-                                        </Dropdown.Item>
-                                        {fontList.map((x) => {
-                                            return (
-                                                <Dropdown.Item
-                                                    style={{ fontFamily: x }}
-                                                    key={x}
-                                                    id={x}
-                                                >
-                                                    {x}
-                                                </Dropdown.Item>
-                                            );
-                                        })}
-                                    </Dropdown.Menu>
-                                </Dropdown.Popover>
-                            </Dropdown>
-                        )}
-                    </div>
-                    <div className='config-item'>
-                        <h3 className='my-auto mx-0'>{t('config.general.font_size.title')}</h3>
-                        {appFontSize !== null && (
-                            <Dropdown>
-                                <Button variant='outline'>{t(`config.general.font_size.${appFontSize}`)}</Button>
-                                <Dropdown.Popover>
-                                    <Dropdown.Menu
-                                        aria-label='window position'
-                                        className='max-h-[50vh] overflow-y-auto'
-                                        onAction={(key) => {
-                                            document.documentElement.style.fontSize = `${key}px`;
-                                            setAppFontSize(key);
-                                        }}
+                                        <Label>{t('config.general.proxy.mode.manual')}</Label>
+                                    </Dropdown.Item>
+                                    <Dropdown.Item
+                                        key='off'
+                                        id='off'
                                     >
-                                        <Dropdown.Item
-                                            key={10}
-                                            id={10}
-                                        >
-                                            <Label>{t(`config.general.font_size.10`)}</Label>
-                                        </Dropdown.Item>
-                                        <Dropdown.Item
-                                            key={12}
-                                            id={12}
-                                        >
-                                            <Label>{t(`config.general.font_size.12`)}</Label>
-                                        </Dropdown.Item>
-                                        <Dropdown.Item
-                                            key={14}
-                                            id={14}
-                                        >
-                                            <Label>{t(`config.general.font_size.14`)}</Label>
-                                        </Dropdown.Item>
-                                        <Dropdown.Item
-                                            key={16}
-                                            id={16}
-                                        >
-                                            <Label>{t(`config.general.font_size.16`)}</Label>
-                                        </Dropdown.Item>
-                                        <Dropdown.Item
-                                            key={18}
-                                            id={18}
-                                        >
-                                            <Label>{t(`config.general.font_size.18`)}</Label>
-                                        </Dropdown.Item>
-                                        <Dropdown.Item
-                                            key={20}
-                                            id={20}
-                                        >
-                                            <Label>{t(`config.general.font_size.20`)}</Label>
-                                        </Dropdown.Item>
-                                        <Dropdown.Item
-                                            key={24}
-                                            id={24}
-                                        >
-                                            <Label>{t(`config.general.font_size.24`)}</Label>
-                                        </Dropdown.Item>
-                                    </Dropdown.Menu>
-                                </Dropdown.Popover>
-                            </Dropdown>
-                        )}
-                    </div>
-                    <div className={`config-item ${osType !== 'Windows_NT' ? 'hidden' : ''}`}>
-                        <h3 className='my-auto'>{t('config.general.tray_click_event')}</h3>
-                        {trayClickEvent !== null && (
-                            <Dropdown>
-                                <Button variant='outline'>{t(`config.general.event.${trayClickEvent}`)}</Button>
-                                <Dropdown.Popover>
-                                    <Dropdown.Menu
-                                        aria-label='tray click event'
-                                        onAction={(key) => {
-                                            setTrayClickEvent(key);
-                                        }}
-                                    >
-                                        <Dropdown.Item
-                                            key='config'
-                                            id='config'
-                                        >
-                                            <Label>{t('config.general.event.config')}</Label>
-                                        </Dropdown.Item>
-                                        <Dropdown.Item
-                                            key='translate'
-                                            id='translate'
-                                        >
-                                            <Label>{t('config.general.event.translate')}</Label>
-                                        </Dropdown.Item>
-                                        <Dropdown.Item
-                                            key='ocr_recognize'
-                                            id='ocr_recognize'
-                                        >
-                                            {t('config.general.event.ocr_recognize')}
-                                        </Dropdown.Item>
-                                        <Dropdown.Item
-                                            key='ocr_translate'
-                                            id='ocr_translate'
-                                        >
-                                            {t('config.general.event.ocr_translate')}
-                                        </Dropdown.Item>
-                                        <Dropdown.Item
-                                            key='disable'
-                                            id='disable'
-                                        >
-                                            <Label>{t('config.general.event.disable')}</Label>
-                                        </Dropdown.Item>
-                                    </Dropdown.Menu>
-                                </Dropdown.Popover>
-                            </Dropdown>
-                        )}
-                    </div>
-                    <div className={`config-item ${osType === 'Darwin' ? 'hidden' : ''}`}>
-                        <h3>{t('config.general.transparent')}</h3>
-                        {transparent !== null && (
-                            <Switch
-                                className='justify-center items-center'
-                                isSelected={transparent}
-                                onChange={(v) => {
-                                    setTransparent(v);
-                                }}
-                            >
-                                <Switch.Content>
-                                    <Switch.Control>
-                                        <Switch.Thumb />
-                                    </Switch.Control>
-                                </Switch.Content>
-                            </Switch>
-                        )}
-                    </div>
-                    <div className='config-item'>
-                        <h3>{t('config.general.dev_mode')}</h3>
-                        {devMode !== null && (
-                            <Switch
-                                className='justify-center items-center'
-                                isSelected={devMode}
-                                onChange={(v) => {
-                                    setDevMode(v);
-                                }}
-                            >
-                                <Switch.Content>
-                                    <Switch.Control>
-                                        <Switch.Thumb />
-                                    </Switch.Control>
-                                </Switch.Content>
-                            </Switch>
-                        )}
-                    </div>
-                </CardContent>
-            </Card>
-            <Card>
-                <CardContent>
-                    <div className='config-item'>
-                        <h3>{t('config.general.proxy.title')}</h3>
-                        {proxyMode !== null && (
-                            <Dropdown>
-                                <Button variant='outline'>{t(`config.general.proxy.mode.${proxyMode}`)}</Button>
-                                <Dropdown.Popover>
-                                    <Dropdown.Menu
-                                        aria-label='proxy mode'
-                                        onAction={async (key) => {
-                                            if (key === 'manual' && (proxyHost === '' || proxyPort === '')) {
-                                                toast.error(t('config.general.proxy_error'), {
-                                                    duration: 3000,
-                                                    style: toastStyle,
-                                                });
-                                                return;
-                                            }
-                                            setProxyMode(key);
-                                            toast.success(t('config.general.proxy_change'), {
-                                                duration: 1000,
-                                                style: toastStyle,
-                                            });
-                                        }}
-                                    >
-                                        <Dropdown.Item
-                                            key='system'
-                                            id='system'
-                                        >
-                                            <Label>{t('config.general.proxy.mode.system')}</Label>
-                                        </Dropdown.Item>
-                                        <Dropdown.Item
-                                            key='manual'
-                                            id='manual'
-                                        >
-                                            <Label>{t('config.general.proxy.mode.manual')}</Label>
-                                        </Dropdown.Item>
-                                        <Dropdown.Item
-                                            key='off'
-                                            id='off'
-                                        >
-                                            <Label>{t('config.general.proxy.mode.off')}</Label>
-                                        </Dropdown.Item>
-                                    </Dropdown.Menu>
-                                </Dropdown.Popover>
-                            </Dropdown>
-                        )}
-                    </div>
-                    {proxyMode === 'system' && systemProxy !== null && (
-                        <div className='config-item'>
-                            <span className='text-[12px] text-muted whitespace-pre-line'>
-                                {systemProxy.pac_url
-                                    ? t('config.general.proxy.detected_pac', { url: systemProxy.pac_url })
-                                    : systemProxy.http || systemProxy.https
-                                      ? t('config.general.proxy.detected', {
-                                            value: systemProxy.https ?? systemProxy.http,
-                                        })
-                                      : t('config.general.proxy.detected_none')}
-                            </span>
-                        </div>
+                                        <Label>{t('config.general.proxy.mode.off')}</Label>
+                                    </Dropdown.Item>
+                                </Dropdown.Menu>
+                            </Dropdown.Popover>
+                        </Dropdown>
                     )}
-                    <div className={`config-item ${proxyMode === 'manual' ? '' : 'hidden'}`}>
-                        {proxyHost !== null && (
-                            // The `http://` prefix is an InputGroup.Prefix rather
-                            // than a child of the input: v3's Input is a real
-                            // <input>, a void element that cannot contain anything.
-                            <TextField
-                                className='mr-2 w-full'
-                                value={proxyHost}
-                                onChange={(v) => {
-                                    setProxyHost(v);
-                                }}
-                                isRequired
-                            >
-                                <Label className='text-base my-auto'>{t('config.general.proxy.host')}</Label>
-                                <InputGroup>
-                                    <InputGroup.Prefix>http://</InputGroup.Prefix>
-                                    <InputGroup.Input type='url' />
-                                </InputGroup>
-                            </TextField>
-                        )}
-                        {proxyPort !== null && (
-                            <TextField
-                                className='flex w-full flex-row items-center justify-between ml-2'
-                                value={proxyPort}
-                                onChange={(v) => {
-                                    if (parseInt(v) > 65535) {
-                                        setProxyPort(65535);
-                                    } else if (parseInt(v) < 0) {
-                                        setProxyPort('');
-                                    } else {
-                                        setProxyPort(parseInt(v));
-                                    }
-                                }}
-                                isRequired
-                            >
-                                <Label className='text-base my-auto'>{t('config.general.proxy.port')}</Label>
-                                <Input type='number' />
-                            </TextField>
-                        )}
+                </Row>
+                {proxyMode === 'system' && systemProxy !== null && (
+                    <div className='flat-note'>
+                        <span>
+                            {systemProxy.pac_url
+                                ? t('config.general.proxy.detected_pac', { url: systemProxy.pac_url })
+                                : systemProxy.http || systemProxy.https
+                                  ? t('config.general.proxy.detected', {
+                                        value: systemProxy.https ?? systemProxy.http,
+                                    })
+                                  : t('config.general.proxy.detected_none')}
+                        </span>
                     </div>
-                    <div className={`config-item ${proxyMode === 'manual' ? '' : 'hidden'}`}>
-                        {proxyUsername !== null && (
-                            <TextField
-                                className='flex w-full flex-row items-center justify-between mr-2'
-                                value={proxyUsername}
-                                onChange={(v) => {
-                                    setProxyUsername(v);
-                                }}
-                            >
-                                <Label className='text-base my-auto'>{t('config.general.proxy.username')}</Label>
-                                <Input type='text' />
-                            </TextField>
-                        )}
-                        {proxyPassword !== null && (
-                            <TextField
-                                className='flex w-full flex-row items-center justify-between ml-2'
-                                value={proxyPassword}
-                                onChange={(v) => {
-                                    setProxyPassword(v);
-                                }}
-                            >
-                                <Label className='text-base my-auto'>{t('config.general.proxy.password')}</Label>
-                                <Input type='password' />
-                            </TextField>
-                        )}
-                    </div>
-                    <div className={`config-item ${proxyMode === 'manual' ? '' : 'hidden'}`}>
-                        {noProxy !== null && (
-                            <TextField
-                                className='flex w-full flex-row items-center justify-between'
-                                value={noProxy}
-                                onChange={(v) => {
-                                    setNoProxy(v);
-                                }}
-                            >
-                                <Label className='text-base my-auto'>{t('config.general.proxy.no_proxy')}</Label>
-                                <Input />
-                            </TextField>
-                        )}
-                    </div>
-                </CardContent>
-            </Card>
+                )}
+                <div className={`flat-row flat-row--fields ${proxyMode === 'manual' ? '' : 'hidden'}`}>
+                    {proxyHost !== null && (
+                        // The `http://` prefix is an InputGroup.Prefix rather
+                        // than a child of the input: v3's Input is a real
+                        // <input>, a void element that cannot contain anything.
+                        <TextField
+                            className='mr-2 w-full'
+                            value={proxyHost}
+                            onChange={(v) => {
+                                setProxyHost(v);
+                            }}
+                            isRequired
+                        >
+                            <Label className='text-base my-auto'>{t('config.general.proxy.host')}</Label>
+                            <InputGroup>
+                                <InputGroup.Prefix>http://</InputGroup.Prefix>
+                                <InputGroup.Input type='url' />
+                            </InputGroup>
+                        </TextField>
+                    )}
+                    {proxyPort !== null && (
+                        <TextField
+                            className='flex w-full flex-row items-center justify-between ml-2'
+                            value={proxyPort}
+                            onChange={(v) => {
+                                if (parseInt(v) > 65535) {
+                                    setProxyPort(65535);
+                                } else if (parseInt(v) < 0) {
+                                    setProxyPort('');
+                                } else {
+                                    setProxyPort(parseInt(v));
+                                }
+                            }}
+                            isRequired
+                        >
+                            <Label className='text-base my-auto'>{t('config.general.proxy.port')}</Label>
+                            <Input type='number' />
+                        </TextField>
+                    )}
+                </div>
+                <div className={`flat-row flat-row--fields ${proxyMode === 'manual' ? '' : 'hidden'}`}>
+                    {proxyUsername !== null && (
+                        <TextField
+                            className='flex w-full flex-row items-center justify-between mr-2'
+                            value={proxyUsername}
+                            onChange={(v) => {
+                                setProxyUsername(v);
+                            }}
+                        >
+                            <Label className='text-base my-auto'>{t('config.general.proxy.username')}</Label>
+                            <Input type='text' />
+                        </TextField>
+                    )}
+                    {proxyPassword !== null && (
+                        <TextField
+                            className='flex w-full flex-row items-center justify-between ml-2'
+                            value={proxyPassword}
+                            onChange={(v) => {
+                                setProxyPassword(v);
+                            }}
+                        >
+                            <Label className='text-base my-auto'>{t('config.general.proxy.password')}</Label>
+                            <Input type='password' />
+                        </TextField>
+                    )}
+                </div>
+                <div className={`flat-row flat-row--fields ${proxyMode === 'manual' ? '' : 'hidden'}`}>
+                    {noProxy !== null && (
+                        <TextField
+                            className='flex w-full flex-row items-center justify-between'
+                            value={noProxy}
+                            onChange={(v) => {
+                                setNoProxy(v);
+                            }}
+                        >
+                            <Label className='text-base my-auto'>{t('config.general.proxy.no_proxy')}</Label>
+                            <Input />
+                        </TextField>
+                    )}
+                </div>
+            </Section>
         </>
     );
 }

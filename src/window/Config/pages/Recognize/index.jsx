@@ -1,7 +1,8 @@
-import { CardContent, Dropdown, Switch, Button, Card, Label } from '@heroui/react';
+import { Dropdown, Switch, Button, Label } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
 
+import { Section, Row } from '../../components/Section';
 import { languageList } from '../../../../utils/language';
 import { useConfig } from '../../../../hooks';
 
@@ -12,11 +13,17 @@ export default function Recognize() {
     const [hideWindow, setHideWindow] = useConfig('recognize_hide_window', false);
     const [closeOnBlur, setCloseOnBlur] = useConfig('recognize_close_on_blur', false);
     const { t } = useTranslation();
+
     return (
-        <Card className='mb-[10px]'>
-            <CardContent>
-                <div className='config-item'>
-                    <h3 className='my-auto mx-0'>{t('config.recognize.language')}</h3>
+        <>
+            <Section
+                name={t('config.recognize.section.reading')}
+                note={t('config.recognize.section.reading_note')}
+            >
+                <Row
+                    label={t('config.recognize.language')}
+                    desc={t('config.recognize.language_desc')}
+                >
                     {recognizeLanguage !== null && (
                         <Dropdown>
                             <Button variant='outline'>{t(`languages.${recognizeLanguage}`)}</Button>
@@ -48,9 +55,11 @@ export default function Recognize() {
                             </Dropdown.Popover>
                         </Dropdown>
                     )}
-                </div>
-                <div className='config-item'>
-                    <h3 className='my-auto mx-0'>{t('config.recognize.delete_newline')}</h3>
+                </Row>
+                <Row
+                    label={t('config.recognize.delete_newline')}
+                    desc={t('config.recognize.delete_newline_desc')}
+                >
                     {deleteNewline !== null && (
                         <Switch
                             className='justify-center items-center'
@@ -66,9 +75,11 @@ export default function Recognize() {
                             </Switch.Content>
                         </Switch>
                     )}
-                </div>
-                <div className='config-item'>
-                    <h3 className='my-auto mx-0'>{t('config.recognize.auto_copy')}</h3>
+                </Row>
+                <Row
+                    label={t('config.recognize.auto_copy')}
+                    desc={t('config.recognize.auto_copy_desc')}
+                >
                     {autoCopy !== null && (
                         <Switch
                             className='justify-center items-center'
@@ -84,9 +95,16 @@ export default function Recognize() {
                             </Switch.Content>
                         </Switch>
                     )}
-                </div>
-                <div className='config-item'>
-                    <h3 className='my-auto mx-0'>{t('config.recognize.close_on_blur')}</h3>
+                </Row>
+            </Section>
+            <Section
+                name={t('config.recognize.section.window')}
+                note={t('config.recognize.section.window_note')}
+            >
+                <Row
+                    label={t('config.recognize.close_on_blur')}
+                    desc={t('config.recognize.close_on_blur_desc')}
+                >
                     {closeOnBlur !== null && (
                         <Switch
                             className='justify-center items-center'
@@ -102,9 +120,11 @@ export default function Recognize() {
                             </Switch.Content>
                         </Switch>
                     )}
-                </div>
-                <div className='config-item'>
-                    <h3 className='my-auto mx-0'>{t('config.recognize.hide_window')}</h3>
+                </Row>
+                <Row
+                    label={t('config.recognize.hide_window')}
+                    desc={t('config.recognize.hide_window_desc')}
+                >
                     {hideWindow !== null && (
                         <Switch
                             className='justify-center items-center'
@@ -120,8 +140,8 @@ export default function Recognize() {
                             </Switch.Content>
                         </Switch>
                     )}
-                </div>
-            </CardContent>
-        </Card>
+                </Row>
+            </Section>
+        </>
     );
 }

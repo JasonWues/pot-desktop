@@ -3,8 +3,6 @@ import {
     ModalHeader,
     ModalBody,
     ModalFooter,
-    Table,
-    TableHeader,
     Dropdown,
     TextArea,
     Button,
@@ -29,6 +27,7 @@ import { invoke_plugin } from '../../../../utils/invoke_plugin';
 import * as builtinServices from '../../../../services/translate';
 import { useConfig, useToastStyle, useDisclosure } from '../../../../hooks';
 import { LanguageFlag } from '../../../../utils/language';
+import Flag from '../../../../components/Flag';
 import { getDatabase } from '../../../../utils/db';
 import { store } from '../../../../utils/store';
 import { osType } from '../../../../utils/env';
@@ -88,6 +87,7 @@ function toCsv(rows) {
 export default function History() {
     const [collectionServiceList] = useConfig('collection_service_list', []);
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
+    const { isOpen: isClearOpen, onOpen: onClearOpen, onOpenChange: onClearOpenChange } = useDisclosure();
     const [pluginList, setPluginList] = useState(null);
     const [selectedItem, setSelectItem] = useState(null);
     const [page, setPage] = useState(1);
@@ -243,6 +243,35 @@ export default function History() {
         return `${year}/${month}/${day} ${hour}:${minute}:${second}`;
     };
 
+    // The entry states its own time; the heading above it carries the date, so
+    // neither has to repeat the other.
+    const formatTime = (date) => formatDate(date).slice(9);
+    const formatDay = (date) => formatDate(date).slice(0, 8);
+
+    /*
+      One pass over the page's rows, splitting on the day they fall in. The rows
+      already arrive newest-first from SQL, so insertion order is the order the
+      groups should render in and no sort is needed.
+    */
+    const groupByDay = (rows) => {
+        const groups = [];
+        for (const item of rows) {
+            const day = formatDay(new Date(item.timestamp));
+            const last = groups[groups.length - 1];
+            if (last && last.day === day) {
+                last.rows.push(item);
+            } else {
+                groups.push({ day, rows: [item] });
+            }
+        }
+        return groups;
+    };
+
+    const serviceIcon = (service) =>
+        getServiceSouceType(service) === ServiceSourceType.PLUGIN
+            ? pluginList['translate'][getServiceName(service)].icon
+            : builtinServices[getServiceName(service)].info.icon;
+
     const serviceLabel = (service) => {
         const name = getServiceName(service);
         if (getServiceSouceType(service) === ServiceSourceType.PLUGIN) {
@@ -280,9 +309,9 @@ export default function History() {
 
     return (
         pluginList !== null && (
-            <>
+            <div className={`flex flex-col ${osType === 'Linux' ? 'h-[calc(100vh-58px)]' : 'h-[calc(100vh-56px)]'}`}>
                 <Toaster />
-                <div className='flex gap-[8px] mb-[8px]'>
+                <div className='history-bar'>
                     {/* SearchField, not Input: v3 dropped `isClearable`/`onClear`,
                         and this is the component that carries a clear button of its
                         own. Clearing goes through `onChange` like any other edit, so
@@ -363,112 +392,77 @@ export default function History() {
                             </Dropdown.Menu>
                         </Dropdown.Popover>
                     </Dropdown>
+                    <span className='history-bar__count'>
+                        {t('config.history.showing', { shown: items.length, total })}
+                    </span>
                 </div>
-                {/* v3's Table is three components, not one: the root styles the
-                    container, ScrollContainer owns the scrolling, and Content is
-                    the actual table -- which is where aria-label, selectionMode and
-                    onRowAction now live. Getting this wrong does not fail the
-                    build: the flat TableHeader/TableRow/TableCell names still
-                    exist, and are literally the same objects, so the v2
-                    arrangement compiled and then threw "cannot be rendered outside
-                    a collection" the moment this page opened.
-
-                    Columns and rows are keyed by `id` rather than React's `key`,
-                    the same distinction the dropdown items have. */}
-                <Table
-                    className={`${
-                        osType === 'Linux' ? 'h-[calc(100vh-180px)]' : 'h-[calc(100vh-150px)]'
-                    } overflow-y-auto`}
-                >
-                    <Table.ScrollContainer>
-                        <Table.Content
-                            selectionMode='single'
-                            selectionBehavior='toggle'
-                            aria-label='History Table'
-                            onRowAction={(id) => {
-                                getSelectedData(id);
-                                onOpen();
-                            }}
-                        >
-                            {/* v2's `hideHeader` on Table is gone, and an unknown prop is
-                                not an error -- it just did nothing, leaving a 20px band of
-                                empty column dividers above the first row. The columns still
-                                have to exist for the collection, so the header row is hidden
-                                instead of dropped. */}
-                            <Table.Header className='hidden'>
-                                <Table.Column id='service' />
-                                <Table.Column id='text' />
-                                <Table.Column id='source' />
-                                <Table.Column id='target' />
-                                <Table.Column id='result' />
-                                <Table.Column id='timestamp' />
-                            </Table.Header>
-                            <Table.Body
-                                renderEmptyState={() => 'No History to display.'}
-                                items={items}
-                            >
-                                {(item) =>
+                {/*
+                    The day-grouped list that replaced v3's Table. A table forced
+                    every entry onto one line and split it across six cells; here an
+                    entry is one block that names its service, pair and time across
+                    the top and gives source and result equal width underneath, so
+                    long text stays readable instead of being ellipsed at the cell
+                    edge. Row click still opens the same editing modal.
+                */}
+                <div className='history-list'>
+                    {items.length === 0 && <div className='history-empty'>{t('config.history.empty')}</div>}
+                    {groupByDay(items).map((group) => (
+                        <div key={group.day}>
+                            <div className='history-day'>
+                                <span className='history-day__label'>{group.day}</span>
+                                <span className='history-day__count'>
+                                    {t('config.history.entry_count', { count: group.rows.length })}
+                                </span>
+                            </div>
+                            {group.rows.map(
+                                (item) =>
                                     whetherAvailableService(item.service, {
                                         [ServiceSourceType.BUILDIN]: builtinServices,
                                         [ServiceSourceType.PLUGIN]: pluginList[ServiceType.TRANSLATE],
                                     }) && (
-                                        <Table.Row id={item.id}>
-                                            <Table.Cell className='px-0'>
-                                                {getServiceSouceType(item.service) === ServiceSourceType.PLUGIN ? (
-                                                    <img
-                                                        src={pluginList['translate'][getServiceName(item.service)].icon}
-                                                        className='h-[18px] w-[18px] my-auto mr-[8px]'
-                                                        draggable={false}
-                                                    />
-                                                ) : (
-                                                    <img
-                                                        src={`${builtinServices[getServiceName(item.service)].info.icon}`}
-                                                        className='h-[18px] w-[18px] my-auto mr-[8px]'
-                                                        draggable={false}
-                                                    />
-                                                )}
-                                            </Table.Cell>
-                                            <Table.Cell className='px-0'>
-                                                <p
-                                                    className={`whitespace-nowrap ${
-                                                        osType === 'Linux'
-                                                            ? 'w-[calc((100vw-287px-26px-60px-140px-30px)*0.5)]'
-                                                            : 'w-[calc((100vw-287px-26px-60px-140px)*0.5)]'
-                                                    } text-ellipsis overflow-hidden`}
-                                                >
-                                                    {item.text}
-                                                </p>
-                                            </Table.Cell>
-                                            <Table.Cell className='px-0'>
-                                                <span className={`w-[30px] fi fi-${LanguageFlag[item.source]}`} />
-                                            </Table.Cell>
-                                            <Table.Cell className='px-0'>
-                                                <span className={`w-[30px] fi fi-${LanguageFlag[item.target]}`} />
-                                            </Table.Cell>
-                                            <Table.Cell className='px-0'>
-                                                <p
-                                                    className={`whitespace-nowrap ${
-                                                        osType === 'Linux'
-                                                            ? 'w-[calc((100vw-287px-26px-60px-140px-30px)*0.5)]'
-                                                            : 'w-[calc((100vw-287px-26px-60px-140px)*0.5)]'
-                                                    } text-ellipsis overflow-hidden`}
-                                                >
-                                                    {item.result}
-                                                </p>
-                                            </Table.Cell>
-                                            <Table.Cell className='px-0'>
-                                                <p className='text-center whitespace-nowrap w-[140px]'>
-                                                    {formatDate(new Date(item.timestamp))}
-                                                </p>
-                                            </Table.Cell>
-                                        </Table.Row>
+                                        <button
+                                            type='button'
+                                            key={item.id}
+                                            className='history-entry'
+                                            onClick={() => {
+                                                getSelectedData(item.id);
+                                                onOpen();
+                                            }}
+                                        >
+                                            <div className='history-entry__head'>
+                                                <img
+                                                    src={serviceIcon(item.service)}
+                                                    className='history-entry__logo'
+                                                    alt=''
+                                                    draggable={false}
+                                                />
+                                                <span className='history-entry__service'>
+                                                    {serviceLabel(item.service)}
+                                                </span>
+                                                <span className='history-entry__pair'>
+                                                    {/* The `fi fi-xx` classes this used to carry render
+                                                        nothing: flag-icons' stylesheet is deliberately not
+                                                        imported (see components/Flag), so only the component
+                                                        actually paints a flag. */}
+                                                    <Flag code={LanguageFlag[item.source]} />
+                                                    <span>→</span>
+                                                    <Flag code={LanguageFlag[item.target]} />
+                                                </span>
+                                                <span className='history-entry__stamp'>
+                                                    {formatTime(new Date(item.timestamp))}
+                                                </span>
+                                            </div>
+                                            <div className='history-entry__body'>
+                                                <div className='history-entry__text'>{item.text}</div>
+                                                <div className='history-entry__result'>{item.result}</div>
+                                            </div>
+                                        </button>
                                     )
-                                }
-                            </Table.Body>
-                        </Table.Content>
-                    </Table.ScrollContainer>
-                </Table>
-                <div className='mt-[8px] flex justify-around'>
+                            )}
+                        </div>
+                    ))}
+                </div>
+                <div className='flat-foot'>
                     {/* v3's Pagination renders no pages of its own: `total`, `page`
                         and `onChange` are gone and every link is written out. With
                         none, it produced an empty <nav> with `total` and `page`
@@ -525,16 +519,55 @@ export default function History() {
                             {t('config.history.export_json')}
                         </Button>
                     </ButtonGroup>
+                    {/*
+                        `danger-soft` and a confirm step, because this sits one
+                        button away from the two exports and used to look
+                        exactly like them -- a misclick dropped every row with
+                        nothing to undo it.
+                    */}
                     <Button
                         size='sm'
+                        variant='danger-soft'
                         className='my-auto'
-                        onPress={clearData}
+                        onPress={onClearOpen}
                     >
                         {t('common.clear')}
                     </Button>
                 </div>
 
                 <Modal>
+                    <Modal.Backdrop
+                        isOpen={isClearOpen}
+                        onOpenChange={onClearOpenChange}
+                    >
+                        <Modal.Container>
+                            <Modal.Dialog>
+                                {({ close }) => (
+                                    <>
+                                        <ModalHeader>{t('common.clear')}</ModalHeader>
+                                        <ModalBody>{t('config.history.clear_confirm', { count: total })}</ModalBody>
+                                        <ModalFooter>
+                                            <Button
+                                                variant='tertiary'
+                                                onPress={close}
+                                            >
+                                                {t('common.cancel')}
+                                            </Button>
+                                            <Button
+                                                variant='danger'
+                                                onPress={async () => {
+                                                    await clearData();
+                                                    close();
+                                                }}
+                                            >
+                                                {t('common.ok')}
+                                            </Button>
+                                        </ModalFooter>
+                                    </>
+                                )}
+                            </Modal.Dialog>
+                        </Modal.Container>
+                    </Modal.Backdrop>
                     <Modal.Backdrop
                         isOpen={isOpen}
                         onOpenChange={onOpenChange}
@@ -704,7 +737,7 @@ export default function History() {
                         </Modal.Container>
                     </Modal.Backdrop>
                 </Modal>
-            </>
+            </div>
         )
     );
 }

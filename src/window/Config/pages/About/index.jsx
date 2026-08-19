@@ -21,7 +21,12 @@ export default function About() {
                 className='mx-auto h-[100px] mb-[5px]'
                 draggable={false}
             />
-            <div className='content-center'>
+            {/*
+                Same `px-[40px]` as the row of buttons below it: both rows are
+                `justify-between`, so a different inset made the two spread to
+                visibly different widths under one shared separator.
+            */}
+            <div className='content-center px-[40px]'>
                 <h1 className='font-bold text-2xl text-center'>Pot</h1>
                 <p className='text-center text-sm text-gray-500 mb-[5px]'>{appVersion}</p>
                 <Separator />

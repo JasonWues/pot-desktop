@@ -1,5 +1,5 @@
 import { useLocation, useRoutes } from 'react-router-dom';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 import { Card, Separator } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
@@ -18,6 +18,7 @@ export default function Config() {
     const { t } = useTranslation();
     const location = useLocation();
     const page = useRoutes(routes);
+    const contentRef = useRef(null);
 
     useEffect(() => {
         if (appWindow.label === 'config') {
@@ -25,29 +26,41 @@ export default function Config() {
         }
     }, []);
 
+    // The pages swap inside one scroll container, so without this the next page
+    // opens at the offset the previous one was left at -- switching away from a
+    // scrolled General landed on Translate with its first row already cut off.
+    useEffect(() => {
+        contentRef.current?.scrollTo({ top: 0 });
+    }, [location.pathname]);
+
     return (
         <>
             <Card
                 shadow='none'
                 className={`${
                     transparent ? 'bg-background/90' : 'bg-surface'
-                } float-left w-[230px] h-screen rounded-none ${osType === 'Linux' ? 'rounded-l-[10px] border-1' : ''} border-r-1 border-border select-none cursor-default`}
+                } float-left w-[230px] h-screen rounded-none ${osType === 'Linux' ? 'rounded-l-[10px] border-1' : ''} border-r-2 border-r-border-secondary select-none cursor-default flex flex-col`}
             >
-                <div className='h-[35px] p-[5px]'>
+                <div className='h-[35px] p-[5px] flex-none'>
                     <div
                         className='w-full h-full'
                         data-tauri-drag-region='true'
                     />
                 </div>
-                <div className='p-[5px]'>
-                    <div data-tauri-drag-region='true'>
-                        <img
-                            alt='pot logo'
-                            src='icon.svg'
-                            className='h-[60px] w-[60px] m-auto mb-[30px]'
-                            draggable={false}
-                        />
-                    </div>
+                {/* Mark and wordmark on one line. It stays a drag region: it is
+                    the only part of the sidebar above the nav, so dropping that
+                    would leave the window draggable only by the title strip. */}
+                <div
+                    className='config-brand'
+                    data-tauri-drag-region='true'
+                >
+                    <img
+                        alt=''
+                        src='icon.svg'
+                        className='config-brand__mark'
+                        draggable={false}
+                    />
+                    <span className='config-brand__name'>pot</span>
                 </div>
                 <SideBar />
             </Card>
@@ -67,6 +80,7 @@ export default function Config() {
                 </div>
                 <Separator />
                 <div
+                    ref={contentRef}
                     className={`p-[10px] overflow-y-auto ${
                         osType === 'Linux' ? 'h-[calc(100vh-38px)]' : 'h-[calc(100vh-36px)]'
                     }`}
