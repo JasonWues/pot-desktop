@@ -1,5 +1,5 @@
-import { Separator, Button, Popover, PopoverTrigger, PopoverContent } from '@heroui/react';
 import { appLogDir, appConfigDir } from '@tauri-apps/api/path';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { open } from '@tauri-apps/plugin-shell';
 // Not `shell`'s `open`: that one validates against a URL regex which no
@@ -7,128 +7,164 @@ import { open } from '@tauri-apps/plugin-shell';
 // rejected. `openPath` is scoped by path instead -- see capabilities/default.json.
 import { openPath } from '@tauri-apps/plugin-opener';
 import { invoke } from '@tauri-apps/api/core';
-import React from 'react';
+import { Button } from '@heroui/react';
 
 import { appVersion } from '../../../../utils/env';
 
+const REPO = 'JasonWues/pot-desktop';
+
+// The marker on a row that leaves the app. Inline rather than an icon import:
+// it is the only glyph on the page, and react-icons has no 1:1 match for the
+// design's arrow-out-of-box.
+function ExternalIcon() {
+    return (
+        <svg
+            className='about-row__icon'
+            viewBox='0 0 24 24'
+            fill='none'
+            stroke='currentColor'
+            strokeWidth='2'
+            strokeLinecap='round'
+            strokeLinejoin='round'
+            aria-hidden='true'
+        >
+            <path d='M15 3h6v6' />
+            <path d='M10 14 21 3' />
+            <path d='M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5' />
+        </svg>
+    );
+}
+
+function LinkRow({ label, value, onOpen }) {
+    return (
+        <button
+            type='button'
+            className='about-row'
+            onClick={onOpen}
+        >
+            <span className='about-row__label'>{label}</span>
+            <span className='about-row__value'>{value}</span>
+            <ExternalIcon />
+        </button>
+    );
+}
+
 export default function About() {
     const { t } = useTranslation();
+    // Resolved once so the rows can state where the folders actually are. The
+    // buttons used to open them without ever saying what they would open.
+    const [logDir, setLogDir] = useState('');
+    const [configDir, setConfigDir] = useState('');
+
+    useEffect(() => {
+        appLogDir().then(setLogDir);
+        appConfigDir().then(setConfigDir);
+    }, []);
 
     return (
-        <div className='h-full w-full py-[80px] px-[100px]'>
-            <img
-                src='icon.png'
-                className='mx-auto h-[100px] mb-[5px]'
-                draggable={false}
-            />
-            {/*
-                Same `px-[40px]` as the row of buttons below it: both rows are
-                `justify-between`, so a different inset made the two spread to
-                visibly different widths under one shared separator.
-            */}
-            <div className='content-center px-[40px]'>
-                <h1 className='font-bold text-2xl text-center'>Pot</h1>
-                <p className='text-center text-sm text-gray-500 mb-[5px]'>{appVersion}</p>
-                <Separator />
-                <div className='flex justify-between'>
-                    <Button
-                        variant='tertiary'
-                        className='my-[5px]'
-                        size='sm'
-                        onPress={() => {
-                            open('https://pot-app.com');
-                        }}
-                    >
-                        {t('config.about.website')}
-                    </Button>
-                    <Button
-                        variant='tertiary'
-                        className='my-[5px]'
-                        size='sm'
-                        onPress={() => {
-                            open('https://github.com/JasonWues/pot-desktop');
-                        }}
-                    >
-                        {t('config.about.github')}
-                    </Button>
-                    <Popover
-                        placement='top'
-                        offset={10}
-                    >
-                        <PopoverTrigger>
-                            <Button
-                                variant='tertiary'
-                                className='my-[5px]'
-                                size='sm'
-                            >
-                                {t('config.about.feedback')}
-                            </Button>
-                        </PopoverTrigger>
-                        <PopoverContent>
-                            <div className='flex justify-between'>
-                                <Button
-                                    variant='tertiary'
-                                    className='my-[5px]'
-                                    size='sm'
-                                    onPress={() => {
-                                        open('https://github.com/JasonWues/pot-desktop/issues');
-                                    }}
-                                >
-                                    {t('config.about.issue')}
-                                </Button>
-                                <Button
-                                    variant='tertiary'
-                                    className='my-[5px]'
-                                    size='sm'
-                                    onPress={() => {
-                                        open('mailto:support@pot-app.com');
-                                    }}
-                                >
-                                    {t('config.about.email')}
-                                </Button>
-                            </div>
-                        </PopoverContent>
-                    </Popover>
+        <div className='about'>
+            <div className='about-id'>
+                <img
+                    src='icon.png'
+                    className='about-id__mark'
+                    alt=''
+                    draggable={false}
+                />
+                <div className='about-id__main'>
+                    <div className='about-kicker'>{t('config.about.section.application')}</div>
+                    <div className='about-id__name'>Pot</div>
+                    <div className='about-id__version'>{appVersion}</div>
                 </div>
-                <Separator />
+                {/*
+                    The one filled action on the page. It opens the updater
+                    window, which is what does the actual checking -- the page
+                    itself knows nothing about whether a release is newer, so it
+                    does not claim to.
+                */}
+                <Button
+                    variant='primary'
+                    className='about-id__action'
+                    onPress={() => {
+                        invoke('updater_window');
+                    }}
+                >
+                    {t('config.about.check_update')}
+                </Button>
             </div>
-            <div className='content-center px-[40px]'>
-                <div className='flex justify-between'>
-                    <Button
-                        variant='tertiary'
-                        className='my-[5px]'
-                        size='sm'
-                        onPress={() => {
-                            invoke('updater_window');
-                        }}
-                    >
-                        {t('config.about.check_update')}
-                    </Button>
-                    <Button
-                        variant='tertiary'
-                        className='my-[5px]'
-                        size='sm'
-                        onPress={async () => {
-                            const dir = await appLogDir();
-                            openPath(dir);
-                        }}
-                    >
-                        {t('config.about.view_log')}
-                    </Button>
-                    <Button
-                        variant='tertiary'
-                        className='my-[5px]'
-                        size='sm'
-                        onPress={async () => {
-                            const dir = await appConfigDir();
-                            openPath(dir);
-                        }}
-                    >
-                        {t('config.about.view_config')}
-                    </Button>
-                </div>
 
-                <Separator />
+            <div className='about-block about-block--ruled'>
+                <div className='about-kicker'>{t('config.about.section.project')}</div>
+                <div className='about-list'>
+                    <LinkRow
+                        label={t('config.about.website')}
+                        value='pot-app.com'
+                        onOpen={() => open('https://pot-app.com')}
+                    />
+                    <LinkRow
+                        label={t('config.about.source')}
+                        value={REPO}
+                        onOpen={() => open(`https://github.com/${REPO}`)}
+                    />
+                    {/*
+                        These two were behind a popover on the Feedback button,
+                        which meant neither destination was visible until after
+                        a click. As rows they cost the same space and say where
+                        they go.
+                    */}
+                    <LinkRow
+                        label={t('config.about.feedback')}
+                        value={t('config.about.issue')}
+                        onOpen={() => open(`https://github.com/${REPO}/issues`)}
+                    />
+                    <LinkRow
+                        label={t('config.about.email')}
+                        value='support@pot-app.com'
+                        onOpen={() => open('mailto:support@pot-app.com')}
+                    />
+                </div>
+            </div>
+
+            <div className='about-block'>
+                <div className='about-kicker'>{t('config.about.section.machine')}</div>
+                <div className='about-list'>
+                    <div className='about-row about-row--action'>
+                        <span className='about-row__label'>{t('config.about.logs')}</span>
+                        {/*
+                            `bdi` so a right-to-left UI language does not reorder
+                            the path itself; the value is clipped from the left,
+                            which keeps the leaf folder readable.
+                        */}
+                        <bdi
+                            className='about-row__value about-row__value--path'
+                            title={logDir}
+                        >
+                            {logDir}
+                        </bdi>
+                        <Button
+                            variant='tertiary'
+                            size='sm'
+                            onPress={() => openPath(logDir)}
+                        >
+                            {t('config.about.open')}
+                        </Button>
+                    </div>
+                    <div className='about-row about-row--action'>
+                        <span className='about-row__label'>{t('config.about.configuration')}</span>
+                        <bdi
+                            className='about-row__value about-row__value--path'
+                            title={configDir}
+                        >
+                            {configDir}
+                        </bdi>
+                        <Button
+                            variant='tertiary'
+                            size='sm'
+                            onPress={() => openPath(configDir)}
+                        >
+                            {t('config.about.open')}
+                        </Button>
+                    </div>
+                </div>
             </div>
         </div>
     );

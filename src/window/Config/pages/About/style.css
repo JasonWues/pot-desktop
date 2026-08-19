@@ -1,0 +1,198 @@
+/*
+  The About page as three blocks separated by the strong rule, in the same flat
+  vocabulary as the rest of the window: identity first, then where the project
+  lives, then what it has put on this machine.
+
+  Its own sheet rather than `.flat-section`, because these blocks are not
+  settings rows -- there is no control hanging off the right of a label, and the
+  identity block is a masthead. Painted with the app's own tokens throughout.
+*/
+
+@layer components {
+    .about {
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* A block's name. The only thing shouting on the page. */
+    .about-kicker {
+        font-size: 11px;
+        font-weight: 700;
+        line-height: 1;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--muted);
+    }
+
+    /* ------------------------------------------------------------ identity */
+
+    .about-id {
+        display: flex;
+        align-items: flex-start;
+        gap: 24px;
+        padding: 32px 28px;
+        border-bottom: 2px solid var(--border-secondary);
+    }
+
+    .about-id__mark {
+        width: 84px;
+        height: 84px;
+        flex: none;
+        display: block;
+    }
+
+    .about-id__main {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .about-id__name {
+        font-size: 38px;
+        font-weight: 700;
+        line-height: 44px;
+        letter-spacing: -0.02em;
+        margin-top: 4px;
+    }
+
+    /*
+      The version is the one fact anyone opens this page for, so it is set as
+      display type in the accent rather than as grey caption under the name.
+    */
+    .about-id__version {
+        margin-top: 6px;
+        font-size: 26px;
+        font-weight: 700;
+        line-height: 1.1;
+        letter-spacing: -0.01em;
+        color: var(--accent);
+        font-variant-numeric: tabular-nums;
+    }
+
+    /* -------------------------------------------------------------- blocks */
+
+    .about-block {
+        padding: 20px 28px 24px;
+    }
+
+    .about-block--ruled {
+        border-bottom: 2px solid var(--border-secondary);
+    }
+
+    .about-list {
+        margin-top: 12px;
+        border-top: 1px solid var(--border);
+    }
+
+    /*
+      A row states what it is, where it goes, and nothing else. The destination
+      being readable before the click is the point: the three project links used
+      to be bare buttons, one of which hid two more behind a popover.
+    */
+    .about-row {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        width: 100%;
+        min-height: 46px;
+        padding: 0;
+        border: 0;
+        border-bottom: 1px solid var(--border);
+        background: transparent;
+        color: inherit;
+        font: inherit;
+        text-align: left;
+    }
+
+    button.about-row {
+        cursor: pointer;
+    }
+
+    button.about-row:hover {
+        background: var(--surface);
+    }
+
+    button.about-row:focus-visible {
+        outline: 2px solid var(--focus);
+        outline-offset: -2px;
+    }
+
+    .about-row__label {
+        width: 150px;
+        flex: none;
+        font-size: 15px;
+        font-weight: 600;
+    }
+
+    .about-row__value {
+        flex: 1;
+        min-width: 0;
+        font-size: 13px;
+        color: var(--muted);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    /* A path is a machine fact, so it is set in the machine's face. */
+    .about-row__value--path {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 12px;
+        direction: rtl;
+        text-align: left;
+    }
+
+    .about-row__icon {
+        flex: none;
+        width: 15px;
+        height: 15px;
+        color: var(--muted);
+    }
+
+    button.about-row:hover .about-row__icon {
+        color: var(--accent);
+    }
+
+    /* The rows that end in a button rather than a link marker. */
+    .about-row--action {
+        padding: 12px 0;
+    }
+
+    /*
+      Nothing here is rounded. The primary keeps its accent fill -- it is the one
+      action on the page -- while the two folder buttons are outlines, the same
+      pair of weights the settings rows use.
+
+      `--button-bg` and friends rather than `background`: `.button` paints from
+      those variables and hovers to `--button-bg-hover`, so setting the
+      declaration alone would leave the hover reaching for the accent.
+    */
+    .about .button {
+        border-radius: 0;
+    }
+
+    .about-id__action {
+        min-height: 38px;
+        height: 38px;
+        padding: 0 18px;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+    }
+
+    .about-row--action .button {
+        --button-bg: transparent;
+        --button-bg-hover: var(--surface);
+        --button-bg-pressed: var(--surface-secondary);
+        --button-fg: var(--foreground);
+        border: 2px solid var(--border-secondary);
+        min-height: 32px;
+        height: 32px;
+        padding: 0 14px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .about-row:last-child {
+        border-bottom: 0;
+    }
+}

@@ -25,6 +25,7 @@
 @import './window/Config/pages/Service/style.css';
 @import './window/Config/pages/History/style.css';
 @import './window/Config/components/SideBar/style.css';
+@import './window/Config/pages/About/style.css';
 
 /*
   v3 selects a theme with `data-theme` on <html> rather than a class, so the

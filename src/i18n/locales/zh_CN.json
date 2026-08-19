@@ -316,7 +316,16 @@
                 "email": "邮件",
                 "check_update": "检查更新",
                 "view_log": "查看日志",
-                "view_config": "查看配置文件"
+                "view_config": "查看配置文件",
+                "section": {
+                    "application": "应用",
+                    "project": "项目",
+                    "machine": "本机文件"
+                },
+                "source": "源代码",
+                "logs": "日志",
+                "configuration": "配置文件",
+                "open": "打开"
             }
         },
         "updater": {

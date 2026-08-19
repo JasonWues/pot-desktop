@@ -316,7 +316,16 @@
                 "email": "Email",
                 "check_update": "Check Update",
                 "view_log": "View Log",
-                "view_config": "View Config"
+                "view_config": "View Config",
+                "section": {
+                    "application": "Application",
+                    "project": "Project",
+                    "machine": "On this machine"
+                },
+                "source": "Source code",
+                "logs": "Logs",
+                "configuration": "Configuration",
+                "open": "Open"
             }
         },
         "updater": {
