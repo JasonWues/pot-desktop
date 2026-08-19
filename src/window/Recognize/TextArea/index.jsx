@@ -9,7 +9,13 @@ import { MdSmartButton } from 'react-icons/md';
 import { useTranslation } from 'react-i18next';
 import { nanoid } from 'nanoid';
 
-import { getServiceName, getServiceSouceType, ServiceSourceType } from '../../../utils/service_instance';
+import {
+    getServiceName,
+    getServiceSouceType,
+    getDisplayInstanceName,
+    INSTANCE_NAME_CONFIG_KEY,
+    ServiceSourceType,
+} from '../../../utils/service_instance';
 import { currentServiceInstanceKeyAtom, languageAtom, recognizeFlagAtom } from '../ControlArea';
 import { invoke_plugin } from '../../../utils/invoke_plugin';
 import * as builtinServices from '../../../services/recognize';
@@ -38,11 +44,20 @@ export default function TextArea(props) {
     // Which service produced the text on screen. The pane header states it, so
     // the reader can tell a bad result from the wrong engine without opening
     // the picker in the bar below.
+    //
+    // It has to be the INSTANCE's name, not the service type's: several
+    // instances of one service are normal here, so "OpenAI" cannot say which of
+    // them ran, and it contradicted the bar below -- which shows the name the
+    // user gave the instance -- for the same running service.
     const serviceName =
         currentServiceInstanceKey &&
-        (getServiceSouceType(currentServiceInstanceKey) === ServiceSourceType.PLUGIN
-            ? pluginList?.[getServiceName(currentServiceInstanceKey)]?.display
-            : t(`services.recognize.${getServiceName(currentServiceInstanceKey)}.title`));
+        getDisplayInstanceName(
+            (serviceInstanceConfigMap?.[currentServiceInstanceKey] ?? {})[INSTANCE_NAME_CONFIG_KEY],
+            () =>
+                getServiceSouceType(currentServiceInstanceKey) === ServiceSourceType.PLUGIN
+                    ? pluginList?.[getServiceName(currentServiceInstanceKey)]?.display
+                    : t(`services.recognize.${getServiceName(currentServiceInstanceKey)}.title`)
+        );
 
     useEffect(() => {
         setText('');

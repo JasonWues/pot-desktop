@@ -78,7 +78,7 @@ export default function ControlArea(props) {
                                           () => pluginList[getServiceName(currentServiceInstanceKey)].display
                                       )
                                     : getInstanceName(currentServiceInstanceKey, () =>
-                                          t(`services.recognize.${currentServiceInstanceKey}.title`)
+                                          t(`services.recognize.${getServiceName(currentServiceInstanceKey)}.title`)
                                       )}
                             </span>
                         </Button>
@@ -113,7 +113,7 @@ export default function ControlArea(props) {
                                                       () => pluginList[getServiceName(instanceKey)].display
                                                   )
                                                 : getInstanceName(instanceKey, () =>
-                                                      t(`services.recognize.${instanceKey}.title`)
+                                                      t(`services.recognize.${getServiceName(instanceKey)}.title`)
                                                   )}
                                         </Dropdown.Item>
                                     );
