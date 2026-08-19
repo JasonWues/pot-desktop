@@ -3,7 +3,6 @@ import { appConfigDir, join } from '@tauri-apps/api/path';
 import { convertFileSrc } from '@tauri-apps/api/core';
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 import React, { useState, useEffect } from 'react';
-import { listen } from '@tauri-apps/api/event';
 import { useTranslation } from 'react-i18next';
 import { BsPinFill } from 'react-icons/bs';
 import { atom, useAtom } from 'jotai';
@@ -11,6 +10,7 @@ import { atom, useAtom } from 'jotai';
 import WindowControl from '../../components/WindowControl';
 import { store } from '../../utils/store';
 import { osType } from '../../utils/env';
+import { useCloseOnBlur } from '../../hooks/useWindowLifecycle';
 import { useConfig } from '../../hooks';
 import ControlArea from './ControlArea';
 import ImageArea from './ImageArea';
@@ -20,38 +20,6 @@ const appWindow = getCurrentWebviewWindow();
 
 export const pluginListAtom = atom();
 
-let blurTimeout = null;
-
-const listenBlur = () => {
-    return listen('tauri://blur', () => {
-        if (appWindow.label === 'recognize') {
-            if (blurTimeout) {
-                clearTimeout(blurTimeout);
-            }
-            // 50ms后关闭窗口，因为在 windows 下拖动窗口时会先切换成 blur 再立即切换成 focus
-            // 如果直接关闭将导致窗口无法拖动
-            blurTimeout = setTimeout(async () => {
-                await appWindow.close();
-            }, 50);
-        }
-    });
-};
-
-let unlisten = listenBlur();
-// 取消 blur 监听
-const unlistenBlur = () => {
-    unlisten.then((f) => {
-        f();
-    });
-};
-
-// 监听 focus 事件取消 blurTimeout 时间之内的关闭窗口
-void listen('tauri://focus', () => {
-    if (blurTimeout) {
-        clearTimeout(blurTimeout);
-    }
-});
-
 export default function Recognize() {
     const [pluginList, setPluginList] = useAtom(pluginListAtom);
     const [closeOnBlur] = useConfig('recognize_close_on_blur', false);
@@ -59,6 +27,9 @@ export default function Recognize() {
     const [serviceInstanceList] = useConfig('recognize_service_list', ['system', 'tesseract']);
     const [serviceInstanceConfigMap, setServiceInstanceConfigMap] = useState(null);
     const { t } = useTranslation();
+
+    // A pinned window stays put, and so does one the user has told to.
+    useCloseOnBlur({ enabled: (closeOnBlur ?? false) && !pined, delay: 50 });
 
     const loadPluginList = async () => {
         let temp = {};
@@ -98,13 +69,6 @@ export default function Recognize() {
     useEffect(() => {
         loadPluginList();
     }, []);
-    // 是否自动关闭窗口
-    useEffect(() => {
-        if (closeOnBlur !== null && !closeOnBlur) {
-            unlistenBlur();
-        }
-    }, [closeOnBlur]);
-
     return (
         pluginList &&
         serviceInstanceConfigMap !== null && (
@@ -128,15 +92,7 @@ export default function Recognize() {
                         aria-label={t('recognize.pin')}
                         aria-pressed={pined}
                         onClick={() => {
-                            if (pined) {
-                                if (closeOnBlur) {
-                                    unlisten = listenBlur();
-                                }
-                                appWindow.setAlwaysOnTop(false);
-                            } else {
-                                unlistenBlur();
-                                appWindow.setAlwaysOnTop(true);
-                            }
+                            appWindow.setAlwaysOnTop(!pined);
                             setPined(!pined);
                         }}
                     >

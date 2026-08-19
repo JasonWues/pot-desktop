@@ -1,7 +1,7 @@
 import { readDir, BaseDirectory, readTextFile, exists } from '@tauri-apps/plugin-fs';
+import { useCloseOnBlur, usePersistWindowGeometry } from '../../hooks/useWindowLifecycle';
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
-import { currentMonitor } from '@tauri-apps/api/window';
 import { appConfigDir, join } from '@tauri-apps/api/path';
 import { convertFileSrc } from '@tauri-apps/api/core';
 import React, { useState, useEffect } from 'react';
@@ -15,55 +15,8 @@ import TargetArea from './components/TargetArea';
 import { osType } from '../../utils/env';
 import { useConfig } from '../../hooks';
 import { store } from '../../utils/store';
-import { info } from '@tauri-apps/plugin-log';
 
 const appWindow = getCurrentWebviewWindow();
-
-let blurTimeout = null;
-let resizeTimeout = null;
-let moveTimeout = null;
-
-const listenBlur = () => {
-    return listen('tauri://blur', () => {
-        if (appWindow.label === 'translate') {
-            if (blurTimeout) {
-                clearTimeout(blurTimeout);
-            }
-            info('Blur');
-            // 100ms后关闭窗口，因为在 windows 下拖动窗口时会先切换成 blur 再立即切换成 focus
-            // 如果直接关闭将导致窗口无法拖动
-            blurTimeout = setTimeout(async () => {
-                info('Confirm Blur');
-                await appWindow.close();
-            }, 100);
-        }
-    });
-};
-
-let unlisten = listenBlur();
-// 取消 blur 监听
-const unlistenBlur = () => {
-    unlisten.then((f) => {
-        f();
-    });
-};
-
-// 监听 focus 事件取消 blurTimeout 时间之内的关闭窗口
-void listen('tauri://focus', () => {
-    info('Focus');
-    if (blurTimeout) {
-        info('Cancel Close');
-        clearTimeout(blurTimeout);
-    }
-});
-// 监听 move 事件取消 blurTimeout 时间之内的关闭窗口
-void listen('tauri://move', () => {
-    info('Move');
-    if (blurTimeout) {
-        info('Cancel Close');
-        clearTimeout(blurTimeout);
-    }
-});
 
 export default function Translate() {
     const [closeOnBlur] = useConfig('translate_close_on_blur', true);
@@ -86,6 +39,16 @@ export default function Translate() {
     const [pluginList, setPluginList] = useState(null);
     const [serviceInstanceConfigMap, setServiceInstanceConfigMap] = useState(null);
     const { t } = useTranslation();
+
+    // A pinned window stays put, and so does one the user has told to. While the
+    // setting is still loading, `?? true` keeps the default behaviour rather
+    // than leaving the window uncloseable for that first tick.
+    useCloseOnBlur({ enabled: (closeOnBlur ?? true) && !pined, delay: 100 });
+    usePersistWindowGeometry({
+        position: windowPosition === 'pre_state',
+        size: rememberWindowSize === true,
+    });
+
     const reorder = (list, startIndex, endIndex) => {
         const result = Array.from(list);
         const [removed] = result.splice(startIndex, 1);
@@ -98,72 +61,18 @@ export default function Translate() {
         const items = reorder(translateServiceInstanceList, result.source.index, result.destination.index);
         setTranslateServiceInstanceList(items);
     };
-    // 是否自动关闭窗口
-    useEffect(() => {
-        if (closeOnBlur !== null && !closeOnBlur) {
-            unlistenBlur();
-        }
-    }, [closeOnBlur]);
+
+    const setPinned = (next) => {
+        appWindow.setAlwaysOnTop(next);
+        setPined(next);
+    };
+
     // 是否默认置顶
     useEffect(() => {
         if (alwaysOnTop !== null && alwaysOnTop) {
-            appWindow.setAlwaysOnTop(true);
-            unlistenBlur();
-            setPined(true);
+            setPinned(true);
         }
     }, [alwaysOnTop]);
-    // 保存窗口位置
-    useEffect(() => {
-        if (windowPosition !== null && windowPosition === 'pre_state') {
-            const unlistenMove = listen('tauri://move', async () => {
-                if (moveTimeout) {
-                    clearTimeout(moveTimeout);
-                }
-                moveTimeout = setTimeout(async () => {
-                    if (appWindow.label === 'translate') {
-                        let position = await appWindow.outerPosition();
-                        const monitor = await currentMonitor();
-                        const factor = monitor.scaleFactor;
-                        position = position.toLogical(factor);
-                        await store.set('translate_window_position_x', parseInt(position.x));
-                        await store.set('translate_window_position_y', parseInt(position.y));
-                        await store.save();
-                    }
-                }, 100);
-            });
-            return () => {
-                unlistenMove.then((f) => {
-                    f();
-                });
-            };
-        }
-    }, [windowPosition]);
-    // 保存窗口大小
-    useEffect(() => {
-        if (rememberWindowSize !== null && rememberWindowSize) {
-            const unlistenResize = listen('tauri://resize', async () => {
-                if (resizeTimeout) {
-                    clearTimeout(resizeTimeout);
-                }
-                resizeTimeout = setTimeout(async () => {
-                    if (appWindow.label === 'translate') {
-                        let size = await appWindow.outerSize();
-                        const monitor = await currentMonitor();
-                        const factor = monitor.scaleFactor;
-                        size = size.toLogical(factor);
-                        await store.set('translate_window_height', parseInt(size.height));
-                        await store.set('translate_window_width', parseInt(size.width));
-                        await store.save();
-                    }
-                }, 100);
-            });
-            return () => {
-                unlistenResize.then((f) => {
-                    f();
-                });
-            };
-        }
-    }, [rememberWindowSize]);
 
     const loadPluginList = async () => {
         const serviceTypeList = ['translate', 'tts', 'recognize', 'collection'];
@@ -194,9 +103,14 @@ export default function Translate() {
 
     useEffect(() => {
         loadPluginList();
-        if (!unlisten) {
-            unlisten = listen('reload_plugin_list', loadPluginList);
-        }
+        // This used to be guarded by `if (!unlisten)`, testing the variable that
+        // held the blur subscription -- always set, so the reload never got a
+        // listener and installing a plugin did not show up until the window was
+        // reopened.
+        const unlisten = listen('reload_plugin_list', loadPluginList);
+        return () => {
+            unlisten.then((f) => f());
+        };
     }, []);
 
     const loadServiceInstanceConfigMap = async () => {
@@ -267,16 +181,7 @@ export default function Translate() {
                             aria-label={t('config.translate.always_on_top')}
                             aria-pressed={pined}
                             onClick={() => {
-                                if (pined) {
-                                    if (closeOnBlur) {
-                                        unlisten = listenBlur();
-                                    }
-                                    appWindow.setAlwaysOnTop(false);
-                                } else {
-                                    unlistenBlur();
-                                    appWindow.setAlwaysOnTop(true);
-                                }
-                                setPined(!pined);
+                                setPinned(!pined);
                             }}
                         >
                             <BsPinFill className={`text-[13px] ${pined ? 'text-accent' : ''}`} />
