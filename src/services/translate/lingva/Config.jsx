@@ -1,26 +1,14 @@
-import { useTranslation } from 'react-i18next';
-import { Button } from '@heroui/react';
+import NoConfigForm from '../../../components/ServiceConfigForm/NoConfigForm';
 import React from 'react';
 
 export function Config(props) {
     const { updateServiceList, onClose } = props;
-    const { t } = useTranslation();
 
     return (
-        <>
-            <div>{t('services.no_need')}</div>
-            <div>
-                <Button
-                    variant='primary'
-                    fullWidth
-                    onPress={() => {
-                        updateServiceList('lingva');
-                        onClose();
-                    }}
-                >
-                    {t('common.save')}
-                </Button>
-            </div>
-        </>
+        <NoConfigForm
+            name='lingva'
+            updateServiceList={updateServiceList}
+            onClose={onClose}
+        />
     );
 }

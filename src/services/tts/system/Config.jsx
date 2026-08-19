@@ -1,34 +1,21 @@
-import { Button, Dropdown, Label } from '@heroui/react';
+import { ConfigItem, SelectConfigField } from '../../../components/ServiceConfigForm/ConfigField';
+import { INSTANCE_NAME_CONFIG_KEY } from '../../../utils/service_instance';
+import ServiceConfigForm from '../../../components/ServiceConfigForm';
 import React, { useEffect, useState } from 'react';
-import toast, { Toaster } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 
-import { INSTANCE_NAME_CONFIG_KEY } from '../../../utils/service_instance';
-import InstanceNameInput from '../../../components/InstanceNameInput';
-import { useConfig } from '../../../hooks/useConfig';
-import { useToastStyle } from '../../../hooks';
 import { getVoiceList, matchVoice } from './index';
 import { Language } from './index';
 import { tts } from './index';
 
 const RATE_OPTIONS = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
 
-export function Config(props) {
-    const { instanceKey, updateServiceList, onClose } = props;
+// A component rather than the render prop's body: the installed voices are
+// queried from the OS, and which language the voice dropdown is editing is
+// state of its own, so there are hooks here that cannot live inside a render
+// callback.
+function SystemTtsFields({ config, setConfig }) {
     const { t } = useTranslation();
-    const [systemTtsConfig, setSystemTtsConfig] = useConfig(
-        instanceKey,
-        {
-            [INSTANCE_NAME_CONFIG_KEY]: t('services.tts.system_tts.title'),
-            rate: 1,
-            // Keyed by the BCP-47 tag from `Language`, so zh_cn and zh_tw can
-            // hold different voices. An absent or empty entry means "let
-            // `matchVoice` pick one".
-            voice: {},
-        },
-        { sync: false }
-    );
-    const [isLoading, setIsLoading] = useState(false);
     const [voiceList, setVoiceList] = useState([]);
     const [voiceListError, setVoiceListError] = useState('');
     // Which language the voice dropdown below is editing. Configuring all 30
@@ -36,151 +23,93 @@ export function Config(props) {
     // more than one or two.
     const [editingLanguage, setEditingLanguage] = useState('en');
 
-    const toastStyle = useToastStyle();
-
     useEffect(() => {
         getVoiceList().then(setVoiceList, (e) => setVoiceListError(e.toString()));
     }, []);
 
     const languageTag = Language[editingLanguage];
-    const configuredVoice = systemTtsConfig?.voice?.[languageTag] ?? '';
+    const configuredVoice = config?.voice?.[languageTag] ?? '';
     const autoVoice = matchVoice(voiceList, languageTag);
 
-    const setVoiceForCurrentLanguage = (name) => {
-        setSystemTtsConfig({
-            ...systemTtsConfig,
-            voice: {
-                ...systemTtsConfig.voice,
-                [languageTag]: name,
-            },
-        });
-    };
+    return (
+        <>
+            <SelectConfigField
+                label={t('services.tts.system_tts.rate')}
+                value={config.rate ?? 1}
+                options={RATE_OPTIONS.map((rate) => ({ id: rate, label: `${rate}x` }))}
+                ariaLabel='tts rate'
+                triggerLabel={`${config.rate ?? 1}x`}
+                onChange={(key) => setConfig({ ...config, rate: Number(key) })}
+            />
+
+            <SelectConfigField
+                label={t('services.tts.system_tts.language')}
+                value={editingLanguage}
+                options={Object.keys(Language).map((language) => ({
+                    id: language,
+                    label: t(`languages.${language}`),
+                }))}
+                ariaLabel='tts language'
+                onChange={(key) => setEditingLanguage(key)}
+                scrollable
+            />
+
+            <SelectConfigField
+                label={t('services.tts.system_tts.voice')}
+                value={configuredVoice === '' ? '__auto__' : configuredVoice}
+                options={[
+                    { id: '__auto__', label: t('services.tts.system_tts.auto_voice') },
+                    ...voiceList.map((v) => ({ id: v.name, label: `${v.name} (${v.language})` })),
+                ]}
+                ariaLabel='tts voice'
+                triggerLabel={
+                    configuredVoice === ''
+                        ? `${t('services.tts.system_tts.auto_voice')}${autoVoice === null ? '' : ` (${autoVoice.name})`}`
+                        : configuredVoice
+                }
+                onChange={(key) =>
+                    setConfig({
+                        ...config,
+                        voice: { ...config.voice, [languageTag]: key === '__auto__' ? '' : key },
+                    })
+                }
+                scrollable
+            />
+
+            {voiceListError !== '' && (
+                <ConfigItem>
+                    <p className='text-danger text-sm'>{voiceListError}</p>
+                </ConfigItem>
+            )}
+        </>
+    );
+}
+
+export function Config(props) {
+    const { instanceKey, updateServiceList, onClose } = props;
+    const { t } = useTranslation();
 
     return (
-        systemTtsConfig !== null && (
-            <>
-                <Toaster />
-                <InstanceNameInput
-                    config={systemTtsConfig}
-                    onChange={setSystemTtsConfig}
+        <ServiceConfigForm
+            instanceKey={instanceKey}
+            defaultConfig={{
+                [INSTANCE_NAME_CONFIG_KEY]: t('services.tts.system_tts.title'),
+                rate: 1,
+                // Keyed by the BCP-47 tag from `Language`, so zh_cn and zh_tw can
+                // hold different voices. An absent or empty entry means "let
+                // `matchVoice` pick one".
+                voice: {},
+            }}
+            onTest={(config) => tts('hello', Language.en, { config })}
+            updateServiceList={updateServiceList}
+            onClose={onClose}
+        >
+            {(config, setConfig) => (
+                <SystemTtsFields
+                    config={config}
+                    setConfig={setConfig}
                 />
-
-                <div className='config-item'>
-                    <h3 className='my-auto'>{t('services.tts.system_tts.rate')}</h3>
-                    <Dropdown>
-                        <Button variant='outline'>{`${systemTtsConfig.rate ?? 1}x`}</Button>
-                        <Dropdown.Popover>
-                            <Dropdown.Menu
-                                aria-label='tts rate'
-                                onAction={(key) => {
-                                    setSystemTtsConfig({
-                                        ...systemTtsConfig,
-                                        rate: Number(key),
-                                    });
-                                }}
-                            >
-                                {RATE_OPTIONS.map((rate) => (
-                                    <Dropdown.Item
-                                        key={rate}
-                                        id={rate}
-                                    >{`${rate}x`}</Dropdown.Item>
-                                ))}
-                            </Dropdown.Menu>
-                        </Dropdown.Popover>
-                    </Dropdown>
-                </div>
-
-                <div className='config-item'>
-                    <h3 className='my-auto'>{t('services.tts.system_tts.language')}</h3>
-                    <Dropdown>
-                        <Button variant='outline'>{t(`languages.${editingLanguage}`)}</Button>
-                        <Dropdown.Popover>
-                            <Dropdown.Menu
-                                aria-label='tts language'
-                                className='max-h-[50vh] overflow-y-auto'
-                                onAction={(key) => {
-                                    setEditingLanguage(key);
-                                }}
-                            >
-                                {Object.keys(Language).map((language) => (
-                                    <Dropdown.Item
-                                        key={language}
-                                        id={language}
-                                    >
-                                        {t(`languages.${language}`)}
-                                    </Dropdown.Item>
-                                ))}
-                            </Dropdown.Menu>
-                        </Dropdown.Popover>
-                    </Dropdown>
-                </div>
-
-                <div className='config-item'>
-                    <h3 className='my-auto'>{t('services.tts.system_tts.voice')}</h3>
-                    <Dropdown>
-                        <Button variant='outline'>
-                            {configuredVoice === ''
-                                ? `${t('services.tts.system_tts.auto_voice')}${
-                                      autoVoice === null ? '' : ` (${autoVoice.name})`
-                                  }`
-                                : configuredVoice}
-                        </Button>
-                        <Dropdown.Popover>
-                            <Dropdown.Menu
-                                aria-label='tts voice'
-                                className='max-h-[50vh] overflow-y-auto'
-                                onAction={(key) => {
-                                    setVoiceForCurrentLanguage(key === '__auto__' ? '' : key);
-                                }}
-                            >
-                                <Dropdown.Item
-                                    key='__auto__'
-                                    id='__auto__'
-                                >
-                                    <Label>{t('services.tts.system_tts.auto_voice')}</Label>
-                                </Dropdown.Item>
-                                {voiceList.map((v) => (
-                                    <Dropdown.Item
-                                        key={v.name}
-                                        id={v.name}
-                                    >{`${v.name} (${v.language})`}</Dropdown.Item>
-                                ))}
-                            </Dropdown.Menu>
-                        </Dropdown.Popover>
-                    </Dropdown>
-                </div>
-
-                {voiceListError !== '' && (
-                    <div className='config-item'>
-                        <p className='text-danger text-sm'>{voiceListError}</p>
-                    </div>
-                )}
-
-                <div>
-                    <Button
-                        variant='primary'
-                        isPending={isLoading}
-                        fullWidth
-                        onPress={() => {
-                            setIsLoading(true);
-                            tts('hello', Language.en, { config: systemTtsConfig }).then(
-                                () => {
-                                    setIsLoading(false);
-                                    setSystemTtsConfig(systemTtsConfig, true);
-                                    updateServiceList(instanceKey);
-                                    onClose();
-                                },
-                                (e) => {
-                                    setIsLoading(false);
-                                    toast.error(t('config.service.test_failed') + e.toString(), { style: toastStyle });
-                                }
-                            );
-                        }}
-                    >
-                        {t('common.save')}
-                    </Button>
-                </div>
-            </>
-        )
+            )}
+        </ServiceConfigForm>
     );
 }

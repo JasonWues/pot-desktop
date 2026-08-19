@@ -1,63 +1,42 @@
+import PromptListEditor, { CHAT_PROMPT_SCHEMA } from '../../../components/ServiceConfigForm/PromptListEditor';
+import { Button, Card, CardContent, InputGroup, Label, Link, ProgressBar, TextField, Tooltip } from '@heroui/react';
 import {
-    Input,
-    Button,
-    Switch,
-    TextArea,
-    Card,
-    CardContent,
-    Link,
-    Tooltip,
-    ProgressBar,
-    Label,
-    TextField,
-    InputGroup,
-} from '@heroui/react';
+    HelpLink,
+    ConfigItem,
+    SwitchConfigField,
+    TextConfigField,
+} from '../../../components/ServiceConfigForm/ConfigField';
 import { INSTANCE_NAME_CONFIG_KEY } from '../../../utils/service_instance';
-import InstanceNameInput from '../../../components/InstanceNameInput';
-import { MdDeleteOutline } from 'react-icons/md';
-import toast, { Toaster } from 'react-hot-toast';
-import { useTranslation } from 'react-i18next';
-import { open } from '@tauri-apps/plugin-shell';
+import ServiceConfigForm from '../../../components/ServiceConfigForm';
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Ollama } from 'ollama/browser';
 
-import { useConfig } from '../../../hooks/useConfig';
-import { useToastStyle } from '../../../hooks';
 import { translate } from './index';
 import { Language } from './index';
 
-export function Config(props) {
-    const { instanceKey, updateServiceList, onClose } = props;
+const defaultPromptList = [
+    {
+        role: 'system',
+        content:
+            'You are a professional translation engine, please translate the text into a colloquial, professional, elegant and fluent content, without the style of machine translation. You must only translate the text content, never interpret it.',
+    },
+    { role: 'user', content: `Translate into $to:\n"""\n$text\n"""` },
+];
+
+// A component rather than the render prop's body: the model list is fetched
+// from the Ollama host, which needs state and an effect, and hooks cannot live
+// inside a render callback.
+function OllamaFields({ config, setConfig }) {
     const { t } = useTranslation();
-    const [serviceConfig, setServiceConfig] = useConfig(
-        instanceKey,
-        {
-            [INSTANCE_NAME_CONFIG_KEY]: t('services.translate.ollama.title'),
-            stream: true,
-            model: 'gemma:2b',
-            requestPath: 'http://localhost:11434',
-            promptList: [
-                {
-                    role: 'system',
-                    content:
-                        'You are a professional translation engine, please translate the text into a colloquial, professional, elegant and fluent content, without the style of machine translation. You must only translate the text content, never interpret it.',
-                },
-                { role: 'user', content: `Translate into $to:\n"""\n$text\n"""` },
-            ],
-        },
-        { sync: false }
-    );
-    const [isLoading, setIsLoading] = useState(false);
     const [isPulling, setIsPulling] = useState(false);
     const [progress, setProgress] = useState(0);
     const [pullingStatus, setPullingStatus] = useState('');
     const [installedModels, setInstalledModels] = useState(null);
 
-    const toastStyle = useToastStyle();
-
     async function getModles() {
         try {
-            const ollama = new Ollama({ host: serviceConfig.requestPath });
+            const ollama = new Ollama({ host: config.requestPath });
             const list = await ollama.list();
             setInstalledModels(list);
         } catch {
@@ -65,10 +44,16 @@ export function Config(props) {
         }
     }
 
+    // Keyed on the host alone. The old effect watched the whole config, so it
+    // re-listed the models on every keystroke in the model name too.
+    useEffect(() => {
+        getModles();
+    }, [config.requestPath]);
+
     async function pullModel() {
         setIsPulling(true);
-        const ollama = new Ollama({ host: serviceConfig.requestPath });
-        const stream = await ollama.pull({ model: serviceConfig.model, stream: true });
+        const ollama = new Ollama({ host: config.requestPath });
+        const stream = await ollama.pull({ model: config.model, stream: true });
         for await (const part of stream) {
             if (part.digest) {
                 let percent = 0;
@@ -88,280 +73,157 @@ export function Config(props) {
         getModles();
     }
 
-    useEffect(() => {
-        if (serviceConfig !== null) {
-            getModles();
-        }
-    }, [serviceConfig]);
+    const isModelInstalled =
+        installedModels !== null && installedModels.models.map((model) => model.name).includes(config['model']);
 
     return (
-        serviceConfig !== null && (
-            <form
-                onSubmit={(e) => {
-                    e.preventDefault();
-                    setIsLoading(true);
-                    translate('hello', Language.auto, Language.zh_cn, { config: serviceConfig }).then(
-                        () => {
-                            setIsLoading(false);
-                            setServiceConfig(serviceConfig, true);
-                            updateServiceList(instanceKey);
-                            onClose();
-                        },
-                        (e) => {
-                            setIsLoading(false);
-                            toast.error(t('config.service.test_failed') + e.toString(), { style: toastStyle });
-                        }
-                    );
-                }}
-            >
-                <Toaster />
-                <InstanceNameInput
-                    config={serviceConfig}
-                    onChange={setServiceConfig}
-                />
-                {installedModels === null && (
-                    <Card
-                        isBlurred
-                        className='border-none bg-danger/20 dark:bg-danger/10'
-                        shadow='sm'
-                    >
-                        <CardContent>
-                            <div>
-                                {t('services.translate.ollama.install_ollama')}
-                                <br />
-                                <Link
-                                    isExternal
-                                    href='https://ollama.com/download'
-                                    color='primary'
-                                >
-                                    {t('services.translate.ollama.install_ollama_link')}
-                                </Link>
-                            </div>
-                        </CardContent>
-                    </Card>
-                )}
-                <div className='config-item'>
-                    <h3 className='my-auto'>{t('services.help')}</h3>
-                    <Button
-                        onPress={() => {
-                            open('https://pot-app.com/docs/api/translate/ollama.html');
-                        }}
-                    >
-                        {t('services.help')}
-                    </Button>
-                </div>
-                <div className='config-item'>
-                    <Switch
-                        isSelected={serviceConfig['stream']}
-                        onChange={(value) => {
-                            setServiceConfig({
-                                ...serviceConfig,
-                                stream: value,
-                            });
-                        }}
-                        className='w-full max-w-full'
-                    >
-                        <Switch.Content className='flex w-full flex-row-reverse items-center justify-between'>
-                            <Switch.Control>
-                                <Switch.Thumb />
-                            </Switch.Control>
-                            {t('services.translate.ollama.stream')}
-                        </Switch.Content>
-                    </Switch>
-                </div>
-                <div className='config-item'>
-                    <TextField
-                        className='flex w-full flex-row items-center justify-between'
-                        value={serviceConfig['requestPath']}
-                        onChange={(value) => {
-                            setServiceConfig({
-                                ...serviceConfig,
-                                requestPath: value,
-                            });
-                        }}
-                    >
-                        <Label className='text-base my-auto'>{t('services.translate.ollama.request_path')}</Label>
-                        <Input className='max-w-[50%]' />
-                    </TextField>
-                </div>
-                <div className='config-item'>
-                    <TextField
-                        className='flex w-full flex-row items-center justify-between'
-                        value={serviceConfig['model']}
-                        onChange={(value) => {
-                            setServiceConfig({
-                                ...serviceConfig,
-                                model: value,
-                            });
-                        }}
-                    >
-                        <Label className='text-base my-auto'>{t('services.translate.ollama.model')}</Label>
-                        {/* InputGroup, not a child of Input: v3's Input renders a
-                            real <input>, which is a void element. The pull button
-                            is a Suffix, which is what v2's `endContent` meant. */}
-                        <InputGroup className='max-w-[50%]'>
-                            <InputGroup.Input />
-                            <InputGroup.Suffix>
-                                {installedModels &&
-                                !installedModels.models
-                                    .map((model) => {
-                                        return model.name;
-                                    })
-                                    .includes(serviceConfig['model']) ? (
-                                    <Tooltip>
-                                        <Tooltip.Trigger>
-                                            <Button
-                                                size='sm'
-                                                variant='tertiary'
-                                                isPending={isPulling}
-                                                onPress={pullModel}
-                                            >
-                                                {t('services.translate.ollama.install_model')}
-                                            </Button>
-                                        </Tooltip.Trigger>
-                                        <Tooltip.Content>
-                                            {t('services.translate.ollama.not_installed')}
-                                        </Tooltip.Content>
-                                    </Tooltip>
-                                ) : (
-                                    <Button
-                                        size='sm'
-                                        variant='tertiary'
-                                        disabled
-                                    >
-                                        {t('services.translate.ollama.ready')}
-                                    </Button>
-                                )}
-                            </InputGroup.Suffix>
-                        </InputGroup>
-                    </TextField>
-                </div>
+        <>
+            {installedModels === null && (
                 <Card
                     isBlurred
-                    className='border-none bg-success/20 dark:bg-success/10'
+                    className='border-none bg-danger/20 dark:bg-danger/10'
                     shadow='sm'
                 >
                     <CardContent>
-                        {/* See the Updater window for the same shape: v3 drops
-                            `label`, `showValueLabel` and `classNames`, so the
-                            status line is markup and each slot becomes a className
-                            on the part it named. */}
-                        {isPulling && (
-                            <ProgressBar
-                                aria-label={pullingStatus}
-                                value={progress}
-                                className='max-w-md'
-                            >
-                                <div className='flex justify-between'>
-                                    <span className='tracking-wider font-medium text-muted'>{pullingStatus}</span>
-                                    <ProgressBar.Output className='text-foreground/60' />
-                                </div>
-                                <ProgressBar.Track className='drop-shadow-md border border-default'>
-                                    <ProgressBar.Fill className='bg-linear-to-r from-pink-500 to-yellow-500' />
-                                </ProgressBar.Track>
-                            </ProgressBar>
-                        )}
-                        <div className='flex justify-center'>
+                        <div>
+                            {t('services.translate.ollama.install_ollama')}
+                            <br />
                             <Link
                                 isExternal
-                                href='https://ollama.com/library'
+                                href='https://ollama.com/download'
                                 color='primary'
                             >
-                                {t('services.translate.ollama.supported_models')}
+                                {t('services.translate.ollama.install_ollama_link')}
                             </Link>
                         </div>
                     </CardContent>
                 </Card>
-                <h3 className='my-auto'>Prompt List</h3>
-                <p className='text-[10px] text-foreground'>{t('services.translate.ollama.prompt_description')}</p>
-
-                <div className='bg-surface-secondary rounded-[10px] p-3'>
-                    {serviceConfig.promptList &&
-                        serviceConfig.promptList.map((prompt, index) => {
-                            return (
-                                <div className='config-item'>
-                                    <TextField
-                                        className='w-full'
-                                        value={prompt.content}
-                                        onChange={(value) => {
-                                            setServiceConfig({
-                                                ...serviceConfig,
-                                                promptList: serviceConfig.promptList.map((p, i) => {
-                                                    if (i === index) {
-                                                        if (i === 0) {
-                                                            return {
-                                                                role: 'system',
-                                                                content: value,
-                                                            };
-                                                        } else {
-                                                            return {
-                                                                role: index % 2 !== 0 ? 'user' : 'assistant',
-                                                                content: value,
-                                                            };
-                                                        }
-                                                    } else {
-                                                        return p;
-                                                    }
-                                                }),
-                                            });
-                                        }}
-                                    >
-                                        <Label>{prompt.role}</Label>
-                                        <TextArea
-                                            fullWidth
-                                            rows={3}
-                                            placeholder={`Input Some ${prompt.role} Prompt`}
-                                        />
-                                    </TextField>
-                                    <Button
-                                        isIconOnly
-                                        className='my-auto mx-1'
-                                        variant='danger-soft'
-                                        onPress={() => {
-                                            setServiceConfig({
-                                                ...serviceConfig,
-                                                promptList: serviceConfig.promptList.filter((_, i) => i !== index),
-                                            });
-                                        }}
-                                    >
-                                        <MdDeleteOutline className='text-[18px]' />
-                                    </Button>
-                                </div>
-                            );
-                        })}
-                    <Button
-                        fullWidth
-                        onPress={() => {
-                            setServiceConfig({
-                                ...serviceConfig,
-                                promptList: [
-                                    ...serviceConfig.promptList,
-                                    {
-                                        role:
-                                            serviceConfig.promptList.length === 0
-                                                ? 'system'
-                                                : serviceConfig.promptList.length % 2 === 0
-                                                  ? 'assistant'
-                                                  : 'user',
-                                        content: '',
-                                    },
-                                ],
-                            });
-                        }}
-                    >
-                        {t('services.translate.ollama.add')}
-                    </Button>
-                </div>
-                <br />
-                <Button
-                    variant='primary'
-                    type='submit'
-                    isPending={isLoading}
-                    fullWidth
+            )}
+            <HelpLink url='https://pot-app.com/docs/api/translate/ollama.html' />
+            <SwitchConfigField
+                label={t('services.translate.ollama.stream')}
+                value={config['stream']}
+                onChange={(value) => setConfig({ ...config, stream: value })}
+            />
+            <TextConfigField
+                label={t('services.translate.ollama.request_path')}
+                value={config['requestPath']}
+                onChange={(value) => setConfig({ ...config, requestPath: value })}
+            />
+            {/* Not a TextConfigField: this box carries the pull button. */}
+            <ConfigItem>
+                <TextField
+                    className='flex w-full flex-row items-center justify-between'
+                    value={config['model']}
+                    onChange={(value) => {
+                        setConfig({ ...config, model: value });
+                    }}
                 >
-                    {t('common.save')}
-                </Button>
-            </form>
-        )
+                    <Label className='text-base my-auto'>{t('services.translate.ollama.model')}</Label>
+                    {/* InputGroup, not a child of Input: v3's Input renders a
+                        real <input>, which is a void element. The pull button
+                        is a Suffix, which is what v2's `endContent` meant. */}
+                    <InputGroup className='max-w-[50%]'>
+                        <InputGroup.Input />
+                        <InputGroup.Suffix>
+                            {installedModels && !isModelInstalled ? (
+                                <Tooltip>
+                                    <Tooltip.Trigger>
+                                        <Button
+                                            size='sm'
+                                            variant='tertiary'
+                                            isPending={isPulling}
+                                            onPress={pullModel}
+                                        >
+                                            {t('services.translate.ollama.install_model')}
+                                        </Button>
+                                    </Tooltip.Trigger>
+                                    <Tooltip.Content>{t('services.translate.ollama.not_installed')}</Tooltip.Content>
+                                </Tooltip>
+                            ) : (
+                                <Button
+                                    size='sm'
+                                    variant='tertiary'
+                                    disabled
+                                >
+                                    {t('services.translate.ollama.ready')}
+                                </Button>
+                            )}
+                        </InputGroup.Suffix>
+                    </InputGroup>
+                </TextField>
+            </ConfigItem>
+            <Card
+                isBlurred
+                className='border-none bg-success/20 dark:bg-success/10'
+                shadow='sm'
+            >
+                <CardContent>
+                    {/* See the Updater window for the same shape: v3 drops
+                        `label`, `showValueLabel` and `classNames`, so the
+                        status line is markup and each slot becomes a className
+                        on the part it named. */}
+                    {isPulling && (
+                        <ProgressBar
+                            aria-label={pullingStatus}
+                            value={progress}
+                            className='max-w-md'
+                        >
+                            <div className='flex justify-between'>
+                                <span className='tracking-wider font-medium text-muted'>{pullingStatus}</span>
+                                <ProgressBar.Output className='text-foreground/60' />
+                            </div>
+                            <ProgressBar.Track className='drop-shadow-md border border-default'>
+                                <ProgressBar.Fill className='bg-linear-to-r from-pink-500 to-yellow-500' />
+                            </ProgressBar.Track>
+                        </ProgressBar>
+                    )}
+                    <div className='flex justify-center'>
+                        <Link
+                            isExternal
+                            href='https://ollama.com/library'
+                            color='primary'
+                        >
+                            {t('services.translate.ollama.supported_models')}
+                        </Link>
+                    </div>
+                </CardContent>
+            </Card>
+            <PromptListEditor
+                promptList={config.promptList}
+                schema={CHAT_PROMPT_SCHEMA}
+                description={t('services.translate.ollama.prompt_description')}
+                addLabel={t('services.translate.ollama.add')}
+                onChange={(promptList) => setConfig({ ...config, promptList })}
+            />
+        </>
+    );
+}
+
+export function Config(props) {
+    const { instanceKey, updateServiceList, onClose } = props;
+    const { t } = useTranslation();
+
+    return (
+        <ServiceConfigForm
+            instanceKey={instanceKey}
+            defaultConfig={{
+                [INSTANCE_NAME_CONFIG_KEY]: t('services.translate.ollama.title'),
+                stream: true,
+                model: 'gemma:2b',
+                requestPath: 'http://localhost:11434',
+                promptList: defaultPromptList,
+            }}
+            onTest={(config) => translate('hello', Language.auto, Language.zh_cn, { config })}
+            updateServiceList={updateServiceList}
+            onClose={onClose}
+        >
+            {(config, setConfig) => (
+                <OllamaFields
+                    config={config}
+                    setConfig={setConfig}
+                />
+            )}
+        </ServiceConfigForm>
     );
 }
