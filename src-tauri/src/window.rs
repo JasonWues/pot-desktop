@@ -128,7 +128,10 @@ pub fn config_window() {
     window
         .set_min_size(Some(tauri::LogicalSize::new(800, 400)))
         .unwrap();
-    window.set_size(tauri::LogicalSize::new(800, 600)).unwrap();
+    // 900 wide, not 800: the settings pages put a named gutter beside their rows,
+    // so the rows themselves get ~136px less than the window is. The minimum stays
+    // 800, which is still enough for the narrowest of them.
+    window.set_size(tauri::LogicalSize::new(900, 600)).unwrap();
     window.center().unwrap();
     log_window_geometry(&window);
 }
