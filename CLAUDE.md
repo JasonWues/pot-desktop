@@ -21,7 +21,9 @@ npx prettier --write .  # format (config in .prettierrc.json: 4 spaces, single q
 
 Linux dev also needs (per `.github/actions/build-for-linux/entrypoint.sh` — note the README still lists the Tauri 1 webkit 4.0 packages): `libgtk-3-dev libwebkit2gtk-4.1-dev libjavascriptcoregtk-4.1-dev libsoup-3.0-dev libayatana-appindicator3-dev librsvg2-dev patchelf libxdo-dev libxcb1 libxrandr2 libdbus-1-3 libpipewire-0.3-dev libspa-0.2-dev clang libclang-dev`.
 
-The last four are for `xcap`, the screenshot backend: it depends on `pipewire` unconditionally on Linux (that is its Wayland capture path, and it is not behind a feature), which drags in `libspa-sys` — a crate that both probes `libpipewire-0.3.pc` through pkg-config and runs bindgen over its headers. Its `build.rs` never passes `--target` to clang, so **cross builds must set `BINDGEN_EXTRA_CLANG_ARGS`** with the target triple and multiarch include dir or bindgen silently sizes the bindings for the host.
+The last seven are for `xcap`, the screenshot backend: it depends on `pipewire` unconditionally on Linux (that is its Wayland capture path, and it is not behind a feature), which drags in `libspa-sys` — a crate that both probes `libpipewire-0.3.pc` through pkg-config and runs bindgen over its headers. Its `build.rs` never passes `--target` to clang, so **cross builds must set `BINDGEN_EXTRA_CLANG_ARGS`** with the target triple and multiarch include dir or bindgen silently sizes the bindings for the host.
+
+The same path links against gbm and EGL (`-lgbm -lEGL`, from the `gbm`/`gbm-sys`/`khronos_egl` crates). The `rust:bookworm` image carries those runtime libraries but not the `.so` symlinks, so they need `-dev` packages as well — and because nothing references them until the final link, a missing one surfaces as `rust-lld: error: unable to find library -lgbm` only after the whole crate graph has already compiled.
 
 There is **no test suite and no lint script** — verification is running the app. Rust side: `cargo check`/`cargo clippy` from `src-tauri/`.
 
