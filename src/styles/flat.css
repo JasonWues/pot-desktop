@@ -229,18 +229,23 @@
       row underneath only has to explain itself -- which is what lets the rows
       drop the cards they used to sit in.
 
-      The gutter is a fixed 118px because it holds one short word set at 11px;
-      the rows take the rest. Both columns are sized in px: this is chrome, and
-      it must not reflow when the user picks a larger `app_font_size`.
+      The gutter holds 100px of text inset 18px on both sides. The inset is
+      symmetric on purpose: the mockup ran the note flush to the dividing rule
+      (`padding-right: 0`), which reads as an accident once the note is set in a
+      language that fills the measure -- Chinese wraps to the full 100px, so
+      every line ended hard against the hairline.
+
+      Both columns are sized in px: this is chrome, and it must not reflow when
+      the reader picks a larger `app_font_size`.
     */
     .flat-section {
         display: grid;
-        grid-template-columns: 118px 1fr;
+        grid-template-columns: 136px 1fr;
         border-top: 2px solid var(--border-secondary);
     }
 
     .flat-section__gutter {
-        padding: 18px 0 18px 18px;
+        padding: 18px;
     }
 
     .flat-section__name {
@@ -357,6 +362,31 @@
         flex: 1;
     }
 
+    /*
+      The suffix action fills the end of the field instead of floating inside it.
+      HeroUI insets it 12px each side, which is right for a pill -- but once the
+      group is squared and the action carries its own 2px box, that inset leaves
+      a strip of dead space between the button's border and the group's, so the
+      end of the field reads as two lines with a gap between them.
+
+      One rule divides them instead: the action loses its own border, keeps a
+      single 2px edge against the input, and stretches to the group's height.
+    */
+    .flat-row__control .input-group__suffix {
+        padding: 0;
+        align-self: stretch;
+    }
+
+    .flat-row__control .input-group__suffix .button {
+        border: 0;
+        border-left: 2px solid var(--border-secondary);
+        border-radius: 0;
+        height: auto;
+        min-height: 0;
+        align-self: stretch;
+        padding: 0 14px;
+    }
+
     .flat-row__control .button:focus-visible,
     .flat-row__control .input:focus-visible {
         outline: 2px solid var(--focus);
@@ -375,6 +405,61 @@
     .flat-row--fields > * {
         flex: 1;
         min-width: 0;
+    }
+
+    /*
+      These rows never went through `.flat-row__control`, so HeroUI's own pill
+      was still showing on the only page that draws them (General, once the
+      proxy is set to manual). Same squared outline as every other field.
+    */
+    .flat-row--fields .textfield {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 10px;
+    }
+
+    /*
+      Sized to its own text rather than to a column: the captions here run from
+      two characters to ten, and any fixed width either wrapped the long one or
+      stranded the short ones.
+    */
+    .flat-row--fields .label {
+        flex: none;
+        white-space: nowrap;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .flat-row--fields .input,
+    .flat-row--fields .input-group {
+        flex: 1;
+        min-width: 0;
+        border-radius: 0;
+        border: 2px solid var(--border-secondary);
+        min-height: 32px;
+        height: 32px;
+        padding: 0;
+    }
+
+    .flat-row--fields .input {
+        padding: 0 12px;
+    }
+
+    .flat-row--fields .input-group__input {
+        min-width: 0;
+        flex: 1;
+    }
+
+    /* The `http://` marker reads as part of the field, divided by one rule. */
+    .flat-row--fields .input-group__prefix {
+        align-self: stretch;
+        display: flex;
+        align-items: center;
+        padding: 0 12px;
+        border-right: 2px solid var(--border-secondary);
+        color: var(--muted);
+        font-size: 13px;
     }
 
     /*
