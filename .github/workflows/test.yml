@@ -1,0 +1,45 @@
+name: Test
+
+# Separate from Package, which only runs on a push to master and rewrites the
+# version fields in three manifests before it builds. Tests have to run on the
+# pull request, before any of that.
+on:
+    push:
+        branches: [master]
+    pull_request:
+
+jobs:
+    test:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Install Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 22
+
+            # pnpm 11 refuses to run below Node 22.13, which is why the version
+            # above is pinned rather than taken from `latest`.
+            - name: Install pnpm
+              uses: pnpm/action-setup@v4
+              with:
+                  version: 11
+
+            - name: Install dependencies
+              run: pnpm install
+
+            # No cargo and no system libraries: everything here runs in Node, so
+            # this job finishes in under a minute where a Tauri build takes tens
+            # of them. The Rust side has no tests yet.
+            #
+            # No `prettier --check` step yet: 16 files in the repository do not
+            # currently satisfy it -- the READMEs, index.html,
+            # pnpm-workspace.yaml, the three webview manifests, two source files,
+            # and the four generated `src-tauri/gen/schemas/*.json`, which should
+            # be in a .prettierignore rather than formatted. Adding the gate means
+            # doing that cleanup first, and a gate that is red on the day it lands
+            # teaches everyone to ignore it.
+            - name: Test
+              run: pnpm test

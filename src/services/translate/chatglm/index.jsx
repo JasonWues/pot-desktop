@@ -1,3 +1,19 @@
+// The plugin's fetch, not the webview's -- this call used to resolve to
+// `window.fetch` because the import was simply missing.
+//
+// What that broke is the proxy. pot's proxy setting is applied by writing
+// HTTP_PROXY/HTTPS_PROXY/NO_PROXY into the process environment (`proxy.rs`),
+// where reqwest picks them up, so only requests issued from Rust obey it. A
+// webview fetch goes out through WebView2's own proxy instead and ignores
+// whatever the user configured here.
+//
+// CORS is the other reason the openai service gives, and it is real but
+// provider-specific -- open.bigmodel.cn does send permissive headers today, so
+// this one happened to keep working. That is the provider's choice to revoke.
+//
+// The v1 shim in `utils/http` cannot stand in either way: it reads the body to
+// build `res.data`, and the stream below needs `response.body` unread.
+import { fetch as streamingFetch } from '@tauri-apps/plugin-http';
 import { Language } from './info';
 import { info } from '@tauri-apps/plugin-log';
 
@@ -83,7 +99,7 @@ export async function translate(text, from, to, options = {}) {
 
     let result = '';
     try {
-        const response = await fetch('https://open.bigmodel.cn/api/paas/v4/chat/completions', {
+        const response = await streamingFetch('https://open.bigmodel.cn/api/paas/v4/chat/completions', {
             method: 'POST',
             headers: headers,
             body: JSON.stringify(body),

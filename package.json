@@ -10,7 +10,9 @@
         "tauri": "tauri",
         "dev:mcp": "tauri dev --config src-tauri/tauri.dev.conf.json",
         "updater": "node updater/updater.mjs",
-        "updater:fixRuntime": "node updater/updater-for-fix-runtime.mjs"
+        "updater:fixRuntime": "node updater/updater-for-fix-runtime.mjs",
+        "test": "vitest run",
+        "test:watch": "vitest"
     },
     "dependencies": {
         "@hello-pangea/dnd": "^18.0.1",
@@ -53,10 +55,14 @@
     "devDependencies": {
         "@tailwindcss/vite": "^4.3.3",
         "@tauri-apps/cli": "^2.1.0",
+        "@testing-library/jest-dom": "^7.0.1",
+        "@testing-library/react": "^16.3.2",
         "@vitejs/plugin-react": "^6.0.5",
+        "jsdom": "^30.0.1",
         "prettier": "3.9.6",
         "tailwindcss": "^4.3.3",
         "typescript": "^5.6.3",
-        "vite": "^8.2.1"
+        "vite": "^8.2.1",
+        "vitest": "^4.1.11"
     }
 }
