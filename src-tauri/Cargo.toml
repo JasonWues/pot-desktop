@@ -45,7 +45,18 @@ tauri-plugin-updater = "2"
 # Only registered under cfg(debug_assertions), see main.rs.
 tauri-plugin-mcp-bridge = "0.12"
 serde = { version = "1.0", features = ["derive"] }
-selection = "1.2.0"
+# A fork of pot-app/Selection. It carries two things 1.2.0 does not: the Windows
+# clipboard fallback watches the clipboard sequence number instead of sleeping a
+# flat 100ms after synthesising Ctrl+C, and its `windows` dependency is 0.62,
+# the same one this crate asks for -- 1.2.0 wanted 0.56, so the bindings were
+# compiled twice into one binary.
+#
+# Still upstream's behaviour, and still wrong: the clipboard is restored one
+# format deep, so a selection translate destroys copied HTML, RTF or a file list.
+#
+# No `rev` here -- the exact commit is pinned by Cargo.lock, which is what makes
+# the build reproducible; naming it twice would only mean editing two places.
+selection = { git = "https://github.com/JasonWues/Selection" }
 serde_json = "1.0"
 dirs = "6.0.0"
 log = "0.4"
@@ -92,5 +103,3 @@ windows-registry = "0.6"
 # this feature is used for production builds or when `devPath` points to the filesystem
 # DO NOT REMOVE!!
 custom-protocol = ["tauri/custom-protocol"]
-
-
