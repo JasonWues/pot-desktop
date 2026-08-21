@@ -1,5 +1,5 @@
 import { unregister, isRegistered } from '@tauri-apps/plugin-global-shortcut';
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { Button, Input, InputGroup } from '@heroui/react';
 import React from 'react';
@@ -113,7 +113,6 @@ export default function Hotkey() {
 
     return (
         <>
-            <Toaster />
             <Section
                 name={t('config.hotkey.section.global')}
                 note={t('config.hotkey.section.global_note')}

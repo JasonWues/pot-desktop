@@ -1,4 +1,4 @@
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 import { Button } from '@heroui/react';
@@ -56,7 +56,6 @@ export default function ServiceConfigForm(props) {
                     );
                 }}
             >
-                <Toaster />
                 <InstanceNameInput
                     config={config}
                     onChange={setConfig}

@@ -2,7 +2,7 @@ import { BaseDirectory, readTextFile } from '@tauri-apps/plugin-fs';
 import React, { useEffect, useRef, useState } from 'react';
 import { writeText } from '@tauri-apps/plugin-clipboard-manager';
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import { listen } from '@tauri-apps/api/event';
 import { useTranslation } from 'react-i18next';
 import { invoke } from '@tauri-apps/api/core';
@@ -406,7 +406,6 @@ export default function SourceArea(props) {
         <section
             className={`translate-section bg-surface ${hideSource && windowType !== '[INPUT_TRANSLATE]' ? 'hidden' : ''}`}
         >
-            <Toaster />
             <div className='px-[10px] pt-[10px] pb-[8px] max-h-[40vh] overflow-y-auto'>
                 {/*
                     No `text-[Npx]` any more. That class was interpolated from

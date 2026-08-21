@@ -1,7 +1,7 @@
 import { Modal, ModalHeader, ModalBody, Button, Skeleton } from '@heroui/react';
 import React, { useEffect, useState } from 'react';
 import { MdDeleteOutline } from 'react-icons/md';
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 
 import { useToastStyle } from '../../../../../hooks';
@@ -66,7 +66,6 @@ export default function WebDavModal(props) {
                 onOpenChange={onOpenChange}
             >
                 <Modal.Container scroll='inside'>
-                    <Toaster />
                     <Modal.Dialog className='max-h-[80vh]'>
                         {({ close }) => (
                             <>

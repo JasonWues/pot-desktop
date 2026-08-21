@@ -166,9 +166,25 @@
   and a per-file class would be 24 places to keep in step.
 */
 @layer components {
+    /*
+      The dialog itself, in the same vocabulary as the flat surfaces: a 2px rule
+      for its edge instead of a 32px radius and a drop shadow, and no padding of
+      its own -- the three parts below carry their own, so the rules between them
+      run edge to edge the way every divider in this app does. Without that the
+      header rule would stop 24px short at both ends and read as an underline.
+    */
+    .modal__dialog {
+        border-radius: 0;
+        padding: 0;
+        border: 2px solid var(--border-secondary);
+        box-shadow: none;
+    }
+
     .modal__header {
         flex-direction: row;
         align-items: center;
+        padding: 14px 18px;
+        border-bottom: 2px solid var(--border-secondary);
     }
 
     /*
@@ -183,7 +199,58 @@
         display: flex;
         flex-direction: column;
         gap: 8px;
+        padding: 14px 18px;
         color: var(--foreground);
+    }
+
+    /*
+      Footers are `justify-end` from v3 and stay that way -- a modal's actions
+      are a decision to confirm, where the flat surfaces' flush-left strip is a
+      list of things a page can do. What changes is the shape: nothing else in
+      the app is a pill.
+    */
+    .modal__footer {
+        padding: 10px 18px;
+        border-top: 2px solid var(--border-secondary);
+    }
+
+    .modal__footer .button,
+    .modal__footer .button-group .button {
+        border-radius: 0;
+    }
+
+    /*
+      Several modals put their save button inside the body's <form> rather than
+      in the footer -- ServiceConfigForm is the one that does it 43 times -- so
+      squaring only the footer would leave those rounded.
+    */
+    .modal__body .button {
+        border-radius: 0;
+    }
+
+    /*
+      The fields follow the same rule as the ones on the flat surfaces: squared,
+      with a 2px edge. v3 draws them as a 12px pill with no border at all, which
+      on the modal's own `--overlay` grey left a row of floating white lozenges
+      two feet from the squared fields on the Service page behind them.
+
+      Adding the border costs no height: `.input` is `border-box` at a fixed
+      36px, so the 2px comes out of the padding box rather than the layout.
+    */
+    .modal__body .input,
+    .modal__body .textarea,
+    .modal__body .input-group {
+        border-radius: 0;
+        border: 2px solid var(--border-secondary);
+    }
+
+    /*
+      An input-group already draws the edge for the whole group, so the input
+      inside it must not draw a second one against the prefix's divider.
+    */
+    .modal__body .input-group .input,
+    .modal__body .input-group__input {
+        border: 0;
     }
 }
 

@@ -1,7 +1,7 @@
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button } from '@heroui/react';
 import { remove, BaseDirectory } from '@tauri-apps/plugin-fs';
 import { open as openInBrowser } from '@tauri-apps/plugin-shell';
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import { MdDeleteOutline } from 'react-icons/md';
 import { useTranslation } from 'react-i18next';
 import { open } from '@tauri-apps/plugin-dialog';
@@ -25,7 +25,6 @@ export default function SelectPluginModal(props) {
                 onOpenChange={onOpenChange}
             >
                 <Modal.Container scroll='inside'>
-                    <Toaster />
                     <Modal.Dialog className='max-h-[80vh]'>
                         {({ close }) => (
                             <>
@@ -134,7 +133,7 @@ export default function SelectPluginModal(props) {
                                 </ModalBody>
                                 <ModalFooter>
                                     <Button
-                                        variant='danger-soft'
+                                        variant='tertiary'
                                         onPress={close}
                                     >
                                         {t('common.cancel')}

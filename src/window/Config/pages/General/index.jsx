@@ -1,7 +1,7 @@
 import { enable, isEnabled, disable } from '@tauri-apps/plugin-autostart';
 import { Dropdown, Button, Switch, Input, Label, TextField, InputGroup } from '@heroui/react';
 import React, { useState, useEffect } from 'react';
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { info } from '@tauri-apps/plugin-log';
 import { LuSun, LuMoon, LuMonitor } from 'react-icons/lu';
@@ -98,7 +98,6 @@ export default function General() {
 
     return (
         <>
-            <Toaster />
             <Section
                 name={t('config.general.section.startup')}
                 note={t('config.general.section.startup_note')}

@@ -1,6 +1,6 @@
 import { Dropdown, Switch, Button, Label } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import React, { useEffect, useState } from 'react';
 
 import { clearCache, getCacheCount } from '../../../../utils/db';
@@ -43,7 +43,6 @@ export default function Translate() {
 
     return (
         <>
-            <Toaster />
             <Section
                 name={t('config.translate.section.languages')}
                 note={t('config.translate.section.languages_note')}

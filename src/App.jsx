@@ -4,6 +4,7 @@ import React, { useEffect } from 'react';
 
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { useAppConfig } from './hooks/useAppConfig';
+import AppToaster from './components/AppToaster';
 import Screenshot from './window/Screenshot';
 import Translate from './window/Translate';
 import Recognize from './window/Recognize';
@@ -34,5 +35,14 @@ export default function App() {
         store.reload();
     }, []);
 
-    return <BrowserRouter>{windowMap[appWindow.label]}</BrowserRouter>;
+    // One toaster per window, above the window's own component. Each page and
+    // several of the modals used to mount their own, and a `<Toaster>` draws
+    // every toast sharing its id -- so a page with a modal open drew each one
+    // twice.
+    return (
+        <BrowserRouter>
+            {windowMap[appWindow.label]}
+            <AppToaster />
+        </BrowserRouter>
+    );
 }

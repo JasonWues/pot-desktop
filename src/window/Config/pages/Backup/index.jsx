@@ -2,7 +2,7 @@ import { readTextFile, BaseDirectory } from '@tauri-apps/plugin-fs';
 import { Dropdown, Button, Input, Avatar, Tooltip, Label, TextField } from '@heroui/react';
 import { Section, Row } from '../../components/Section';
 
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { warn } from '@tauri-apps/plugin-log';
 import React, { useEffect, useState } from 'react';
@@ -173,7 +173,6 @@ export default function Backup() {
 
     return (
         <>
-            <Toaster />
             <Section
                 name={t('config.backup.section.target')}
                 note={t('config.backup.section.target_note')}

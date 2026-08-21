@@ -75,7 +75,7 @@ export default function ConfigModal(props) {
                                 </ModalBody>
                                 <ModalFooter>
                                     <Button
-                                        variant='danger-soft'
+                                        variant='tertiary'
                                         onPress={close}
                                     >
                                         {t('common.cancel')}

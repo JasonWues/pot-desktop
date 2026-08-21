@@ -3,7 +3,7 @@ import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 import React, { useEffect, useState } from 'react';
 import { relaunch } from '@tauri-apps/plugin-process';
 import { check } from '@tauri-apps/plugin-updater';
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import ReactMarkdown from 'react-markdown';
 
@@ -48,7 +48,6 @@ export default function Updater() {
         <div
             className={`${transparent ? 'bg-background/90' : 'bg-background'} h-screen ${osType === 'Linux' ? 'rounded-[10px] border-1 border-border' : ''}`}
         >
-            <Toaster />
             <div className='p-[5px] h-[35px] w-full select-none cursor-default'>
                 <div
                     data-tauri-drag-region='true'
@@ -188,7 +187,7 @@ export default function Updater() {
                         : t('updater.update')}
                 </Button>
                 <Button
-                    variant='danger-soft'
+                    variant='tertiary'
                     onPress={() => {
                         appWindow.close();
                     }}

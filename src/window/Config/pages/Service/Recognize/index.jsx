@@ -1,5 +1,5 @@
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 
@@ -61,7 +61,6 @@ export default function Recognize(props) {
 
     return (
         <>
-            <Toaster />
             {/*
                 The count states what the numbers down the list mean: this is an
                 ordered list and the order is the priority. The two add buttons

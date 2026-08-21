@@ -16,7 +16,7 @@ import { readDir, BaseDirectory, readTextFile, exists } from '@tauri-apps/plugin
 import { appConfigDir, join } from '@tauri-apps/api/path';
 import { convertFileSrc } from '@tauri-apps/api/core';
 import React, { useEffect, useState } from 'react';
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import { save } from '@tauri-apps/plugin-dialog';
 import { MdDeleteOutline } from 'react-icons/md';
 import { useTranslation } from 'react-i18next';
@@ -310,7 +310,6 @@ export default function History() {
     return (
         pluginList !== null && (
             <div className={`flex flex-col ${osType === 'Linux' ? 'h-[calc(100vh-58px)]' : 'h-[calc(100vh-56px)]'}`}>
-                <Toaster />
                 <div className='history-bar'>
                     {/* SearchField, not Input: v3 dropped `isClearable`/`onClear`,
                         and this is the component that carries a clear button of its

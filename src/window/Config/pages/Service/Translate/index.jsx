@@ -1,5 +1,5 @@
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 
@@ -65,7 +65,6 @@ export default function Translate(props) {
 
     return (
         <>
-            <Toaster />
             <div className='service-head'>
                 <span className='service-head__count'>
                     {t('config.service.instance_count', { count: translateServiceInstanceList?.length ?? 0 })}
