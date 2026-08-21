@@ -7,11 +7,12 @@ import { PiTextboxFill } from 'react-icons/pi';
 import { MdKeyboardAlt } from 'react-icons/md';
 import { MdExtension } from 'react-icons/md';
 import { AiFillCloud } from 'react-icons/ai';
+import { BiBookContent } from 'react-icons/bi';
 import { FaHistory } from 'react-icons/fa';
 import React from 'react';
 
 /*
-  The eight entries, in the order they are drawn. They were eight copies of the
+  The nine entries, in the order they are drawn. They were eight copies of the
   same twelve-line block before; the only thing that ever varied between them is
   in this table.
 */
@@ -21,6 +22,7 @@ const NAV = [
     { path: '/recognize', icon: PiTextboxFill, label: 'config.recognize.label' },
     { path: '/hotkey', icon: MdKeyboardAlt, label: 'config.hotkey.label' },
     { path: '/service', icon: MdExtension, label: 'config.service.label' },
+    { path: '/glossary', icon: BiBookContent, label: 'config.glossary.label' },
     { path: '/history', icon: FaHistory, label: 'config.history.label' },
     { path: '/backup', icon: AiFillCloud, label: 'config.backup.label' },
     { path: '/about', icon: BsInfoSquareFill, label: 'config.about.label' },

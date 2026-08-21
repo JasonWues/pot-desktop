@@ -1,0 +1,130 @@
+/*
+  The Glossary page in the flat vocabulary, built on the primitives in
+  src/styles/flat.css -- see that file's header for why chrome is sized in px
+  and content in rem.
+
+  An entry is a pair, so the page is laid out as pairs rather than as a form: the
+  term and its replacement sit on one line either side of an arrow, the scope and
+  the switch trail off to the right in the quieter face the rest of the app uses
+  for machine facts. The add row at the top is the same shape as an entry, which
+  is what makes it read as "one more of these" rather than as a dialog.
+*/
+
+@layer components {
+    /* ---------------------------------------------------------- the add row */
+
+    .glossary-add {
+        flex: none;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 0;
+        border-bottom: 2px solid var(--border-secondary);
+    }
+
+    /* The two text boxes share the width left over by the arrow, the two scope
+       pickers and the button, so a long replacement is as readable as a long
+       term. */
+    .glossary-add__field {
+        flex: 1;
+        min-width: 0;
+    }
+
+    /*
+      Squared and unfilled, matching the filters on the History page -- but only
+      the two scope pickers, which are the outline variant. Taking `--button-bg`
+      off `.button` as a whole also drained the submit button beside them: a
+      primary button paints that same custom property, so a transparent one with
+      its disabled text on a light surface was invisible rather than merely
+      quiet.
+    */
+    .glossary-add .input,
+    .glossary-add .button--outline {
+        --button-bg: transparent;
+        --button-bg-hover: var(--surface);
+        --button-bg-pressed: var(--surface-secondary);
+        border-radius: 0;
+    }
+
+    /* The submit keeps its fill and loses only the pill. */
+    .glossary-add .button--primary {
+        border-radius: 0;
+    }
+
+    .glossary-add__arrow {
+        flex: none;
+        color: var(--muted);
+    }
+
+    .glossary-note {
+        flex: none;
+        padding: 10px 0;
+    }
+
+    /* ------------------------------------------------------------- the list */
+
+    .glossary-list {
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
+        border-top: 1px solid var(--border);
+    }
+
+    .glossary-entry {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 12px 18px;
+        border-bottom: 1px solid var(--border);
+    }
+
+    /* Disabled entries stay legible rather than being greyed into the metadata:
+       the switch beside them already says which state they are in. */
+    .glossary-entry--off .glossary-entry__pair {
+        opacity: 0.45;
+    }
+
+    .glossary-entry__pair {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+    }
+
+    /* Body copy, so the terms track the user's reading size. */
+    .glossary-entry__term,
+    .glossary-entry__replacement {
+        font-size: 1rem;
+        line-height: 1.3;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .glossary-entry__term {
+        font-weight: 600;
+        flex: 0 1 auto;
+    }
+
+    .glossary-entry__replacement {
+        flex: 1 1 auto;
+        color: var(--accent);
+    }
+
+    .glossary-entry__arrow {
+        flex: none;
+        color: var(--muted);
+    }
+
+    .glossary-entry__scope {
+        flex: none;
+        max-width: 40%;
+    }
+
+    .glossary-empty {
+        padding: 28px 18px;
+        text-align: center;
+        color: var(--muted);
+    }
+}

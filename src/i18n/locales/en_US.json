@@ -277,6 +277,18 @@
                 "entry_count": "{{count}} entries",
                 "showing": "Showing {{shown}} of {{total}}"
             },
+            "glossary": {
+                "label": "Glossary",
+                "title": "Glossary",
+                "term": "Term",
+                "replacement": "Render as",
+                "add": "Add",
+                "any_language": "Any language",
+                "enabled": "Enabled",
+                "delete": "Delete",
+                "empty": "No terms yet. A term added here is applied to every translation that matches its languages.",
+                "note": "Services backed by a language model (OpenAI, Ollama, ChatGLM, Gemini) are told the terms before they translate, so a term is applied wherever it occurs. The other services take a language pair and cannot be given instructions, so there a term is only applied to a result that came back with it untranslated — which covers names and jargon, but not a word the engine already translated its own way."
+            },
             "backup": {
                 "label": "Backup",
                 "title": "Backup Settings",

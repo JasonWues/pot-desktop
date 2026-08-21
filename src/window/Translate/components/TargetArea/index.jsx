@@ -5,7 +5,7 @@ import { sendNotification } from '@tauri-apps/plugin-notification';
 import React, { useEffect, useState, useRef } from 'react';
 import { writeText } from '@tauri-apps/plugin-clipboard-manager';
 import { HiOutlineVolumeUp } from 'react-icons/hi';
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useAtomValue } from 'jotai';
 import { nanoid } from 'nanoid';
@@ -18,7 +18,14 @@ import { invoke_plugin } from '../../../../utils/invoke_plugin';
 import { applyPreset, DEFAULT_PRESET } from '../../../../utils/ai_presets';
 import * as builtinServices from '../../../../services/translate';
 import * as builtinTtsServices from '../../../../services/tts';
-import { addToHistory, buildCacheKey, getCachedTranslation, setCachedTranslation } from '../../../../utils/db';
+import { applyGlossaryToConfig, applyGlossaryToResult, glossarySignature } from '../../../../utils/glossary';
+import {
+    addToHistory,
+    buildCacheKey,
+    getActiveGlossary,
+    getCachedTranslation,
+    setCachedTranslation,
+} from '../../../../utils/db';
 
 import { info, error as logError } from '@tauri-apps/plugin-log';
 import {
@@ -145,7 +152,7 @@ export default function TargetArea(props) {
         // a copy, so the saved config is untouched and -- because the cache key is
         // derived from the config that is actually used -- a polished result
         // cannot come back from the cache as a translation.
-        const instanceConfig = applyPreset(savedConfig, translateServiceName, aiPreset);
+        const presetConfig = applyPreset(savedConfig, translateServiceName, aiPreset);
 
         // Plugins declare their languages in info.json, built-in services in a
         // Language enum; both are keyed by pot's own language codes.
@@ -166,6 +173,28 @@ export default function TargetArea(props) {
             aiPreset === DEFAULT_PRESET && sourceLanguage === 'auto' && targetLanguage === detectLanguage
                 ? translateSecondLanguage
                 : targetLanguage;
+
+        // Scoped by the languages actually in play: with the source set to auto
+        // that is the detected language, not the literal 'auto', which no user
+        // would think to scope a term to. A broken glossary must never stop a
+        // translation, so a failed read is simply an empty one.
+        const glossaryEntries = await getActiveGlossary(
+            sourceLanguage === 'auto' ? detectLanguage : sourceLanguage,
+            newTargetLanguage
+        ).catch((e) => {
+            logError(`read glossary failed: ${e}`);
+            return [];
+        });
+        const instanceConfig = applyGlossaryToConfig(presetConfig, translateServiceName, glossaryEntries);
+
+        // `applyGlossaryToConfig` hands back the config it was given whenever it
+        // could not place the terms -- a service that reads no prompt at all, or
+        // an LLM instance saved before it had a `promptList`. That is exactly
+        // when the result has to be rewritten instead, which makes the identity
+        // check a better condition here than asking `supportsPrompt` again: the
+        // second case would disagree with it.
+        const glossaryWentIntoPrompt = instanceConfig !== presetConfig;
+        const applyGlossary = (v) => (glossaryWentIntoPrompt ? v : applyGlossaryToResult(v, glossaryEntries));
 
         const setHideOnce = invokeOnce(setHide);
 
@@ -219,6 +248,7 @@ export default function TargetArea(props) {
             to: newTargetLanguage,
             detect: detectLanguage,
             text: sourceText.trim(),
+            glossary: glossarySignature(glossaryEntries),
         });
 
         if (cacheEnable) {
@@ -243,9 +273,13 @@ export default function TargetArea(props) {
         setIsLoading(true);
         setHide(true);
 
-        const onResolve = (v) => {
-            info(`[${currentTranslateServiceInstanceKey}]resolve:` + v);
+        const onResolve = (rawResult) => {
+            info(`[${currentTranslateServiceInstanceKey}]resolve:` + rawResult);
             if (translateID[index] !== id) return;
+            // Rewritten before it is cached, not after it is read back: the
+            // glossary is part of the cache key, so what the key describes is
+            // the finished text.
+            const v = applyGlossary(rawResult);
             // Only plain text is cached; dictionary services resolve with an
             // object whose shape is service specific.
             if (cacheEnable && typeof v === 'string' && v.trim() !== '') {
@@ -262,9 +296,11 @@ export default function TargetArea(props) {
         };
 
         // Streaming services push partial text through this before resolving.
+        // Rewritten as it arrives so the terms do not visibly flip once the
+        // stream ends; `onResolve` is still what decides the stored text.
         const onPartialResult = (v) => {
             if (translateID[index] !== id) return;
-            setResult(v);
+            setResult(applyGlossary(v));
             setHideOnce(false);
         };
 
@@ -376,7 +412,6 @@ export default function TargetArea(props) {
 
     return (
         <section className={`translate-section ${hide ? 'translate-section--quiet' : ''}`}>
-            <Toaster />
             {/*
                 The row is the drag handle for reordering, so the collapse control
                 stays a separate target rather than the whole header being clickable.

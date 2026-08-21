@@ -277,6 +277,18 @@
                 "entry_count": "{{count}} 条",
                 "showing": "显示 {{shown}} / {{total}}"
             },
+            "glossary": {
+                "label": "术语表",
+                "title": "术语表",
+                "term": "术语",
+                "replacement": "译为",
+                "add": "添加",
+                "any_language": "任意语言",
+                "enabled": "启用",
+                "delete": "删除",
+                "empty": "还没有术语。在这里添加的术语会应用到所有语言匹配的翻译上。",
+                "note": "基于大语言模型的服务(OpenAI、Ollama、智谱、Gemini)会在翻译前收到这些术语,因此术语在任何位置都会生效。其余服务只接受语言对、无法附加指令,所以只能对译文中原样保留下来的术语生效——这覆盖了专有名词和行话,但覆盖不了引擎已经按自己方式译过的词。"
+            },
             "backup": {
                 "label": "备份设置",
                 "title": "备份设置",

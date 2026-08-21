@@ -6,6 +6,7 @@ import General from '../pages/General';
 import Service from '../pages/Service';
 import History from '../pages/History';
 import Hotkey from '../pages/Hotkey';
+import Glossary from '../pages/Glossary';
 import Backup from '../pages/Backup';
 import About from '../pages/About';
 
@@ -37,6 +38,10 @@ const routes = [
     {
         path: '/backup',
         element: <Backup />,
+    },
+    {
+        path: '/glossary',
+        element: <Glossary />,
     },
     {
         path: '/about',

@@ -26,6 +26,19 @@ const SCHEMA = [
         timestamp INTEGER NOT NULL
     )`,
     `CREATE INDEX IF NOT EXISTS idx_cache_timestamp ON cache(timestamp)`,
+    // Terms the user wants rendered a particular way. `from_lang`/`to_lang` hold
+    // pot's own language codes or the string 'all', which is why they are not
+    // called `from`/`to`: `from` is a reserved word in sqlite and would have to
+    // be quoted at every call site.
+    `CREATE TABLE IF NOT EXISTS glossary(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        term TEXT NOT NULL,
+        replacement TEXT NOT NULL,
+        from_lang TEXT NOT NULL DEFAULT 'all',
+        to_lang TEXT NOT NULL DEFAULT 'all',
+        enabled INTEGER NOT NULL DEFAULT 1,
+        timestamp INTEGER NOT NULL
+    )`,
 ];
 
 export async function getDatabase() {
@@ -68,11 +81,19 @@ const SEPARATOR = '\u0000';
 // The service config is part of the key, so editing a prompt, model, or API
 // endpoint misses the cache instead of replaying a result the new settings
 // would not have produced.
-export function buildCacheKey({ instanceKey, config, from, to, detect, text }) {
+export function buildCacheKey({ instanceKey, config, from, to, detect, text, glossary }) {
     // Still MD5, and still hex. This is a cache key, not a security boundary --
     // but changing either would change every key, so every user's existing cache
     // would miss once and be rebuilt for no benefit.
     const parts = [instanceKey, JSON.stringify(config ?? {}), from, to, detect ?? '', text];
+    // Appended rather than slotted in, and only when there is a glossary at all,
+    // for that same reason: a user who keeps none has every key they already had.
+    // For an LLM service the glossary is in `config.promptList` too and the key
+    // would move anyway; for the other seventeen this is the only thing that
+    // stops an edited term replaying the result it was supposed to change.
+    if (glossary) {
+        parts.push(glossary);
+    }
     return toHex(md5(parts.join(SEPARATOR)));
 }
 
@@ -111,4 +132,53 @@ export async function getCacheCount() {
 export async function clearCache() {
     const db = await getDatabase();
     await db.execute('DELETE FROM cache');
+}
+
+// Ordered by id so the rows arrive the same way every time. `glossarySignature`
+// hashes them into the cache key, and an unstable order would change that key
+// without anything having changed.
+export async function listGlossary() {
+    const db = await getDatabase();
+    return db.select('SELECT * FROM glossary ORDER BY id');
+}
+
+/// The entries that apply to one translation. 'all' is the wildcard on either
+/// side, so a term can be scoped to a single direction, to everything going into
+/// one language, or to everything.
+///
+/// `from` should be the language actually being translated out of: with the
+/// source set to auto that is the detected language, not the literal 'auto',
+/// which no user would think to scope a term to.
+export async function getActiveGlossary(from, to) {
+    const db = await getDatabase();
+    return db.select(
+        `SELECT * FROM glossary
+         WHERE enabled = 1
+           AND (from_lang = 'all' OR from_lang = $1)
+           AND (to_lang = 'all' OR to_lang = $2)
+         ORDER BY id`,
+        [from ?? 'all', to ?? 'all']
+    );
+}
+
+export async function addGlossaryEntry({ term, replacement, fromLang = 'all', toLang = 'all', enabled = true }) {
+    const db = await getDatabase();
+    await db.execute(
+        `INSERT INTO glossary (term, replacement, from_lang, to_lang, enabled, timestamp)
+         VALUES ($1, $2, $3, $4, $5, $6)`,
+        [term, replacement, fromLang, toLang, enabled ? 1 : 0, Date.now()]
+    );
+}
+
+export async function updateGlossaryEntry(id, { term, replacement, fromLang, toLang, enabled }) {
+    const db = await getDatabase();
+    await db.execute(
+        `UPDATE glossary SET term = $1, replacement = $2, from_lang = $3, to_lang = $4, enabled = $5 WHERE id = $6`,
+        [term, replacement, fromLang, toLang, enabled ? 1 : 0, id]
+    );
+}
+
+export async function deleteGlossaryEntry(id) {
+    const db = await getDatabase();
+    await db.execute('DELETE FROM glossary WHERE id = $1', [id]);
 }

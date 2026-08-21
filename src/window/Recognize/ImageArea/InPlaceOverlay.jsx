@@ -3,7 +3,8 @@ import { invoke } from '@tauri-apps/api/core';
 
 import * as builtinServices from '../../../services/translate';
 import { getServiceName, whetherPluginService } from '../../../utils/service_instance';
-import { buildCacheKey, getCachedTranslation, setCachedTranslation } from '../../../utils/db';
+import { applyGlossaryToConfig, applyGlossaryToResult, glossarySignature } from '../../../utils/glossary';
+import { buildCacheKey, getActiveGlossary, getCachedTranslation, setCachedTranslation } from '../../../utils/db';
 import { invoke_plugin } from '../../../utils/invoke_plugin';
 import { windowsLangMap } from '../../../services/recognize/system';
 import { store } from '../../../utils/store';
@@ -137,10 +138,18 @@ async function mapLimit(items, limit, fn) {
 async function translateBlocks(blocks, instanceKey, pluginList, from, to, onProgress) {
     const serviceName = getServiceName(instanceKey);
     const isPlugin = whetherPluginService(instanceKey);
-    const instanceConfig = (await store.get(instanceKey)) ?? {};
+    const savedConfig = (await store.get(instanceKey)) ?? {};
     if (isPlugin) {
-        instanceConfig['enable'] = 'true';
+        savedConfig['enable'] = 'true';
     }
+
+    // Same two-tier glossary as the Translate window, and for the same reason
+    // this file duplicates the dispatch at all: there is no shared path to put
+    // it on. `from` here is already the recognised language, never 'auto'.
+    const glossaryEntries = await getActiveGlossary(from, to).catch(() => []);
+    const instanceConfig = applyGlossaryToConfig(savedConfig, serviceName, glossaryEntries);
+    const glossaryWentIntoPrompt = instanceConfig !== savedConfig;
+    const glossarySignatureValue = glossarySignature(glossaryEntries);
 
     const languageMap = isPlugin
         ? pluginList['translate'][serviceName].language
@@ -158,6 +167,7 @@ async function translateBlocks(blocks, instanceKey, pluginList, from, to, onProg
             to,
             detect: from,
             text: block.text,
+            glossary: glossarySignatureValue,
         });
         let result = null;
         try {
@@ -182,6 +192,10 @@ async function translateBlocks(blocks, instanceKey, pluginList, from, to, onProg
                     detect: from,
                     setResult: null,
                 });
+            }
+            // Rewritten before it is cached, since the glossary is part of the key.
+            if (!glossaryWentIntoPrompt) {
+                result = applyGlossaryToResult(result, glossaryEntries);
             }
             if (typeof result === 'string' && result.trim() !== '') {
                 setCachedTranslation(cacheKey, result.trim()).catch(() => {});
