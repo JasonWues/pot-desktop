@@ -158,19 +158,29 @@ fn translate_window() -> WebviewWindow {
         return window;
     }
     window.set_skip_taskbar(true).unwrap();
-    // Get Translate Window Size
+    // Get Translate Window Size.
+    //
+    // 440x580, up from the 350x420 this shipped with. The window is a column of
+    // sections now -- titlebar, source, languages, then one row per configured
+    // service -- and at 420 tall a single expanded result filled it, so every
+    // other service was below the fold before the first translation returned.
+    //
+    // These are seeded into the store on first run only, so an existing install
+    // keeps whatever size it already has: this default reaches new installs, and
+    // everyone else changes it by resizing with `translate_remember_window_size`
+    // on, or by clearing the two keys.
     let width = match get("translate_window_width") {
         Some(v) => v.as_i64().unwrap(),
         None => {
-            set("translate_window_width", 350);
-            350
+            set("translate_window_width", 440);
+            440
         }
     };
     let height = match get("translate_window_height") {
         Some(v) => v.as_i64().unwrap(),
         None => {
-            set("translate_window_height", 420);
-            420
+            set("translate_window_height", 580);
+            580
         }
     };
 
