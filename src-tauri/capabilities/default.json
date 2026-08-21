@@ -68,8 +68,21 @@
             ]
         },
         {
+            "_comment": [
+                "`*:*`, not `*`. These are URLPatterns, and a pattern that leaves the port",
+                "segment out matches only the protocol's DEFAULT port -- so `http://*` allowed",
+                "example.com but rejected 127.0.0.1:60828 with `url not allowed on the",
+                "configured scope`. That silently broke everything pot talks to on a port of",
+                "its own: the Recognize window's translate button, which POSTs to the local",
+                "server; the Anki collection service on 8765; and any service a user points at",
+                "a self-hosted endpoint. The path segment does default to a wildcard, which is",
+                "why the other 36 services never noticed.",
+                "",
+                "The intent was always 'any http(s) URL' -- pot exists to reach whatever",
+                "endpoint the user configured -- so this says that."
+            ],
             "identifier": "http:default",
-            "allow": [{ "url": "http://*" }, { "url": "https://*" }]
+            "allow": [{ "url": "http://*:*" }, { "url": "https://*:*" }]
         },
         "mcp-bridge:default"
     ]
