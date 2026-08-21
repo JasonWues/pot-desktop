@@ -14,10 +14,15 @@ pnpm tauri dev          # run the app (starts vite on :1420, then cargo)
 pnpm dev:mcp            # same, but merges src-tauri/tauri.dev.conf.json (withGlobalTauri: true)
 pnpm tauri build        # build installers for the current platform
 pnpm dev                # frontend only — mostly useless, every window calls into Tauri
+pnpm test               # vitest, one pass (what CI runs)
+pnpm test:watch         # vitest, watching
+pnpm test src/utils/http.test.js       # one file (`vitest run` takes a path filter; -t filters by name)
 npx prettier --write .  # format (config in .prettierrc.json: 4 spaces, single quotes, 120 cols)
 ```
 
 `dev:mcp` exists for the two MCP servers in `.mcp.json`: `tauri` (`@hypothesi/tauri-mcp-server`, drives the running app — windows, DOM, screenshots, IPC — and needs `withGlobalTauri`) and `heroui` (`@heroui/mcp`, v3 component docs/props/source). Reach for the HeroUI one before guessing at a v3 prop; the v2→v3 migration here has already been bitten by props v3 accepts and ignores.
+
+The `tauri` server talks to a Rust half that has to be present too: `tauri-plugin-mcp-bridge`, registered in `main.rs` under `cfg(debug_assertions)` with `Config::localhost_only()` (the plugin otherwise binds `0.0.0.0`, which would let anyone on the network drive these windows), plus `mcp-bridge:default` in the capability file. All three pieces are already in the tree, so a failed connect is almost always the third one missing at runtime — i.e. the app was started with `pnpm tauri dev` instead of `pnpm dev:mcp`.
 
 Linux dev also needs (per `.github/actions/build-for-linux/entrypoint.sh` — note the README still lists the Tauri 1 webkit 4.0 packages): `libgtk-3-dev libwebkit2gtk-4.1-dev libjavascriptcoregtk-4.1-dev libsoup-3.0-dev libayatana-appindicator3-dev librsvg2-dev patchelf libxdo-dev libxcb1 libxrandr2 libdbus-1-3 libpipewire-0.3-dev libspa-0.2-dev clang libclang-dev`.
 
@@ -25,7 +30,9 @@ The last seven are for `xcap`, the screenshot backend: it depends on `pipewire` 
 
 The same path links against gbm and EGL (`-lgbm -lEGL`, from the `gbm`/`gbm-sys`/`khronos_egl` crates). The `rust:bookworm` image carries those runtime libraries but not the `.so` symlinks, so they need `-dev` packages as well — and because nothing references them until the final link, a missing one surfaces as `rust-lld: error: unable to find library -lgbm` only after the whole crate graph has already compiled.
 
-There is **no test suite and no lint script** — verification is running the app. Rust side: `cargo check`/`cargo clippy` from `src-tauri/`.
+Tests are **vitest** (`46608c2`), matching `src/**/*.test.{js,jsx,ts,tsx}` — four files so far: `utils/crypto`, `utils/db`, `utils/http`, `services/config-forms`. `vitest.config.js` is deliberately separate from `vite.config.js`, which carries the build targets and watch exclusions the Tauri build depends on. The default environment is `node`; a file that needs a DOM opts in with a `// @vitest-environment jsdom` docblock on its first line. `vitest.setup.js` fills the three globals jsdom lacks but the app touches **at import time**: WebCrypto (the real one from `node:crypto`, so a test that signs something gets a real signature), an `AudioContext` stub (`useVoice` constructs one at module scope, so merely importing the hooks barrel throws without it), and `window.__TAURI_EVENT_PLUGIN_INTERNALS__` (`mockIPC` does not install it, and every unmounted `useConfig` rejects on cleanup without it).
+
+`.github/workflows/test.yml` runs `pnpm test` on every PR — Node only, no cargo, under a minute. There is still **no lint script** and no `prettier --check` gate; 16 files in the tree do not satisfy it yet, and that workflow's comment lists them. Rust has no tests at all: verification there is `cargo check`/`cargo clippy` from `src-tauri/`, and for anything visual, running the app.
 
 Release packaging happens in `.github/workflows/package.yml` on push to `master`; it rewrites the version in `package.json`, `src-tauri/tauri.conf.json` and `Cargo.toml` from `git describe --tags`, so those version fields are not hand-maintained.
 
@@ -42,6 +49,8 @@ return <BrowserRouter>{windowMap[appWindow.label]}</BrowserRouter>;
 
 Each entry maps to `src/window/<Name>/`. Rust creates those windows (`src-tauri/src/window.rs`: `translate_window`, `recognize_window`, `screenshot_window`, `config_window`, `updater_window`) positioned on the monitor under the mouse. A hidden `daemon` window (`daemon.html`, the second Vite rollup input) exists only so the backend always has a webview to query monitors from.
 
+Side effects shared by the windows live in hooks rather than in the window components (`0d74bc1`): `useAppConfig()` applies theme, language and typeface and is called once from `App.jsx`; `useKeyboardShortcuts()` swallows the browser keys a webview offers that mean nothing in a non-browser window (only `ctrl` + `c/v/x/a/z/y` survive, and F12 opens devtools when `dev_mode` is set); `useWindowLifecycle.jsx` holds `useCloseOnBlur` and `usePersistWindowGeometry`. `useCloseOnBlur` _queues_ the close instead of acting on the blur, because on Windows starting to drag a window fires blur and then focus straight back — focus or move cancels it. These three are **not** re-exported from `src/hooks/index.jsx`; import them by path.
+
 Entry points into those windows: global hotkeys (`hotkey.rs`), tray menu (`tray.rs`), clipboard monitor (`clipboard.rs`), and a localhost HTTP server on port `server_port` (default 60828, `server.rs`) used by the PopClip/SnipDo extensions in `.scripts/`.
 
 ### Config store — the app's shared state
@@ -54,7 +63,7 @@ Everything user-facing lives in one JSON store (`config.json` in the app config 
 
 History and the translation cache live in SQLite, not the store. **Everything that touches sqlite goes through `src/utils/db.js`** — it owns the single shared connection plus the schema and indexes for both tables, so callers can assume they exist. Don't call `Database.load('sqlite:history.db')` directly (the one exception is `invoke_plugin.js`, which hands the raw `Database` class to `.potext` plugins).
 
-The cache key is a hash of the text, languages, service instance **and its config** (`buildCacheKey`), so editing a prompt or endpoint misses the cache rather than replaying a stale result.
+The cache key is a hash of the text, languages, service instance **and its config** (`buildCacheKey`), so editing a prompt or endpoint misses the cache rather than replaying a stale result. The glossary signature is appended to it, and only when there is one — a user who keeps no terms keeps every key they already had.
 
 ### Services (translate / recognize / tts / collection)
 
@@ -62,7 +71,13 @@ The cache key is a hash of the text, languages, service instance **and its confi
 
 - `info.ts` — `info = { name, icon }` plus a `Language` enum mapping pot's language codes to the provider's.
 - `index.jsx` — the actual call, e.g. `translate(text, from, to, { config })`; throws a string on failure.
-- `Config.jsx` — the settings form; reads/writes its own config through `useConfig(instanceKey, defaults, { sync: false })` and usually test-calls the service before saving.
+- `Config.jsx` — the settings form, assembled from the shared parts below rather than hand-written.
+
+Since `0f30603` the forms are built out of `src/components/ServiceConfigForm`, which owns the wiring all of them repeated: load this instance's config with `useConfig(instanceKey, defaultConfig, { sync: false })`, test-call the service on submit, and only once that call resolves persist (a forced `setConfig(config, true)`, since the hook is unsynced) and close — otherwise toast the string the service threw. `children` is a render prop, `(config, setConfig) => rows`, because the rows need the config the component owns. `defaultConfig` is also merged over the stored config on read: `useConfig` seeds defaults only when the key is absent altogether, and plenty of instances are stored as a fragment like `{enable: false}`, whose fields would otherwise render blank.
+
+The rows come from `ServiceConfigForm/ConfigField.jsx` — `TextConfigField`, `TextAreaConfigField`, `SelectConfigField`, `SwitchConfigField`, `HelpLink`, each taking `hidden` as a **prop** rather than being wrapped in a conditional element, because `.config-item` is the flex row itself. `NoConfigForm` is the entire form for the nine services that take no settings, and `PromptListEditor` (with one of the three `*_PROMPT_SCHEMA` constants) the LLM prompt list.
+
+That consolidation is what makes `src/services/config-forms.test.jsx` worth having: it renders all 43 forms, so a field name that does not match the service's config or an i18n key that does not exist fails there instead of in a dialog nobody opened. A new service is covered by it automatically.
 
 Register a new service by adding it to the barrel `src/services/<type>/index.jsx` **and** adding `services.<type>.<name>.*` strings to `src/i18n/locales/en_US.json` (other locales come from Weblate — only edit `en_US.json` and `zh_CN.json` by hand).
 
@@ -85,6 +100,8 @@ This branch migrated from Tauri 1.8 to Tauri 2 (`d44c7bb`). Two shims deliberate
 - `src/utils/env.js` — remaps v2's `linux|macos|windows` back to `Linux|Darwin|Windows_NT`, which the UI, `public/logo/*.svg` and plugins expect.
 
 Other v2 consequences worth knowing: core APIs are now 15 separate plugins (see `Cargo.toml` / `package.json`); every frontend capability must be allow-listed in `src-tauri/capabilities/default.json` (a missing permission fails at runtime, e.g. `data-tauri-drag-region` needs `core:window:allow-start-dragging`); the store returns `undefined` (not `null`) for missing keys.
+
+The `allow` entries in that capability file are **URLPatterns**, and one omitted segment does not behave like the others: leaving the _port_ out matches the protocol's default port only. `{ "url": "http://*" }` therefore reached example.com but rejected `127.0.0.1:60828` with `url not allowed on the configured scope` — which broke the Recognize window's translate button (it POSTs to pot's own local server), the Anki collection service on 8765, and every self-hosted endpoint a user had configured. The _path_ segment does default to a wildcard, which is why the other 36 services never noticed. `http:default` allows `http://*:*` and `https://*:*` for that reason.
 
 ### Custom CSS must be wrapped in a layer
 
@@ -113,7 +130,19 @@ Because every surface in the app is painted with v3 tokens (`bg-surface`, `text-
 
 Only `light` and `dark` ship (the `nocturne` and `modernist` experiments were removed in `2835314`), so `src/window/Config/style.css` currently declares the plain `@layer theme, base, components, utilities;` — see the comment there for why that file, not `src/style.css`, has to own the statement. A theme that wants to restyle utility **classes** rather than just retint the tokens behind them has to append its own layer after `utilities` in that same statement, because nothing in `components` can outrank a utility. Two traps that path has hit before: `backdrop-filter` establishes a containing block for `position: fixed` descendants, so it must not go on the `bg-background` shells that hold the `data-tauri-drag-region` strips; and lightningcss merges a property with its own prefixed forms, so hand-writing `-webkit-backdrop-filter` makes it emit _only_ the legacy property, which Chrome 151/WebView2 no longer supports.
 
-Anything reading a theme colour from JS should pass the var through as a string (`'var(--surface)'`) rather than branching on the theme name — it resolves against whatever `data-theme` is on `<html>` at paint time, so it stays correct for themes added later and needs no re-render on a theme switch. Note that v3's tokens are **complete colour values**, where v2's `--heroui-*` were bare HSL triplets meant to be wrapped: `hsl(var(--heroui-content1))` is now an invalid colour that silently falls back, and translucency is `color-mix(in oklab, var(--x) N%, transparent)` rather than `hsl(var(--x) / 0.N)`.
+Anything reading a theme colour from JS should pass the var through as a string (`'var(--surface)'`) rather than branching on the theme name — it resolves against whatever `data-theme` is on `<html>` at paint time, so it stays correct for themes added later and needs no re-render on a theme switch. Note that v3's tokens are **complete colour values**, where v2's `--heroui-*` were bare HSL triplets meant to be wrapped: `hsl(var(--heroui-content1))` is now an invalid colour that silently falls back, and translucency is `color-mix(in oklab, var(--x) N%, transparent)` rather than `hsl(var(--x) / 0.N)`. `useToastStyle` was the one place that survived the migration still naming them, so every toast in the app drew the library's white default under a dark theme until it was pointed at `--overlay`.
+
+### Toasts and modals
+
+Both are overlay surfaces and both are styled centrally rather than per call site.
+
+**Toasts.** `<AppToaster />` is mounted once per window from `App.jsx`, and that placement is load-bearing: a `<Toaster>` renders every toast sharing its `toasterId`, all of them take the default id, and there used to be sixteen — one per page plus one inside several of the modals those pages open — so a page with a modal on top of it drew each toast twice. It owns position, duration and `iconTheme`; the icons point at `--accent` and `--danger` instead of the library's two hard-coded hexes. The 55 call sites keep passing `useToastStyle()`, which is the same object `AppToaster` hands to `toastOptions.style`, so the two agree whichever way a toast is raised.
+
+**Modals.** `.modal__dialog` carries no padding of its own; `__header`, `__body` and `__footer` carry theirs, which is what lets the 2px rules between them run edge to edge instead of stopping short at both ends. Fields inside a modal are squared with a 2px edge like the ones on the flat surfaces — v3 draws them as a borderless 12px pill, which on the dialog's `--overlay` grey read as floating white lozenges. All of it is one rule each in `src/style.css` rather than a className on twelve call sites.
+
+A dismiss button is `tertiary`, not `danger-soft`. Ten of them were danger, which put Cancel in the same colour as Delete and left the colour saying nothing; the seven that are still `danger-soft` all genuinely destroy something.
+
+Note that the native screenshot the Tauri MCP takes **does not capture a toast**: react-hot-toast animates one in on its own compositing layer, and a window-level capture on Windows drops GPU-composited layers. It is in the DOM and hit-testable the whole time, so verify one by reading computed styles, not by looking for it in a picture.
 
 ### The flat surfaces
 
@@ -123,13 +152,32 @@ Chrome there is sized in `px` and content in `rem` deliberately: `App.jsx` write
 
 ### In-place image translation
 
-The Recognize window can paint a translation back over the captured image (`src/window/Recognize/ImageArea/InPlaceOverlay.jsx`). It is the one feature that goes around the normal translate path: it calls `system_ocr_layout` for per-line boxes, groups lines that are plainly one paragraph (adjacent, similar height, horizontally overlapping) so wrapped sentences translate as prose, then dispatches to the builtin service or `invoke_plugin()` and reads/writes the same `db.js` cache itself. So it duplicates the service-dispatch logic that `TargetArea` owns, and **Windows-only** — `ocr_layout.rs` is the only backend that reports geometry.
+The Recognize window can paint a translation back over the captured image (`src/window/Recognize/ImageArea/InPlaceOverlay.jsx`). It is the one feature that goes around the normal translate path: it calls `system_ocr_layout` for per-line boxes, groups lines that are plainly one paragraph (adjacent, similar height, horizontally overlapping) so wrapped sentences translate as prose, then dispatches to the builtin service or `invoke_plugin()` and reads/writes the same `db.js` cache itself. So it duplicates the service-dispatch logic that `TargetArea` owns — which is why the glossary had to be wired into both files rather than one.
+
+It runs on **Windows and Linux**. `ocr_layout.rs` has a backend per platform: `Windows.Media.Ocr` reports a `BoundingRect` per word, and on Linux the same `tesseract` binary `system_ocr` already shells out to is asked for `stdout tsv` instead, which is the identical recognition with the geometry left in. Both fold words into lines by unioning the boxes, because a line's own rectangle is the type area rather than the ink. macOS is the gap, and not for want of data — Vision reports a `boundingBox` too — but pot reaches it through the prebuilt `resources/ocr-*-apple-darwin` binary, whose contract is a finished string and whose source is not in this repository.
+
+The one frontend consequence is `toOcrLanguage`: each engine wants its own spelling, so it picks `linuxLangMap` or `windowsLangMap` off `osType`. Handing tesseract a BCP-47 tag fails as a missing language package rather than as a bad argument, so getting that wrong looks like a user problem.
 
 `src/utils/ai_presets.js` is the other thing layered onto translation: named prompt presets (`polish`, `summarize`, `grammar`, `explain_code`) that swap an LLM service's `promptList` for one request without touching its saved config. Only the services listed in `PROMPT_SERVICES` read a prompt at all; the rest take a language pair and have nowhere to put an instruction.
 
+### Glossary
+
+Terms the user wants rendered a particular way, stored in the same sqlite file as history and the cache (`glossary` table, CRUD in `db.js` like everything else that touches sqlite) and edited on the Config window's Glossary page. An entry is scoped by language pair, where `'all'` on either side is the wildcard; `getActiveGlossary(from, to)` is what a translation asks for, and `from` is the _detected_ language when the source is set to auto, since nobody scopes a term to "auto".
+
+The application is two-tier, and `src/utils/glossary.js` holds both halves as pure functions:
+
+- **LLM services** (the same `PROMPT_SERVICES` list `ai_presets` uses) get the terms as an instruction appended to their first prompt message, so the model applies them while translating. That is the only way "render `bug` as 缺陷" can work at all — by the time a finished translation exists the word is gone. `applyGlossaryToConfig` returns a _copy_ of the config, exactly as `applyPreset` does, which is also what makes the cache key move on its own.
+- **Everything else** takes a language pair and has nowhere to put an instruction, so there the terms are applied to the result. That reaches what actually dominates a glossary — proper nouns and jargon an engine passes through untranslated — and it cannot damage anything: a term the engine did translate simply is not found. Pre-substituting a sentinel would cover the rest, but an engine that drops or mangles the sentinel takes the user's words with it, and losing text is worse than not rewriting it.
+
+Which of the two applies is decided by `instanceConfig !== presetConfig`, not by asking `supportsPrompt` a second time: `applyGlossaryToConfig` also declines when an LLM instance was saved before it had a `promptList`, and that instance does want the result rewritten.
+
+Two details in `applyGlossaryToResult` that look arbitrary and are not: word boundaries are added only where the term's own edge is an ASCII word character (JS `\b` is ASCII, so demanding one around a CJK term demands a boundary that never occurs — while a Latin term without one rewrites the middle of another word, and an entry for `AI` would hit `SAID`), and every term goes into **one** alternation sorted longest-first rather than a replace per term, so a replacement containing another term is not then rewritten itself.
+
+Because `InPlaceOverlay` owns its own copy of the dispatch, all of this is wired in twice. A change to how the glossary is applied has to touch both.
+
 ### Rust module map (`src-tauri/src/`)
 
-`main.rs` wires plugins, the global `APP: OnceCell<AppHandle>`, and the `invoke_handler` list — a new `#[tauri::command]` must be added there _and_ usually needs a capability entry. `cmd.rs` misc commands (image cropping, clipboard image, plugin install, fonts, history export, devtools). `screenshot.rs` the capture itself; `proxy.rs` per-OS system proxy discovery. `system_ocr.rs` per-OS native OCR (Windows.Media.Ocr / macOS Vision / Linux tesseract binary), text only. `ocr_layout.rs` the same engine but returning a box per line — Windows only, because none of the other backends report geometry. `tts.rs` per-OS offline speech (Windows.Media.SpeechSynthesis / macOS `say` / Linux `espeak-ng`) and `edge_tts.rs` Edge's read-aloud voices, which live in Rust because the WebSocket handshake needs `Origin`/`User-Agent` headers a webview cannot set; both return base64 WAV because the IPC layer would otherwise serialize the audio as a JSON number array. `lang_detect.rs` offline detection via `lingua`. `backup.rs` WebDAV/Aliyun/local config backup. `updater.rs` + `updater_window`. `error.rs` the one `thiserror` enum every command returns.
+`main.rs` wires plugins, the global `APP: OnceCell<AppHandle>`, and the `invoke_handler` list — a new `#[tauri::command]` must be added there _and_ usually needs a capability entry. `cmd.rs` misc commands (image cropping, clipboard image, plugin install, fonts, history export, devtools). `screenshot.rs` the capture itself; `proxy.rs` per-OS system proxy discovery. `system_ocr.rs` per-OS native OCR (Windows.Media.Ocr / macOS Vision / Linux tesseract binary), text only. `ocr_layout.rs` the same engines but returning a box per line — Windows and Linux only (see above); its TSV parser is deliberately outside the `cfg` gate so it compiles and is unit-tested on any host. `tts.rs` per-OS offline speech (Windows.Media.SpeechSynthesis / macOS `say` / Linux `espeak-ng`) and `edge_tts.rs` Edge's read-aloud voices, which live in Rust because the WebSocket handshake needs `Origin`/`User-Agent` headers a webview cannot set; both return base64 WAV because the IPC layer would otherwise serialize the audio as a JSON number array. `lang_detect.rs` offline detection via `lingua`. `backup.rs` WebDAV/Aliyun/local config backup. `updater.rs` + `updater_window`. `error.rs` the one `thiserror` enum every command returns.
 
 Windows are created hidden and shown once React mounts, so **anything that throws before `root.render` leaves an invisible window**. `main.jsx` therefore never lets init failures escape and mirrors the webview console into the Rust log (`attachConsole`) — check the log dir (tray → View Log) when a window fails to appear.
 
@@ -137,4 +185,5 @@ Windows are created hidden and shown once React mounts, so **anything that throw
 
 - Frontend is JSX with plain JS; `.ts` files are used only for data tables (`language.ts`, `info.ts`, `service_instance.ts`). No type-checking step runs.
 - Import order in existing files is roughly longest-line-first; Prettier does not enforce it, so just match the surrounding file.
+- **Hashing goes through `src/utils/crypto.js`** (`md5`, `sha256`, `hmacSha1`, `hmacSha256`, `toHex`, `toBase64`, `base64ToBytes`, `base64ToUtf8`), which wraps `@noble/hashes`. `crypto-js` is still a dependency for exactly one reason — `invoke_plugin.js` hands it to `.potext` plugins as published API — and nothing in the app's own code should import it. The wrappers absorb two differences that are silent rather than loud: noble takes bytes and throws on a string, and returns a `Uint8Array` where crypto-js's WordArray stringified to hex on its own. A third is in the signature — `hmacSha256(key, message)` takes the **key first**, where `CryptoJS.HmacSHA256` took the message first, so a mechanical rename at a call site would have signed the key with the message and still returned a plausible-looking digest.
 - User-visible strings go through `react-i18next` (`t('...')`), keyed under `translation` in each locale file.
