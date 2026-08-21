@@ -5,18 +5,22 @@ import * as builtinServices from '../../../services/translate';
 import { getServiceName, whetherPluginService } from '../../../utils/service_instance';
 import { applyGlossaryToConfig, applyGlossaryToResult, glossarySignature } from '../../../utils/glossary';
 import { buildCacheKey, getActiveGlossary, getCachedTranslation, setCachedTranslation } from '../../../utils/db';
+import { linuxLangMap, windowsLangMap } from '../../../services/recognize/system';
 import { invoke_plugin } from '../../../utils/invoke_plugin';
-import { windowsLangMap } from '../../../services/recognize/system';
 import { store } from '../../../utils/store';
+import { osType } from '../../../utils/env';
 
-// The Windows OCR engine wants a BCP-47 tag; the window's language atom holds
-// pot's own code. Reusing the system recognize service's table keeps the two
-// from drifting apart.
+// The two backends spell a language differently -- Windows OCR wants a BCP-47
+// tag, tesseract a three-letter code -- and the window's language atom holds
+// pot's own. Reusing the system recognize service's tables keeps the two paths
+// from drifting apart, and keeps the code in step with the
+// `tesseract-ocr-<lang>` package the Rust side names when the data is missing.
 function toOcrLanguage(language) {
-    return windowsLangMap[language ?? 'auto'] ?? 'auto';
+    const map = osType === 'Linux' ? linuxLangMap : windowsLangMap;
+    return map[language ?? 'auto'] ?? 'auto';
 }
 
-// Windows OCR puts spaces between CJK glyphs, which the system recognize
+// Both engines put spaces between CJK glyphs, which the system recognize
 // service strips for the same reason: they are not real word boundaries and
 // they make the translation noticeably worse.
 function normalizeText(text, language) {
