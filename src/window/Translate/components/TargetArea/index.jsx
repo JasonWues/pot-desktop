@@ -14,18 +14,12 @@ import * as builtinCollectionServices from '../../../../services/collection';
 import { sourceLanguageAtom, targetLanguageAtom, aiPresetAtom } from '../LanguageArea';
 import { useConfig, useToastStyle, useVoice } from '../../../../hooks';
 import { sourceTextAtom, detectLanguageAtom } from '../SourceArea';
+import { callService, resolveService, withGlossary } from '../../../../utils/translate_dispatch';
+import { addToHistory, buildCacheKey, getCachedTranslation, setCachedTranslation } from '../../../../utils/db';
 import { invoke_plugin } from '../../../../utils/invoke_plugin';
-import { applyPreset, DEFAULT_PRESET } from '../../../../utils/ai_presets';
+import { DEFAULT_PRESET } from '../../../../utils/ai_presets';
 import * as builtinServices from '../../../../services/translate';
 import * as builtinTtsServices from '../../../../services/tts';
-import { applyGlossaryToConfig, applyGlossaryToResult, glossarySignature } from '../../../../utils/glossary';
-import {
-    addToHistory,
-    buildCacheKey,
-    getActiveGlossary,
-    getCachedTranslation,
-    setCachedTranslation,
-} from '../../../../utils/db';
 
 import { info, error as logError } from '@tauri-apps/plugin-log';
 import {
@@ -141,25 +135,12 @@ export default function TargetArea(props) {
         const startedAt = Date.now();
 
         const translateServiceName = getServiceName(currentTranslateServiceInstanceKey);
-        const isPluginService = whetherPluginService(currentTranslateServiceInstanceKey);
-        const savedConfig = serviceInstanceConfigMap[currentTranslateServiceInstanceKey];
-        if (isPluginService && savedConfig) {
-            // The plugin protocol expects this flag on the config. Setting it
-            // before the cache key is derived keeps the key stable across calls.
-            savedConfig['enable'] = 'true';
-        }
-        // A non-default preset swaps the prompt for this request only. It returns
-        // a copy, so the saved config is untouched and -- because the cache key is
-        // derived from the config that is actually used -- a polished result
-        // cannot come back from the cache as a translation.
-        const presetConfig = applyPreset(savedConfig, translateServiceName, aiPreset);
-
-        // Plugins declare their languages in info.json, built-in services in a
-        // Language enum; both are keyed by pot's own language codes.
-        const languageMap = isPluginService
-            ? pluginList['translate'][translateServiceName].language
-            : builtinServices[translateServiceName].Language;
-        if (!(sourceLanguage in languageMap && targetLanguage in languageMap)) {
+        const base = resolveService(currentTranslateServiceInstanceKey, {
+            pluginList,
+            savedConfig: serviceInstanceConfigMap[currentTranslateServiceInstanceKey],
+            preset: aiPreset,
+        });
+        if (!(sourceLanguage in base.languageMap && targetLanguage in base.languageMap)) {
             setError('Language not supported');
             return;
         }
@@ -176,25 +157,13 @@ export default function TargetArea(props) {
 
         // Scoped by the languages actually in play: with the source set to auto
         // that is the detected language, not the literal 'auto', which no user
-        // would think to scope a term to. A broken glossary must never stop a
-        // translation, so a failed read is simply an empty one.
-        const glossaryEntries = await getActiveGlossary(
-            sourceLanguage === 'auto' ? detectLanguage : sourceLanguage,
-            newTargetLanguage
-        ).catch((e) => {
-            logError(`read glossary failed: ${e}`);
-            return [];
+        // would think to scope a term to. It has to happen after the target
+        // language is settled, which is why it is not folded into `resolveService`.
+        const service = await withGlossary(base, {
+            from: sourceLanguage === 'auto' ? detectLanguage : sourceLanguage,
+            to: newTargetLanguage,
         });
-        const instanceConfig = applyGlossaryToConfig(presetConfig, translateServiceName, glossaryEntries);
-
-        // `applyGlossaryToConfig` hands back the config it was given whenever it
-        // could not place the terms -- a service that reads no prompt at all, or
-        // an LLM instance saved before it had a `promptList`. That is exactly
-        // when the result has to be rewritten instead, which makes the identity
-        // check a better condition here than asking `supportsPrompt` again: the
-        // second case would disagree with it.
-        const glossaryWentIntoPrompt = instanceConfig !== presetConfig;
-        const applyGlossary = (v) => (glossaryWentIntoPrompt ? v : applyGlossaryToResult(v, glossaryEntries));
+        const applyGlossary = service.applyGlossary;
 
         const setHideOnce = invokeOnce(setHide);
 
@@ -243,12 +212,12 @@ export default function TargetArea(props) {
 
         const cacheKey = buildCacheKey({
             instanceKey: currentTranslateServiceInstanceKey,
-            config: instanceConfig,
+            config: service.config,
             from: sourceLanguage,
             to: newTargetLanguage,
             detect: detectLanguage,
             text: sourceText.trim(),
-            glossary: glossarySignature(glossaryEntries),
+            glossary: service.glossary,
         });
 
         if (cacheEnable) {
@@ -304,23 +273,10 @@ export default function TargetArea(props) {
             setHideOnce(false);
         };
 
-        if (isPluginService) {
-            let [func, utils] = await invoke_plugin('translate', translateServiceName);
-            func(sourceText.trim(), languageMap[sourceLanguage], languageMap[newTargetLanguage], {
-                config: instanceConfig,
-                detect: detectLanguage,
-                setResult: onPartialResult,
-                utils,
-            }).then(onResolve, onReject);
-        } else {
-            builtinServices[translateServiceName]
-                .translate(sourceText.trim(), languageMap[sourceLanguage], languageMap[newTargetLanguage], {
-                    config: instanceConfig,
-                    detect: detectLanguage,
-                    setResult: onPartialResult,
-                })
-                .then(onResolve, onReject);
-        }
+        callService(service, sourceText.trim(), sourceLanguage, newTargetLanguage, {
+            detect: detectLanguage,
+            setResult: onPartialResult,
+        }).then(onResolve, onReject);
     };
 
     // hide empty textarea

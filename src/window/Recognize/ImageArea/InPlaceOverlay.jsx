@@ -1,12 +1,9 @@
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { invoke } from '@tauri-apps/api/core';
 
-import * as builtinServices from '../../../services/translate';
-import { getServiceName, whetherPluginService } from '../../../utils/service_instance';
-import { applyGlossaryToConfig, applyGlossaryToResult, glossarySignature } from '../../../utils/glossary';
-import { buildCacheKey, getActiveGlossary, getCachedTranslation, setCachedTranslation } from '../../../utils/db';
+import { callService, resolveService, withGlossary } from '../../../utils/translate_dispatch';
+import { buildCacheKey, getCachedTranslation, setCachedTranslation } from '../../../utils/db';
 import { linuxLangMap, windowsLangMap } from '../../../services/recognize/system';
-import { invoke_plugin } from '../../../utils/invoke_plugin';
 import { store } from '../../../utils/store';
 import { osType } from '../../../utils/env';
 
@@ -140,38 +137,24 @@ async function mapLimit(items, limit, fn) {
 }
 
 async function translateBlocks(blocks, instanceKey, pluginList, from, to, onProgress) {
-    const serviceName = getServiceName(instanceKey);
-    const isPlugin = whetherPluginService(instanceKey);
-    const savedConfig = (await store.get(instanceKey)) ?? {};
-    if (isPlugin) {
-        savedConfig['enable'] = 'true';
-    }
-
-    // This path asks for no streaming, whatever the instance is configured for.
-    // It translates every block at once and paints each one only when it is
-    // finished, so there is nowhere to put partial text -- which is why it
-    // passes `setResult: null`. Asked to stream with no `setResult` to hand it
-    // to, ollama, openai and geminipro all give up and return the literal
-    // string '[STREAM]', and that is what got painted over the image and then
-    // cached under the block's key.
+    // `stream: false` because this path has nowhere to put partial text: it
+    // translates every block at once and paints each only when it is finished,
+    // so it hands `callService` no `setResult`. Asked to stream with nothing to
+    // stream to, three of the services abort and resolve with the literal
+    // '[STREAM]', which then got painted over the image and cached.
     //
-    // Only when the instance actually carries the option, so the services that
-    // have no `stream` at all keep the cache keys they already had -- the config
-    // is hashed into the key, so adding a field to it would miss every entry.
-    const baseConfig = 'stream' in savedConfig ? { ...savedConfig, stream: false } : savedConfig;
+    // `from` is already the recognised language here, never 'auto', so it is
+    // what the glossary is scoped by.
+    const service = await withGlossary(
+        resolveService(instanceKey, {
+            pluginList,
+            savedConfig: (await store.get(instanceKey)) ?? {},
+            stream: false,
+        }),
+        { from, to }
+    );
 
-    // Same two-tier glossary as the Translate window, and for the same reason
-    // this file duplicates the dispatch at all: there is no shared path to put
-    // it on. `from` here is already the recognised language, never 'auto'.
-    const glossaryEntries = await getActiveGlossary(from, to).catch(() => []);
-    const instanceConfig = applyGlossaryToConfig(baseConfig, serviceName, glossaryEntries);
-    const glossaryWentIntoPrompt = instanceConfig !== baseConfig;
-    const glossarySignatureValue = glossarySignature(glossaryEntries);
-
-    const languageMap = isPlugin
-        ? pluginList['translate'][serviceName].language
-        : builtinServices[serviceName].Language;
-    if (!(from in languageMap) || !(to in languageMap)) {
+    if (!(from in service.languageMap) || !(to in service.languageMap)) {
         throw new Error('Language not supported');
     }
 
@@ -179,12 +162,12 @@ async function translateBlocks(blocks, instanceKey, pluginList, from, to, onProg
     return mapLimit(blocks, 4, async (block) => {
         const cacheKey = buildCacheKey({
             instanceKey,
-            config: instanceConfig,
+            config: service.config,
             from,
             to,
             detect: from,
             text: block.text,
-            glossary: glossarySignatureValue,
+            glossary: service.glossary,
         });
         let result = null;
         try {
@@ -193,27 +176,9 @@ async function translateBlocks(blocks, instanceKey, pluginList, from, to, onProg
             // A broken cache must never stop a translation.
         }
         if (result === null) {
-            if (isPlugin) {
-                // `invoke_plugin` hands back the entry point and the `utils`
-                // object the plugin protocol expects to receive alongside it.
-                const [func, utils] = await invoke_plugin('translate', serviceName);
-                result = await func(block.text, languageMap[from], languageMap[to], {
-                    config: instanceConfig,
-                    detect: from,
-                    setResult: null,
-                    utils,
-                });
-            } else {
-                result = await builtinServices[serviceName].translate(block.text, languageMap[from], languageMap[to], {
-                    config: instanceConfig,
-                    detect: from,
-                    setResult: null,
-                });
-            }
+            result = await callService(service, block.text, from, to, { detect: from, setResult: null });
             // Rewritten before it is cached, since the glossary is part of the key.
-            if (!glossaryWentIntoPrompt) {
-                result = applyGlossaryToResult(result, glossaryEntries);
-            }
+            result = service.applyGlossary(result);
             if (typeof result === 'string' && result.trim() !== '') {
                 setCachedTranslation(cacheKey, result.trim()).catch(() => {});
             }

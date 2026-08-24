@@ -152,15 +152,29 @@ Chrome there is sized in `px` and content in `rem` deliberately: `App.jsx` write
 
 ### In-place image translation
 
-The Recognize window can paint a translation back over the captured image (`src/window/Recognize/ImageArea/InPlaceOverlay.jsx`). It is the one feature that goes around the normal translate path: it calls `system_ocr_layout` for per-line boxes, groups lines that are plainly one paragraph (adjacent, similar height, horizontally overlapping) so wrapped sentences translate as prose, then dispatches to the builtin service or `invoke_plugin()` and reads/writes the same `db.js` cache itself. So it duplicates the service-dispatch logic that `TargetArea` owns — which is why the glossary had to be wired into both files rather than one.
+The Recognize window can paint a translation back over the captured image (`src/window/Recognize/ImageArea/InPlaceOverlay.jsx`). It is the one feature that goes around the normal translate path: it calls `system_ocr_layout` for per-line boxes, groups lines that are plainly one paragraph (adjacent, similar height, horizontally overlapping) so wrapped sentences translate as prose, then translates through `translate_dispatch.js` and reads/writes the same `db.js` cache itself.
 
 It runs on **Windows and Linux**. `ocr_layout.rs` has a backend per platform: `Windows.Media.Ocr` reports a `BoundingRect` per word, and on Linux the same `tesseract` binary `system_ocr` already shells out to is asked for `stdout tsv` instead, which is the identical recognition with the geometry left in. Both fold words into lines by unioning the boxes, because a line's own rectangle is the type area rather than the ink. macOS is the gap, and not for want of data — Vision reports a `boundingBox` too — but pot reaches it through the prebuilt `resources/ocr-*-apple-darwin` binary, whose contract is a finished string and whose source is not in this repository.
 
-Two things this path gets wrong if they are not held in mind. It passes `setResult: null`, because it translates every block at once and paints each only when finished, so there is nowhere for partial text to go — and ollama, openai and geminipro all respond to "stream with nobody to stream to" by aborting and returning the literal string `'[STREAM]'`, which then gets painted over the image _and cached under that block's key_. So the config it dispatches with forces `stream: false`, and only when the instance actually has the field, since the config is hashed into the cache key. And the overlay is positioned over the whole pane while the `<img>` is sized to the image and centred in it, so the geometry has to add the element's own `offsetLeft`/`offsetTop` to whatever `object-contain` letterboxed inside it; accounting for only the second put every box a hundred pixels above a wide, short capture.
+It asks `resolveService` for `stream: false`, because it translates every block at once and paints each only when finished, so it hands `callService` no `setResult` — and ollama, openai and geminipro all answer "stream with nobody to stream to" by aborting and returning the literal string `'[STREAM]'`, which used to get painted over the image _and cached under that block's key_.
+
+The geometry is the part that is genuinely local to this file. The overlay is positioned over the whole pane while the `<img>` is sized to the image and centred in it, so `measure()` has to add the element's own `offsetLeft`/`offsetTop` to whatever `object-contain` letterboxed inside it. Accounting for only the second put every box a hundred pixels above a wide, short capture.
 
 The one frontend consequence of the platform split is `toOcrLanguage`: each engine wants its own spelling, so it picks `linuxLangMap` or `windowsLangMap` off `osType`. Handing tesseract a BCP-47 tag fails as a missing language package rather than as a bad argument, so getting that wrong looks like a user problem.
 
 `src/utils/ai_presets.js` is the other thing layered onto translation: named prompt presets (`polish`, `summarize`, `grammar`, `explain_code`) that swap an LLM service's `promptList` for one request without touching its saved config. Only the services listed in `PROMPT_SERVICES` read a prompt at all; the rest take a language pair and have nowhere to put an instruction.
+
+### The shared translate dispatch
+
+`src/utils/translate_dispatch.js` is the path between "the user picked a service" and "the service was called". Three steps, in order, and both the Translate window and the Recognize window's in-place overlay walk all three:
+
+- `resolveService(instanceKey, { pluginList, savedConfig, preset, stream })` — the config the call is actually made with, and the language table. It sets the plugin `enable` flag, applies the AI preset, and honours `stream: false` for a caller with nowhere to put partial text. Every one of those returns a **copy**; nothing writes into the caller's `savedConfig`, which the Translate window keeps in a map for the whole session.
+- `withGlossary(resolved, { from, to })` — the terms, folded into the config or into a result rewriter. Separate from the step above because the language pair is not final until after the service's own language support has been checked.
+- `callService(resolved, text, from, to, { detect, setResult })` — the builtin-versus-plugin dispatch.
+
+The cache is deliberately **not** in here: both callers use `buildCacheKey` and the `db.js` helpers directly, because their control flow around a hit genuinely differs — the Translate window has to tell a hit from a miss to report where the answer came from and to hold its own race guard, while the overlay runs the lookup per block inside a concurrency limiter.
+
+These were two separate implementations until they were merged, 193 lines against 74, and they had already drifted twice: the `'[STREAM]'` bug below came from the overlay passing `setResult: null` where the Translate window passes a function, and the glossary had to be written into both files. A change to how a translation is prepared now has one place to go.
 
 ### Glossary
 
@@ -175,7 +189,7 @@ Which of the two applies is decided by `instanceConfig !== presetConfig`, not by
 
 Two details in `applyGlossaryToResult` that look arbitrary and are not: word boundaries are added only where the term's own edge is an ASCII word character (JS `\b` is ASCII, so demanding one around a CJK term demands a boundary that never occurs — while a Latin term without one rewrites the middle of another word, and an entry for `AI` would hit `SAID`), and every term goes into **one** alternation sorted longest-first rather than a replace per term, so a replacement containing another term is not then rewritten itself.
 
-Because `InPlaceOverlay` owns its own copy of the dispatch, all of this is wired in twice. A change to how the glossary is applied has to touch both.
+Both halves are reached through `withGlossary` in `translate_dispatch.js`, so this is wired in once — see below.
 
 ### Rust module map (`src-tauri/src/`)
 
