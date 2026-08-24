@@ -147,12 +147,25 @@ async function translateBlocks(blocks, instanceKey, pluginList, from, to, onProg
         savedConfig['enable'] = 'true';
     }
 
+    // This path asks for no streaming, whatever the instance is configured for.
+    // It translates every block at once and paints each one only when it is
+    // finished, so there is nowhere to put partial text -- which is why it
+    // passes `setResult: null`. Asked to stream with no `setResult` to hand it
+    // to, ollama, openai and geminipro all give up and return the literal
+    // string '[STREAM]', and that is what got painted over the image and then
+    // cached under the block's key.
+    //
+    // Only when the instance actually carries the option, so the services that
+    // have no `stream` at all keep the cache keys they already had -- the config
+    // is hashed into the key, so adding a field to it would miss every entry.
+    const baseConfig = 'stream' in savedConfig ? { ...savedConfig, stream: false } : savedConfig;
+
     // Same two-tier glossary as the Translate window, and for the same reason
     // this file duplicates the dispatch at all: there is no shared path to put
     // it on. `from` here is already the recognised language, never 'auto'.
     const glossaryEntries = await getActiveGlossary(from, to).catch(() => []);
-    const instanceConfig = applyGlossaryToConfig(savedConfig, serviceName, glossaryEntries);
-    const glossaryWentIntoPrompt = instanceConfig !== savedConfig;
+    const instanceConfig = applyGlossaryToConfig(baseConfig, serviceName, glossaryEntries);
+    const glossaryWentIntoPrompt = instanceConfig !== baseConfig;
     const glossarySignatureValue = glossarySignature(glossaryEntries);
 
     const languageMap = isPlugin
@@ -218,8 +231,20 @@ const InPlaceOverlay = forwardRef(function InPlaceOverlay(props, ref) {
     const [geometry, setGeometry] = useState(null);
     const layoutRef = useRef(null);
 
-    // The image is drawn with `object-contain`, so it is letterboxed inside its
-    // box and the overlay has to be mapped onto the painted area, not the element.
+    // Where the painted pixels sit, in the coordinates the overlay is positioned
+    // in. Two separate gaps, and only the second used to be accounted for:
+    //
+    //   - the <img> element's own place inside the box the overlay is absolutely
+    //     positioned against. The overlay is `top-0 left-0 w-full h-full` over
+    //     the whole pane, while the element is sized to the image and centred in
+    //     it, so a wide, short capture left the element a hundred pixels below
+    //     the pane's top edge -- and every box was painted that much too high.
+    //   - the letterboxing `object-contain` leaves inside the element when the
+    //     two aspect ratios still differ.
+    //
+    // `offsetLeft`/`offsetTop` are measured against the nearest positioned
+    // ancestor, which is the same element the overlay's `top: 0` resolves
+    // against, so the two agree by construction.
     const measure = useCallback(() => {
         const img = imgRef.current;
         const layout = layoutRef.current;
@@ -227,8 +252,8 @@ const InPlaceOverlay = forwardRef(function InPlaceOverlay(props, ref) {
         const scale = Math.min(img.clientWidth / img.naturalWidth, img.clientHeight / img.naturalHeight);
         setGeometry({
             scale,
-            offsetX: (img.clientWidth - img.naturalWidth * scale) / 2,
-            offsetY: (img.clientHeight - img.naturalHeight * scale) / 2,
+            offsetX: img.offsetLeft + (img.clientWidth - img.naturalWidth * scale) / 2,
+            offsetY: img.offsetTop + (img.clientHeight - img.naturalHeight * scale) / 2,
         });
     }, [imgRef]);
 
