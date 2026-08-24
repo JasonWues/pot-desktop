@@ -255,6 +255,80 @@
 }
 
 /*
+  Dropdowns, which every picker in the app opens -- the History filters, the
+  Glossary scopes, and the `SelectConfigField` row that 43 service forms are
+  built out of.
+
+  Same treatment as the dialog and the toast, because it is the same kind of
+  thing: a surface floating over the window. v3 gives it a 32px radius and a drop
+  shadow; here it gets a 2px rule, and the items are divided by hairlines rather
+  than held apart by gaps.
+*/
+@layer components {
+    .dropdown__popover {
+        border-radius: 0;
+        border: 2px solid var(--border-secondary);
+        box-shadow: none;
+    }
+
+    /*
+      The menu's own padding and its inter-item gap are what keep the items from
+      touching. Dropping both is what lets a divider run the full width of the
+      popover instead of stopping short at two rounded corners.
+    */
+    .dropdown__menu {
+        padding: 0;
+        gap: 0;
+    }
+
+    .menu-item {
+        border-radius: 0;
+        /* See the pressed rule below: with no transform left there is nothing
+           for a per-row compositing layer to promote. */
+        will-change: auto;
+    }
+
+    .menu-item:not(:last-child) {
+        border-bottom: 1px solid var(--border);
+    }
+
+    /*
+      `--surface-hover`, not the library's `--default`. The popover's ground is
+      `--overlay`, which is the same value as `--surface` under both themes, so
+      the app's usual `--surface` hover would be invisible here -- and `--default`
+      is exactly `--border-secondary`'s value under the dark theme, which would
+      paint a hovered row the colour of the rules dividing it.
+    */
+    .menu-item[data-hovered='true'] {
+        background-color: var(--surface-hover);
+    }
+
+    /*
+      v3 draws focus as a ring built out of box-shadow, offset from the item by a
+      band of `--background` -- which on a squared, rule-divided list was the one
+      thing left floating and rounded in it. The rest of the app marks focus with
+      an inset outline (`.flat-action`, `.history-entry`), so this does too. The
+      shadow has to be cleared as well as the outline set, since the ring is not
+      an outline at all.
+    */
+    .menu-item[data-focus-visible='true'] {
+        box-shadow: none;
+        outline: 2px solid var(--focus);
+        outline-offset: -2px;
+    }
+
+    /*
+      v3 scales an item to .98 while it is held. Nothing else in this app moves
+      under the pointer, and dropping the transform also leaves `will-change`
+      promoting a compositing layer per row for nothing -- which on the language
+      pickers is thirty-odd of them.
+    */
+    .menu-item[data-pressed='true'] {
+        transform: none;
+    }
+}
+
+/*
   v2's `isLoading` swapped the label for a spinner. Its v3 successor `isPending`
   draws nothing at all -- `@apply status-pending` resolves to `pointer-events:
   none` and that is the whole of it -- so the ~40 "test connection" and "save"
