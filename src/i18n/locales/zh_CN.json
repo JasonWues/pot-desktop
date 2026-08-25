@@ -101,13 +101,13 @@
                 },
                 "section": {
                     "startup": "启动",
-                    "startup_note": "开机时的行为，以及其它应用如何访问 pot。",
+                    "startup_note": "开机时的行为，以及其它应用如何访问 Gloss。",
                     "appearance": "外观",
                     "appearance_note": "影响五个窗口外观的全部设置。",
                     "network": "网络",
                     "network_note": "对翻译、文字识别和语音合成同样生效。"
                 },
-                "auto_start_desc": "登录系统后自动启动 pot。",
+                "auto_start_desc": "登录系统后自动启动 Gloss。",
                 "check_update_desc": "启动时检查是否有新版本。",
                 "server_port_desc": "PopClip 与 SnipDo 扩展调用的本地端口。",
                 "app_language_desc": "界面语言，不是翻译语言。",
@@ -230,7 +230,7 @@
                 "set_hotkey": "按下按键设置快捷键",
                 "section": {
                     "global": "全局",
-                    "global_note": "系统级快捷键，pot 没有窗口在前台时同样生效。"
+                    "global_note": "系统级快捷键，Gloss 没有窗口在前台时同样生效。"
                 },
                 "selection_translate_desc": "翻译当前选中的文本。",
                 "input_translate_desc": "打开翻译窗口，直接输入要翻译的内容。",
@@ -314,7 +314,7 @@
                 },
                 "type_desc": "WebDAV、阿里云盘，或本机的一个文件夹。",
                 "webdav_url_desc": "完整的集合 URL，包含备份到的路径。",
-                "webdav_username_desc": "WebDAV 服务的账号，不是 pot 的账号。",
+                "webdav_username_desc": "WebDAV 服务的账号，不是 Gloss 的账号。",
                 "webdav_password_desc": "以明文形式存放在本地配置文件中。",
                 "aliyun_account_desc": "已登录。点击头像可退出并重新扫码。"
             },

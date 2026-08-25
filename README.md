@@ -1,10 +1,10 @@
 <img width="200px" src="public/icon.svg" align="left"/>
 
-# Pot (派了个萌的翻译器)
+# Gloss
 
 > 🌈 一个跨平台的划词翻译软件 ([QQ 频道](https://pd.qq.com/s/akns94e1r))
 
-![License](https://img.shields.io/github/license/pot-app/pot-desktop.svg)
+![License](https://img.shields.io/github/license/JasonWues/gloss.svg)
 ![Tauri](https://img.shields.io/badge/Tauri-2-blue?logo=tauri)
 ![JavaScript](https://img.shields.io/badge/-JavaScript-yellow?logo=javascript&logoColor=white)
 ![Rust](https://img.shields.io/badge/-Rust-orange?logo=rust&logoColor=white)
@@ -157,7 +157,7 @@
 
 你可以在 [Plugin List](https://pot-app.com/plugin.html) 查找你需要的插件，然后前往插件仓库下载插件。
 
-pot 插件的扩展名为 `.potext`, 下载得到`.potext`文件之后， 在 偏好设置-服务设置-添加外部插件-安装外部插件 选择对应的 `.potext` 即可安装成功，添加到服务列表中即可像内置服务一样正常使用了。
+Gloss 插件的扩展名为 `.potext`, 下载得到`.potext`文件之后， 在 偏好设置-服务设置-添加外部插件-安装外部插件 选择对应的 `.potext` 即可安装成功，添加到服务列表中即可像内置服务一样正常使用了。
 
 ### 故障排除
 
@@ -178,6 +178,10 @@ pot 插件的扩展名为 `.potext`, 下载得到`.potext`文件之后， 在 �
 # 安装指南
 
 </div>
+
+> [!NOTE]
+> 下面这些渠道（Winget、Homebrew、AUR、Flathub 以及 Release 下载链接）分发的是上游的 **pot**，不是 Gloss。
+> Gloss 目前请从源码编译，见 [手动编译](#手动编译)。
 
 ## Windows
 
@@ -297,7 +301,7 @@ sudo pacman -S pot-translation
 
 </div>
 
-Pot 提供了完整的 HTTP 接口，以便可以被其他软件调用。您可以通过向 `127.0.0.1:port` 发送 HTTP 请求来调用 pot，其中的`port`是 pot 监听的端口号，默认为`60828`,可以在软件设置中进行更改。
+Gloss 提供了完整的 HTTP 接口，以便可以被其他软件调用。您可以通过向 `127.0.0.1:port` 发送 HTTP 请求来调用 Gloss，其中的`port`是 Gloss 监听的端口号，默认为`60828`,可以在软件设置中进行更改。
 
 ## API 文档:
 
@@ -319,7 +323,7 @@ GET "/ocr_translate?screenshot=true" => 截图翻译,
 
 -   调用划词翻译：
 
-    如果想要调用 pot 划词翻译，只需向`127.0.0.1:port`发送请求即可。
+    如果想要调用 Gloss 划词翻译，只需向`127.0.0.1:port`发送请求即可。
 
     例如通过 curl 发送请求：
 
@@ -329,7 +333,7 @@ GET "/ocr_translate?screenshot=true" => 截图翻译,
 
 ## 不使用软件内截图
 
-这一功能可以让您在不使用软件内截图的情况下调用截图 OCR/截图翻译功能，这样您就可以使用您喜欢的截图工具来截图了，也可以解决在某些平台下 pot 自带的截图无法使用的问题。
+这一功能可以让您在不使用软件内截图的情况下调用截图 OCR/截图翻译功能，这样您就可以使用您喜欢的截图工具来截图了，也可以解决在某些平台下 Gloss 自带的截图无法使用的问题。
 
 ### 调用流程
 
@@ -348,6 +352,9 @@ rm ~/.cache/com.pot-app.desktop/pot_screenshot_cut.png && flameshot gui -s -p ~/
 ```
 
 ## 现有用法 (快捷划词翻译)
+
+> [!NOTE]
+> 下面两个扩展同样来自上游 pot 的 Release（`pot.pbar` / `pot.popclipextz`）。本仓库构建出的对应文件是 `gloss.pbar` 和 `Gloss.popclipextz`。
 
 ### SnipDo (Windows)
 
@@ -375,15 +382,15 @@ Github: [ccslykx/Starry](https://github.com/ccslykx/Starry)
 
 </div>
 
-由于各大发行版对于 Wayland 的支持程度不同，所以 pot 本身没法做到特别完美的支持，这里可以提供一些常见问题的解决方案，通过合理的设置之后，pot 也可以在 Wayland 下完美运行。
+由于各大发行版对于 Wayland 的支持程度不同，所以 Gloss 本身没法做到特别完美的支持，这里可以提供一些常见问题的解决方案，通过合理的设置之后，Gloss 也可以在 Wayland 下完美运行。
 
 ## 快捷键无法使用
 
-由于 Tauri 的快捷键方案并没有支持 Wayland，所以 pot 应用内的快捷键设置在 Wayland 下无法使用。 您可以设置系统快捷用 curl 发送请求来触发 pot，详见[外部调用](#外部调用)
+由于 Tauri 的快捷键方案并没有支持 Wayland，所以 Gloss 应用内的快捷键设置在 Wayland 下无法使用。 您可以设置系统快捷用 curl 发送请求来触发 Gloss，详见[外部调用](#外部调用)
 
 ## 截图无法使用
 
-在一些纯 Wayland 桌面环境/窗口管理器(如 Hyprland)上，pot 内置的截图无法使用，这时可以通过使用其他截图工具代替，详见 [不使用软件内截图](#不使用软件内截图)
+在一些纯 Wayland 桌面环境/窗口管理器(如 Hyprland)上，Gloss 内置的截图无法使用，这时可以通过使用其他截图工具代替，详见 [不使用软件内截图](#不使用软件内截图)
 
 下面给出在 Hyprland 下的配置示例(通过 grim 和 slurp 实现截图)：
 
@@ -396,11 +403,11 @@ bind = ALT, C, exec, grim -g "$(slurp)" ~/.cache/com.pot-app.desktop/pot_screens
 
 ## 划词翻译窗口跟随鼠标位置
 
-由于目前 pot 在 Wayland 下还无法获取到正确的鼠标坐标，所以内部的实现无法工作。 对于某些桌面环境/窗口管理器，可以通过设置窗口规则来实现窗口跟随鼠标位置，这里以 Hyprland 为例：
+由于目前 Gloss 在 Wayland 下还无法获取到正确的鼠标坐标，所以内部的实现无法工作。 对于某些桌面环境/窗口管理器，可以通过设置窗口规则来实现窗口跟随鼠标位置，这里以 Hyprland 为例：
 
 ```conf
-windowrulev2 = float, class:(pot), title:(Translator|OCR|PopClip|Screenshot Translate) # Translation window floating
-windowrulev2 = move cursor 0 0, class:(pot), title:(Translator|PopClip|Screenshot Translate) # Translation window follows the mouse position.
+windowrulev2 = float, class:(Gloss), title:(Translator|OCR|PopClip|Screenshot Translate) # Translation window floating
+windowrulev2 = move cursor 0 0, class:(Gloss), title:(Translator|PopClip|Screenshot Translate) # Translation window follows the mouse position.
 ```
 
 <div align="center">
@@ -436,13 +443,13 @@ Rust >= 1.80.0
 1. Clone 仓库
 
     ```bash
-    git clone https://github.com/pot-app/pot-desktop.git
+    git clone https://github.com/JasonWues/gloss.git
     ```
 
 2. 安装依赖
 
     ```bash
-    cd pot-desktop
+    cd gloss
     pnpm install
     ```
 

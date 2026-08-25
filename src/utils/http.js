@@ -76,7 +76,7 @@ function toBlobPart(file) {
         return new Uint8Array(file);
     }
     // Tauri 1 also accepted a path string here, which the Rust side read from disk.
-    // Nothing in pot uses that, so the string is sent as-is.
+    // Nothing in Gloss uses that, so the string is sent as-is.
     return file;
 }
 

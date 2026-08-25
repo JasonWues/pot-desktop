@@ -12,7 +12,7 @@ use tauri::tray::TrayIconEvent;
 use tauri::{AppHandle, Emitter, Manager, Wry};
 use tauri_plugin_global_shortcut::GlobalShortcutExt;
 
-pub const TRAY_ID: &str = "pot";
+pub const TRAY_ID: &str = "gloss";
 
 // Labels of the tray menu for a single language
 struct TrayLabels {
@@ -352,7 +352,7 @@ pub fn update_tray(app_handle: tauri::AppHandle, mut language: String, mut copy_
 
     #[cfg(not(target_os = "linux"))]
     tray.set_tooltip(Some(&format!(
-        "pot {}",
+        "Gloss {}",
         app_handle.package_info().version
     )))
     .unwrap();

@@ -60,7 +60,7 @@ export default function Config() {
                         className='config-brand__mark'
                         draggable={false}
                     />
-                    <span className='config-brand__name'>pot</span>
+                    <span className='config-brand__name'>gloss</span>
                 </div>
                 <SideBar />
             </Card>

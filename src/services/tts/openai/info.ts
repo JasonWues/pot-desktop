@@ -4,7 +4,7 @@ export const info = {
 };
 
 // The speech endpoint infers the language from the input text, so there is no
-// language parameter to map to. Every language pot knows is listed to keep
+// language parameter to map to. Every language Gloss knows is listed to keep
 // `lang in Language` — the support check every caller runs — true.
 export enum Language {
     zh_cn = 'zh_cn',

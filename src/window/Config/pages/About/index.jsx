@@ -11,7 +11,7 @@ import { Button } from '@heroui/react';
 
 import { appVersion } from '../../../../utils/env';
 
-const REPO = 'JasonWues/pot-desktop';
+const REPO = 'JasonWues/gloss';
 
 // The marker on a row that leaves the app. Inline rather than an icon import:
 // it is the only glyph on the page, and react-icons has no 1:1 match for the
@@ -72,7 +72,7 @@ export default function About() {
                 />
                 <div className='about-id__main'>
                     <div className='about-kicker'>{t('config.about.section.application')}</div>
-                    <div className='about-id__name'>Pot</div>
+                    <div className='about-id__name'>Gloss</div>
                     <div className='about-id__version'>{appVersion}</div>
                 </div>
                 {/*

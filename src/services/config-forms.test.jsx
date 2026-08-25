@@ -9,7 +9,7 @@ import React from 'react';
 // catch until a user opened that one dialog. There are 43 of them; this renders
 // all 43.
 
-// The config store, in memory. Mocked at pot's own boundary rather than through
+// The config store, in memory. Mocked at Gloss's own boundary rather than through
 // `mockIPC` on `plugin:store|*`: what is under test is `useConfig` and the
 // forms, not the plugin's wire protocol, and the protocol is the part most
 // likely to change out from under a test.

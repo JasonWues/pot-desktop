@@ -4,7 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-Pot is a cross-platform translation + OCR desktop app: a React 19 frontend (Vite, HeroUI v3, Tailwind 4) inside a Tauri 2 shell. Package manager is **pnpm** (Node 22, see `.node-version` — pnpm 11 refuses to run below 22.13). pnpm >= 10 needs every dependency build script decided explicitly, so a new dep with a postinstall goes in the `allowBuilds` map in `pnpm-workspace.yaml` or it is silently skipped.
+Gloss is a cross-platform translation + OCR desktop app: a React 19 frontend (Vite, HeroUI v3, Tailwind 4) inside a Tauri 2 shell. Package manager is **pnpm** (Node 22, see `.node-version` — pnpm 11 refuses to run below 22.13). pnpm >= 10 needs every dependency build script decided explicitly, so a new dep with a postinstall goes in the `allowBuilds` map in `pnpm-workspace.yaml` or it is silently skipped.
+
+It is a fork of [pot](https://github.com/pot-app/pot-desktop), renamed to **Gloss** — the word for the interlinear translation written beside a difficult line, which is what the in-place image overlay does. The rename is deliberately skin-deep in one place: the bundle identifier is still `com.pot-app.desktop`, because Tauri derives `appConfigDir()` from it and that directory holds the user's `config.json`, `history.db` and installed `.potext` plugins. Changing it would strand every existing install's data, and `backup.rs` hardcodes the same string in five places. Rename it only together with a migration that moves the old directory across.
+
+Three other things still say "pot" on purpose: `https://pot-app.com/**` (upstream's docs, dictionary API, plugin store, and `lingva.pot-app.com` — real endpoints, not branding), the Anki deck `Pot` / note type `Pot Card 2` and the Eudic notebook default `pot` (renaming those would split a user's existing collection), and `pt_br = 'pot'` in three `info.ts` files, which is Baidu's language code for Portuguese.
 
 ## Commands
 
@@ -69,7 +73,7 @@ The cache key is a hash of the text, languages, service instance **and its confi
 
 `src/services/<type>/<name>/` is the unit of extension, each with three files:
 
-- `info.ts` — `info = { name, icon }` plus a `Language` enum mapping pot's language codes to the provider's.
+- `info.ts` — `info = { name, icon }` plus a `Language` enum mapping Gloss's language codes to the provider's.
 - `index.jsx` — the actual call, e.g. `translate(text, from, to, { config })`; throws a string on failure.
 - `Config.jsx` — the settings form, assembled from the shared parts below rather than hand-written.
 
@@ -90,7 +94,7 @@ cp node_modules/tesseract.js/dist/worker.min.js public/worker.min.js
 cp node_modules/.pnpm/tesseract.js-core@<v>/node_modules/tesseract.js-core/tesseract-core-simd-lstm.wasm.js public/
 ```
 
-Only the one SIMD+LSTM core is vendored (~3.9 MB, wasm embedded in the `.js`); pointing `corePath` at a directory instead would make tesseract.js pick a variant per device and require shipping all six (~25 MB), and since v7 that set includes relaxed-SIMD builds that older WebViews cannot run. `langPath` is pot's own R2 mirror of the traineddata, unrelated to the npm version.
+Only the one SIMD+LSTM core is vendored (~3.9 MB, wasm embedded in the `.js`); pointing `corePath` at a directory instead would make tesseract.js pick a variant per device and require shipping all six (~25 MB), and since v7 that set includes relaxed-SIMD builds that older WebViews cannot run. `langPath` is the upstream pot project's R2 mirror of the traineddata, unrelated to the npm version.
 
 ### The Tauri 1 compatibility layer (important)
 
@@ -101,7 +105,7 @@ This branch migrated from Tauri 1.8 to Tauri 2 (`d44c7bb`). Two shims deliberate
 
 Other v2 consequences worth knowing: core APIs are now 15 separate plugins (see `Cargo.toml` / `package.json`); every frontend capability must be allow-listed in `src-tauri/capabilities/default.json` (a missing permission fails at runtime, e.g. `data-tauri-drag-region` needs `core:window:allow-start-dragging`); the store returns `undefined` (not `null`) for missing keys.
 
-The `allow` entries in that capability file are **URLPatterns**, and one omitted segment does not behave like the others: leaving the _port_ out matches the protocol's default port only. `{ "url": "http://*" }` therefore reached example.com but rejected `127.0.0.1:60828` with `url not allowed on the configured scope` — which broke the Recognize window's translate button (it POSTs to pot's own local server), the Anki collection service on 8765, and every self-hosted endpoint a user had configured. The _path_ segment does default to a wildcard, which is why the other 36 services never noticed. `http:default` allows `http://*:*` and `https://*:*` for that reason.
+The `allow` entries in that capability file are **URLPatterns**, and one omitted segment does not behave like the others: leaving the _port_ out matches the protocol's default port only. `{ "url": "http://*" }` therefore reached example.com but rejected `127.0.0.1:60828` with `url not allowed on the configured scope` — which broke the Recognize window's translate button (it POSTs to Gloss's own local server), the Anki collection service on 8765, and every self-hosted endpoint a user had configured. The _path_ segment does default to a wildcard, which is why the other 36 services never noticed. `http:default` allows `http://*:*` and `https://*:*` for that reason.
 
 ### Custom CSS must be wrapped in a layer
 
@@ -154,7 +158,7 @@ Chrome there is sized in `px` and content in `rem` deliberately: `App.jsx` write
 
 The Recognize window can paint a translation back over the captured image (`src/window/Recognize/ImageArea/InPlaceOverlay.jsx`). It is the one feature that goes around the normal translate path: it calls `system_ocr_layout` for per-line boxes, groups lines that are plainly one paragraph (adjacent, similar height, horizontally overlapping) so wrapped sentences translate as prose, then translates through `translate_dispatch.js` and reads/writes the same `db.js` cache itself.
 
-It runs on **Windows and Linux**. `ocr_layout.rs` has a backend per platform: `Windows.Media.Ocr` reports a `BoundingRect` per word, and on Linux the same `tesseract` binary `system_ocr` already shells out to is asked for `stdout tsv` instead, which is the identical recognition with the geometry left in. Both fold words into lines by unioning the boxes, because a line's own rectangle is the type area rather than the ink. macOS is the gap, and not for want of data — Vision reports a `boundingBox` too — but pot reaches it through the prebuilt `resources/ocr-*-apple-darwin` binary, whose contract is a finished string and whose source is not in this repository.
+It runs on **Windows and Linux**. `ocr_layout.rs` has a backend per platform: `Windows.Media.Ocr` reports a `BoundingRect` per word, and on Linux the same `tesseract` binary `system_ocr` already shells out to is asked for `stdout tsv` instead, which is the identical recognition with the geometry left in. Both fold words into lines by unioning the boxes, because a line's own rectangle is the type area rather than the ink. macOS is the gap, and not for want of data — Vision reports a `boundingBox` too — but Gloss reaches it through the prebuilt `resources/ocr-*-apple-darwin` binary, whose contract is a finished string and whose source is not in this repository.
 
 It asks `resolveService` for `stream: false`, because it translates every block at once and paints each only when finished, so it hands `callService` no `setResult` — and ollama, openai and geminipro all answer "stream with nobody to stream to" by aborting and returning the literal string `'[STREAM]'`, which used to get painted over the image _and cached under that block's key_.
 

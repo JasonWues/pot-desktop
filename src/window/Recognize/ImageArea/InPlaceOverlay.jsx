@@ -9,7 +9,7 @@ import { osType } from '../../../utils/env';
 
 // The two backends spell a language differently -- Windows OCR wants a BCP-47
 // tag, tesseract a three-letter code -- and the window's language atom holds
-// pot's own. Reusing the system recognize service's tables keeps the two paths
+// Gloss's own. Reusing the system recognize service's tables keeps the two paths
 // from drifting apart, and keeps the code in step with the
 // `tesseract-ocr-<lang>` package the Rust side names when the data is missing.
 function toOcrLanguage(language) {

@@ -1,0 +1,12 @@
+{
+    "name": "Gloss Translation",
+    "identifier": "com.gloss.snipdoext.desktop",
+    "icon": "gloss.png",
+    "actions": [
+        {
+            "title": "Gloss Translation",
+            "icon": "gloss.png",
+            "powershellFile": "gloss.ps1"
+        }
+    ]
+}

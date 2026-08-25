@@ -1,7 +1,7 @@
 use std::sync::OnceLock;
 use whatlang::{Detector, Lang};
 
-// Only the languages pot can actually return. Without an allowlist whatlang
+// Only the languages Gloss can actually return. Without an allowlist whatlang
 // weighs all 69 of its languages, and short strings drift into neighbours the
 // app has no code for -- English routinely comes back as Slovak or Catalan.
 const SUPPORTED: [Lang; 19] = [
@@ -40,7 +40,7 @@ pub fn init_lang_detect() {
 
 /// Mongolian is written in Cyrillic and whatlang has no model for it, so on the
 /// letters alone it lands on Russian or Ukrainian. Ө and Ү (with their lowercase
-/// forms) are the giveaway: among the Cyrillic languages pot supports -- Russian,
+/// forms) are the giveaway: among the Cyrillic languages Gloss supports -- Russian,
 /// Ukrainian and Mongolian -- only Mongolian uses them.
 fn is_mongolian(text: &str) -> bool {
     text.chars()

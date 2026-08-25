@@ -7,7 +7,7 @@
 //
 // Windows and Linux: `Windows.Media.Ocr` reports a `BoundingRect` per word, and
 // tesseract's `tsv` output has the same information in columns. macOS is the gap
-// -- Vision does report a `boundingBox`, but pot reaches it through the
+// -- Vision does report a `boundingBox`, but Gloss reaches it through the
 // prebuilt `resources/ocr-*-apple-darwin` binary, whose contract is a finished
 // string and whose source is not in this repository.
 use serde::Serialize;
@@ -302,7 +302,7 @@ fn parse_tesseract_tsv(tsv: &str) -> Vec<OcrLine> {
 #[tauri::command(async)]
 #[cfg(not(any(target_os = "windows", target_os = "linux")))]
 pub fn system_ocr_layout(_app_handle: tauri::AppHandle, _lang: &str) -> Result<OcrLayout, String> {
-    Err("In-place image translation needs per-line OCR geometry, which pot can only get from the Windows OCR engine and from tesseract on Linux so far".to_string())
+    Err("In-place image translation needs per-line OCR geometry, which Gloss can only get from the Windows OCR engine and from tesseract on Linux so far".to_string())
 }
 
 #[cfg(test)]

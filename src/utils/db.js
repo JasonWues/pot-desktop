@@ -27,7 +27,7 @@ const SCHEMA = [
     )`,
     `CREATE INDEX IF NOT EXISTS idx_cache_timestamp ON cache(timestamp)`,
     // Terms the user wants rendered a particular way. `from_lang`/`to_lang` hold
-    // pot's own language codes or the string 'all', which is why they are not
+    // Gloss's own language codes or the string 'all', which is why they are not
     // called `from`/`to`: `from` is a reserved word in sqlite and would have to
     // be quoted at every call site.
     `CREATE TABLE IF NOT EXISTS glossary(

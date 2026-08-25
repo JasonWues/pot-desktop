@@ -93,7 +93,7 @@
   v3's switch is deliberately flatter than v2's: a 20px track (v2: 24px) with a
   22x16 rounded rectangle for a thumb, where v2 had a 20px circle. v3 holds that
   1.375:1 thumb at every size. It is not a bug, it is the new design -- but
-  everything else on this branch is a port of pot's existing look, so the
+  everything else on this branch is a port of the app's existing look, so the
   proportions go back: a circle inset 2px in the track, at all three sizes.
 
   The checked offset has to move with the thumb, since v3 slides it by margin

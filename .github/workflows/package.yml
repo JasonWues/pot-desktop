@@ -92,14 +92,14 @@ jobs:
             - name: Upload Artifacts
               uses: actions/upload-artifact@v4
               with:
-                  name: Pot.popclipextz
-                  path: .scripts/popclip/Pot.popclipextz
+                  name: Gloss.popclipextz
+                  path: .scripts/popclip/Gloss.popclipextz
                   if-no-files-found: error
             - name: Upload Artifacts
               uses: actions/upload-artifact@v4
               with:
-                  name: pot.pbar
-                  path: .scripts/snipdo/pot.pbar
+                  name: gloss.pbar
+                  path: .scripts/snipdo/gloss.pbar
                   if-no-files-found: error
             - name: Upload Release
               if: startsWith(github.ref, 'refs/tags')
@@ -107,14 +107,14 @@ jobs:
               with:
                   body_path: CHANGELOG
                   token: ${{ secrets.GITHUB_TOKEN }}
-                  files: .scripts/popclip/Pot.popclipextz
+                  files: .scripts/popclip/Gloss.popclipextz
             - name: Upload Release
               if: startsWith(github.ref, 'refs/tags')
               uses: softprops/action-gh-release@v1
               with:
                   body_path: CHANGELOG
                   token: ${{ secrets.GITHUB_TOKEN }}
-                  files: .scripts/snipdo/pot.pbar
+                  files: .scripts/snipdo/gloss.pbar
 
     build-for-macos:
         needs: change-version

@@ -213,7 +213,7 @@ export default function History() {
     const exportData = async (format) => {
         try {
             const selected = await save({
-                defaultPath: `pot-history.${format}`,
+                defaultPath: `gloss-history.${format}`,
                 filters: [{ name: format.toUpperCase(), extensions: [format] }],
             });
             if (selected === null) {

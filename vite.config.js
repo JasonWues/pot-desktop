@@ -19,7 +19,7 @@ export default defineConfig(async () => ({
         watch: {
             // cargo writes and locks files under src-tauri/target while it builds.
             // Watching them makes chokidar's fs.watch throw EBUSY on the linked
-            // pot.exe, and that error event terminates the whole dev server.
+            // gloss.exe, and that error event terminates the whole dev server.
             ignored: ['**/src-tauri/**'],
         },
     },

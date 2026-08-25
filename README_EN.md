@@ -1,10 +1,10 @@
 <img width="200px" src="public/icon.svg" align="left"/>
 
-# Pot (A cute translator)
+# Gloss
 
 > A cross-platform translator application ([Telegram Group](https://t.me/pot_app))
 
-![License](https://img.shields.io/github/license/pot-app/pot-desktop.svg)
+![License](https://img.shields.io/github/license/JasonWues/gloss.svg)
 ![Tauri](https://img.shields.io/badge/Tauri-2-blue?logo=tauri)
 ![JavaScript](https://img.shields.io/badge/-JavaScript-yellow?logo=javascript&logoColor=white)
 ![Rust](https://img.shields.io/badge/-Rust-orange?logo=rust&logoColor=white)
@@ -157,7 +157,7 @@ The built-in services are limited. But you can expand the app's functionality th
 
 You can find plugins you need in the [Plugin List](https://pot-app.com/plugin.html), and then go to the plugin repo to download it.
 
-The file extension of pot plugin is `.potext`. After downloading the `.potext` file, go to Preferences - Service Settings - Add External Plugin - Install External Plugin to select the corresponding `.potext` to install it. It will then be added to the service list and can be used like a built-in service.
+The file extension of Gloss plugin is `.potext`. After downloading the `.potext` file, go to Preferences - Service Settings - Add External Plugin - Install External Plugin to select the corresponding `.potext` to install it. It will then be added to the service list and can be used like a built-in service.
 
 ### Troubleshooting
 
@@ -178,6 +178,10 @@ The [Template](https://pot-app.com/en/plugin.html#template) section in the [Plug
 # Installation
 
 </div>
+
+> [!NOTE]
+> The channels below (Winget, Homebrew, AUR, Flathub and the Release download links) distribute upstream **pot**, not Gloss.
+> To get Gloss, build it from source — see [Manual compilation](#manual-compilation).
 
 ## Windows
 
@@ -293,7 +297,7 @@ sudo pacman -S pot-translation
 
 </div>
 
-Pot provides a complete HTTP interface for integration with other software. You can call pot by sending HTTP requests to `127.0.0.1:port`, where `port` is the listening port of pot, default to `60828`, and can be changed in the app settings.
+Gloss provides a complete HTTP interface for integration with other software. You can call Gloss by sending HTTP requests to `127.0.0.1:port`, where `port` is the listening port of Gloss, default to `60828`, and can be changed in the app settings.
 
 ## API Docs:
 
@@ -315,7 +319,7 @@ GET "/ocr_translate?screenshot=true" => Translate screenshot
 
 -   Call translation by selection:
 
-    To call pot's translation by selection, simply send a request to `127.0.0.1:port`:
+    To call Gloss's translation by selection, simply send a request to `127.0.0.1:port`:
 
     E.g. using curl:
 
@@ -325,7 +329,7 @@ GET "/ocr_translate?screenshot=true" => Translate screenshot
 
 ## OCR without internal screenshot
 
-This allows you to perform OCR/translation without using pot's internal screenshot, so you can use your own screenshot tools. It also solves the problem where pot's internal screenshot doesn't work on some platforms.
+This allows you to perform OCR/translation without using Gloss's internal screenshot, so you can use your own screenshot tools. It also solves the problem where Gloss's internal screenshot doesn't work on some platforms.
 
 ### Workflow:
 
@@ -344,6 +348,9 @@ rm ~/.cache/com.pot-app.desktop/pot_screenshot_cut.png && flameshot gui -s -p ~/
 ```
 
 ## Existing Usages (Quick selection translation)
+
+> [!NOTE]
+> The two extensions below also come from upstream pot's Release (`pot.pbar` / `pot.popclipextz`). The equivalents built from this repo are `gloss.pbar` and `Gloss.popclipextz`.
 
 ### SnipDo (Windows)
 
@@ -371,16 +378,16 @@ Github: [ccslykx/Starry](https://github.com/ccslykx/Starry)
 
 </div>
 
-Due to the varying levels of support for Wayland among different distributions, pot itself cannot achieve perfect compatibility. However, here are some solutions to common issues that can be implemented through proper configuration, allowing pot to run flawlessly on Wayland.
+Due to the varying levels of support for Wayland among different distributions, Gloss itself cannot achieve perfect compatibility. However, here are some solutions to common issues that can be implemented through proper configuration, allowing Gloss to run flawlessly on Wayland.
 
 ## Shortcut key cannot be used
 
-Due to Tauri's lack of support for Wayland, the shortcut key scheme in the pot application cannot be used under Wayland.
-You can set the system shortcut and send a request with `curl` to call pot, see [External Calls](#external-calls) for details
+Due to Tauri's lack of support for Wayland, the shortcut key scheme in the Gloss application cannot be used under Wayland.
+You can set the system shortcut and send a request with `curl` to call Gloss, see [External Calls](#external-calls) for details
 
 ## Screenshot doesn't work
 
-In some pure Wayland desktop environments/window managers (such as Hyprland), the built-in screenshot feature of pot cannot be used. In this case, you can use other screenshot tools instead. For more details, please refer to the section [Not Using Built-in Screenshot](#not-using-built-in-screenshot).
+In some pure Wayland desktop environments/window managers (such as Hyprland), the built-in screenshot feature of Gloss cannot be used. In this case, you can use other screenshot tools instead. For more details, please refer to the section [Not Using Built-in Screenshot](#not-using-built-in-screenshot).
 
 Below is a configuration example for Hyprland using `grim` and `slurp` to achieve screenshot functionality:
 
@@ -393,12 +400,12 @@ Other desktop environments/window managers also have similar operations.
 
 ## The translation window follows the mouse position.
 
-Due to the current inability of pot to obtain accurate mouse coordinates under Wayland, its internal implementation cannot function properly.
+Due to the current inability of Gloss to obtain accurate mouse coordinates under Wayland, its internal implementation cannot function properly.
 For certain desktop environments/window managers, it is possible to achieve window following mouse position by setting window rules. Here we take Hyprland as an example:
 
 ```conf
-windowrulev2 = float, class:(pot), title:(Translator|OCR|PopClip|Screenshot Translate) # Translation window floating
-windowrulev2 = move cursor 0 0, class:(pot), title:(Translator|PopClip|Screenshot Translate) # Translation window follows the mouse position.
+windowrulev2 = float, class:(Gloss), title:(Translator|OCR|PopClip|Screenshot Translate) # Translation window floating
+windowrulev2 = move cursor 0 0, class:(Gloss), title:(Translator|PopClip|Screenshot Translate) # Translation window follows the mouse position.
 ```
 
 <div align="center">
@@ -434,13 +441,13 @@ Rust >= 1.80.0
 1. Clone the repository
 
     ```bash
-    git clone https://github.com/pot-app/pot-desktop.git
+    git clone https://github.com/JasonWues/gloss.git
     ```
 
 2. Install dependencies
 
     ```bash
-    cd pot-desktop
+    cd gloss
     pnpm install
     ```
 

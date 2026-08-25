@@ -1,7 +1,7 @@
 // The plugin's fetch, not the webview's -- this call used to resolve to
 // `window.fetch` because the import was simply missing.
 //
-// What that broke is the proxy. pot's proxy setting is applied by writing
+// What that broke is the proxy. Gloss's proxy setting is applied by writing
 // HTTP_PROXY/HTTPS_PROXY/NO_PROXY into the process environment (`proxy.rs`),
 // where reqwest picks them up, so only requests issued from Rust obey it. A
 // webview fetch goes out through WebView2's own proxy instead and ignores

@@ -101,13 +101,13 @@
                 },
                 "section": {
                     "startup": "Startup",
-                    "startup_note": "What happens when the machine boots, and how other apps reach pot.",
+                    "startup_note": "What happens when the machine boots, and how other apps reach Gloss.",
                     "appearance": "Appearance",
                     "appearance_note": "Everything that changes how the five windows look.",
                     "network": "Network",
                     "network_note": "Applies to translation, OCR and TTS alike."
                 },
-                "auto_start_desc": "Launch pot when you sign in.",
+                "auto_start_desc": "Launch Gloss when you sign in.",
                 "check_update_desc": "Look for a new release on launch.",
                 "server_port_desc": "The local port the PopClip and SnipDo extensions call.",
                 "app_language_desc": "Language of the interface, not of translation.",
@@ -230,7 +230,7 @@
                 "set_hotkey": "Press to Set Hotkey",
                 "section": {
                     "global": "Global",
-                    "global_note": "System-wide shortcuts, live even when pot has no window focused."
+                    "global_note": "System-wide shortcuts, live even when Gloss has no window focused."
                 },
                 "selection_translate_desc": "Translate whatever text is selected right now.",
                 "input_translate_desc": "Open the translate window with an empty box to type into.",
@@ -314,7 +314,7 @@
                 },
                 "type_desc": "WebDAV, Aliyun Drive or a folder on this machine.",
                 "webdav_url_desc": "Full collection URL, including the path to back up into.",
-                "webdav_username_desc": "The WebDAV account, not your pot account.",
+                "webdav_username_desc": "The WebDAV account, not your Gloss account.",
                 "webdav_password_desc": "Stored in the local config file as written.",
                 "aliyun_account_desc": "Signed in. Click the avatar to sign out and scan again."
             },

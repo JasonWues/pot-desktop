@@ -1,8 +1,8 @@
 {
     "app": {
         "trayIcon": {
-            "id": "pot",
-            "iconPath": "icons/icon.ico",
+            "id": "gloss",
+            "iconPath": "icons/tray.ico",
             "iconAsTemplate": true
         }
     }

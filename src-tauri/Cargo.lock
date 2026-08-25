@@ -2540,6 +2540,57 @@ dependencies = [
 ]
 
 [[package]]
+name = "gloss"
+version = "0.0.0"
+dependencies = [
+ "base64 0.23.1",
+ "chrono",
+ "dirs 6.0.0",
+ "font-kit",
+ "futures-util",
+ "image",
+ "log",
+ "macos-accessibility-client",
+ "percent-encoding",
+ "reqwest 0.12.28",
+ "reqwest_dav",
+ "selection",
+ "serde",
+ "serde_json",
+ "sha2",
+ "tauri",
+ "tauri-build",
+ "tauri-plugin-autostart",
+ "tauri-plugin-clipboard-manager",
+ "tauri-plugin-dialog",
+ "tauri-plugin-fs",
+ "tauri-plugin-global-shortcut",
+ "tauri-plugin-http",
+ "tauri-plugin-log",
+ "tauri-plugin-mcp-bridge",
+ "tauri-plugin-notification",
+ "tauri-plugin-opener",
+ "tauri-plugin-os",
+ "tauri-plugin-process",
+ "tauri-plugin-shell",
+ "tauri-plugin-single-instance",
+ "tauri-plugin-sql",
+ "tauri-plugin-store",
+ "tauri-plugin-updater",
+ "thiserror 2.0.20",
+ "tiny_http",
+ "tokio",
+ "tokio-tungstenite",
+ "uuid",
+ "walkdir",
+ "whatlang",
+ "windows 0.62.2",
+ "windows-registry",
+ "xcap",
+ "zip 2.4.2",
+]
+
+[[package]]
 name = "gobject-sys"
 version = "0.18.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5077,57 +5128,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c2a106d1259c23fac8e543272398ae0e3c0b8d33c88ed73d0cc71b0f1d902618"
 dependencies = [
  "portable-atomic",
-]
-
-[[package]]
-name = "pot"
-version = "0.0.0"
-dependencies = [
- "base64 0.23.1",
- "chrono",
- "dirs 6.0.0",
- "font-kit",
- "futures-util",
- "image",
- "log",
- "macos-accessibility-client",
- "percent-encoding",
- "reqwest 0.12.28",
- "reqwest_dav",
- "selection",
- "serde",
- "serde_json",
- "sha2",
- "tauri",
- "tauri-build",
- "tauri-plugin-autostart",
- "tauri-plugin-clipboard-manager",
- "tauri-plugin-dialog",
- "tauri-plugin-fs",
- "tauri-plugin-global-shortcut",
- "tauri-plugin-http",
- "tauri-plugin-log",
- "tauri-plugin-mcp-bridge",
- "tauri-plugin-notification",
- "tauri-plugin-opener",
- "tauri-plugin-os",
- "tauri-plugin-process",
- "tauri-plugin-shell",
- "tauri-plugin-single-instance",
- "tauri-plugin-sql",
- "tauri-plugin-store",
- "tauri-plugin-updater",
- "thiserror 2.0.20",
- "tiny_http",
- "tokio",
- "tokio-tungstenite",
- "uuid",
- "walkdir",
- "whatlang",
- "windows 0.62.2",
- "windows-registry",
- "xcap",
- "zip 2.4.2",
 ]
 
 [[package]]

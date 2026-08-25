@@ -44,7 +44,7 @@ export function glossaryInstruction(entries) {
 }
 
 /// Appended to the first message rather than to the one carrying `$text`: the
-/// first is the priming turn under every schema pot ships -- a system message
+/// first is the priming turn under every schema Gloss ships -- a system message
 /// for OpenAI and Ollama, an opening user turn for ChatGLM and Gemini -- and an
 /// instruction sitting next to the text to translate reads like part of it.
 export function applyGlossaryToConfig(instanceConfig, serviceName, entries) {

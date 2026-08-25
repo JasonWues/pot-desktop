@@ -1,7 +1,7 @@
-rm Pot.popclipextz
-mkdir Pot.popclipext
-cp Config.plist Pot.popclipext
-cp Pot.png Pot.popclipext
-cp Pot.sh Pot.popclipext
-zip -r Pot.popclipextz Pot.popclipext
-rm -r Pot.popclipext
+rm Gloss.popclipextz
+mkdir Gloss.popclipext
+cp Config.plist Gloss.popclipext
+cp Gloss.png Gloss.popclipext
+cp Gloss.sh Gloss.popclipext
+zip -r Gloss.popclipextz Gloss.popclipext
+rm -r Gloss.popclipext

@@ -1,7 +1,7 @@
 {
     "app": {
         "trayIcon": {
-            "id": "pot",
+            "id": "gloss",
             "iconPath": "icons/icon.ico",
             "iconAsTemplate": true,
             "showMenuOnLeftClick": false
@@ -32,7 +32,7 @@
     "plugins": {
         "updater": {
             "endpoints": [
-                "https://github.com/JasonWues/pot-desktop/releases/download/updater/update-fix-runtime.json"
+                "https://github.com/JasonWues/gloss/releases/download/updater/update-fix-runtime.json"
             ]
         }
     }

@@ -59,7 +59,7 @@ export function resolveService(instanceKey, { pluginList, savedConfig, preset = 
     }
 
     // Plugins declare their languages in info.json, built-in services in a
-    // Language enum; both are keyed by pot's own language codes.
+    // Language enum; both are keyed by Gloss's own language codes.
     const languageMap = isPlugin
         ? pluginList['translate'][serviceName].language
         : builtinServices[serviceName].Language;

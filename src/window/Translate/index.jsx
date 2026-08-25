@@ -170,7 +170,7 @@ export default function Translate() {
                             className='translate-brand'
                             data-tauri-drag-region='true'
                         >
-                            Pot · {t('translate.translate')}
+                            Gloss · {t('translate.translate')}
                         </span>
                     )}
                     <div className='flex items-center gap-[10px] ml-auto'>

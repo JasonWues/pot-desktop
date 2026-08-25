@@ -104,7 +104,7 @@ fn main() {
                 .builder()
                 .title("The program is already running. Please do not start it again!")
                 .body(cwd)
-                .icon("pot")
+                .icon("Gloss")
                 .show();
         }))
         .plugin(
@@ -186,7 +186,7 @@ fn main() {
                         .builder()
                         .title("Failed to register global shortcut")
                         .body(&e)
-                        .icon("pot")
+                        .icon("Gloss")
                         .show();
                 }
             }
