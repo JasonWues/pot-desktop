@@ -136,6 +136,28 @@ Only `light` and `dark` ship (the `nocturne` and `modernist` experiments were re
 
 Anything reading a theme colour from JS should pass the var through as a string (`'var(--surface)'`) rather than branching on the theme name — it resolves against whatever `data-theme` is on `<html>` at paint time, so it stays correct for themes added later and needs no re-render on a theme switch. Note that v3's tokens are **complete colour values**, where v2's `--heroui-*` were bare HSL triplets meant to be wrapped: `hsl(var(--heroui-content1))` is now an invalid colour that silently falls back, and translucency is `color-mix(in oklab, var(--x) N%, transparent)` rather than `hsl(var(--x) / 0.N)`. `useToastStyle` was the one place that survived the migration still naming them, so every toast in the app drew the library's white default under a dark theme until it was pointed at `--overlay`.
 
+### Icons
+
+Two full sets, because `tauri.macos.conf.json` points `bundle.icon` at its own directory: `src-tauri/icons/` and `src-tauri/icons_mac/`. Both are generated output. The source of the app icon is **`public/icon.svg`** itself, which is also the runtime asset the Config sidebar loads, so there is one copy rather than a source and a duplicate that drift.
+
+`tauri icon` takes an SVG directly, so nothing needs rasterising first:
+
+```bash
+pnpm tauri icon public/icon.svg                            # src-tauri/icons
+pnpm tauri icon public/icon.svg -o src-tauri/icons_mac     # the macOS set
+pnpm tauri icon public/icon.svg -o <tmp> --png 820         # then copy to public/icon.png
+pnpm tauri icon design/tray-color.svg -o <tmp>             # icon.ico + 128x128.png -> icons/tray.{ico,png}
+pnpm tauri icon design/tray-macos.svg -o <tmp>             # icon.ico -> icons_mac/tray.ico
+```
+
+It writes `android/`, `ios/` and a `64x64.png` that this desktop-only project has no use for; delete them after each run or they land in the diff.
+
+**The tray needs two variants and they are not interchangeable.** `iconAsTemplate` maps to a macOS-only API: up there the system keeps only the alpha channel and repaints the glyph to match the menu bar, so `icons_mac/tray.ico` is a solid black silhouette. Windows and Linux ignore the flag and draw the image as-is, so the same black glyph would disappear on a dark Windows 11 taskbar — `icons/tray.ico` is the same geometry in mid grey and accent blue, which holds on a light and a dark bar alike. Each platform config carries its own `iconPath`, so the one in `tauri.conf.json` never applies on desktop; both platform files used to point the tray at the full-colour app icon.
+
+`design/` holds the two tray sources. Keep their geometry in step with each other — only the palette differs.
+
+One trap when editing any of these by hand: **an XML comment cannot contain a double hyphen**, so a `--` used as a dash inside `<!-- -->` makes resvg fail the parse and `tauri icon` panics with `InvalidComment` rather than a readable error.
+
 ### Toasts and modals
 
 Both are overlay surfaces and both are styled centrally rather than per call site.

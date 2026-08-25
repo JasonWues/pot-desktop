@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="Gloss">
+    <!-- Windows and Linux tray. Both ignore `iconAsTemplate` (it maps to a
+         macOS-only API) and draw the image as-is, so the black template used on
+         macOS would vanish on a dark Windows 11 taskbar. Mid grey and the accent
+         blue both hold against a light AND a dark bar, which is the only thing
+         this variant has to survive.
+
+         Geometry is identical to design/tray-macos.svg; keep the two in step. -->
+    <g fill="#7c8492">
+        <rect x="96" y="80" width="320" height="64" rx="32" />
+        <rect x="96" y="368" width="240" height="64" rx="32" />
+    </g>
+    <line x1="116" y1="276" x2="300" y2="236" stroke="#3578e5" stroke-width="96" stroke-linecap="round" />
+</svg>

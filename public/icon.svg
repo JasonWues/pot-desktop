@@ -13,7 +13,7 @@
     <!-- The printed lines. Three, of falling length, so the block reads as a
          paragraph ending rather than a UI list. rx is half the height, which
          makes each a pill and matches the gloss's round caps. -->
-    <g fill="#9ca3ae">
+    <g fill="#7c8492">
         <rect x="258" y="268" width="508" height="72" rx="36" />
         <rect x="258" y="396" width="436" height="72" rx="36" />
         <rect x="258" y="684" width="352" height="72" rx="36" />
