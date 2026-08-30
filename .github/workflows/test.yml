@@ -41,5 +41,14 @@ jobs:
             # be in a .prettierignore rather than formatted. Adding the gate means
             # doing that cleanup first, and a gate that is red on the day it lands
             # teaches everyone to ignore it.
+            # Vite transpiles TypeScript with esbuild, which strips types without
+            # checking them -- `vite build` will happily accept
+            # `const x: number = 'nope'`. So nothing verified the `.ts` files in
+            # this repository until this step existed. It is green on the day it
+            # lands, which is the only reason it is worth adding: a gate that is
+            # red from the start teaches everyone to ignore it.
+            - name: Typecheck
+              run: pnpm typecheck
+
             - name: Test
               run: pnpm test

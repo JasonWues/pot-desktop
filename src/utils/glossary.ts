@@ -1,5 +1,7 @@
 import { supportsPrompt } from './ai_presets';
 
+import type { GlossaryTerm, PromptMessage, ServiceConfig } from '../types/services';
+
 // Terms the user wants rendered a particular way, applied to a translation two
 // different ways depending on what the service can be told.
 //
@@ -24,21 +26,21 @@ import { supportsPrompt } from './ai_presets';
 /// `{ role, parts: [{ text }] }` for Gemini. Reading the shape off the message
 /// rather than off a service name means a fourth spelling, or a service moving
 /// between them, needs nothing here.
-function messageText(message) {
+function messageText(message: PromptMessage | undefined): string {
     return Array.isArray(message?.parts) ? (message.parts[0]?.text ?? '') : (message?.content ?? '');
 }
 
-function withMessageText(message, text) {
+function withMessageText(message: PromptMessage, text: string): PromptMessage {
     return Array.isArray(message?.parts) ? { ...message, parts: [{ text }] } : { ...message, content: text };
 }
 
 /// Terms with an empty `term` are dropped: they would compile to an empty
 /// alternation branch, which matches at every position.
-function usableEntries(entries) {
+function usableEntries(entries: readonly GlossaryTerm[] | null | undefined): GlossaryTerm[] {
     return (entries ?? []).filter((entry) => typeof entry?.term === 'string' && entry.term !== '');
 }
 
-export function glossaryInstruction(entries) {
+export function glossaryInstruction(entries: readonly GlossaryTerm[] | null | undefined): string {
     const lines = usableEntries(entries).map((entry) => `- "${entry.term}" -> "${entry.replacement ?? ''}"`);
     return `Always translate the following terms exactly as given, whatever the surrounding context:\n${lines.join('\n')}`;
 }
@@ -47,7 +49,11 @@ export function glossaryInstruction(entries) {
 /// first is the priming turn under every schema Gloss ships -- a system message
 /// for OpenAI and Ollama, an opening user turn for ChatGLM and Gemini -- and an
 /// instruction sitting next to the text to translate reads like part of it.
-export function applyGlossaryToConfig(instanceConfig, serviceName, entries) {
+export function applyGlossaryToConfig(
+    instanceConfig: ServiceConfig | undefined,
+    serviceName: string,
+    entries: readonly GlossaryTerm[] | null | undefined
+): ServiceConfig | undefined {
     const usable = usableEntries(entries);
     if (usable.length === 0 || !supportsPrompt(serviceName)) {
         return instanceConfig;
@@ -67,7 +73,7 @@ export function applyGlossaryToConfig(instanceConfig, serviceName, entries) {
 /// boundary that never occurs -- while a Latin term without one matches inside
 /// other words, and a glossary entry for "AI" would rewrite the middle of
 /// "SAID".
-function termPattern(term) {
+function termPattern(term: string): string {
     const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const head = /^\w/.test(term) ? '\\b' : '';
     const tail = /\w$/.test(term) ? '\\b' : '';
@@ -78,7 +84,12 @@ function termPattern(term) {
 /// in one pass over one alternation rather than a replace per term: a
 /// replacement that happens to contain another term must not then be rewritten
 /// itself.
-export function applyGlossaryToResult(text, entries) {
+/// Generic rather than `(text: string)`: the dictionary services resolve with an
+/// object instead of text, and the guard below is what passes those through
+/// untouched. Typing the parameter as a string would have made every one of
+/// those call sites an error and hidden that this function is deliberately
+/// total.
+export function applyGlossaryToResult<T>(text: T, entries: readonly GlossaryTerm[] | null | undefined): T {
     const usable = usableEntries(entries);
     if (usable.length === 0 || typeof text !== 'string' || text === '') {
         return text;
@@ -90,13 +101,14 @@ export function applyGlossaryToResult(text, entries) {
 
     // A term that matched is its own key; `??` covers nothing, but keeps a
     // surprising regex from deleting text.
-    return text.replace(pattern, (match) => replacements.get(match) ?? match);
+    // `text` is narrowed to `T & string` above, so the result is the same T.
+    return text.replace(pattern, (match) => replacements.get(match) ?? match) as T;
 }
 
 /// What the cache key hashes. Only the pair matters -- which entries were in
 /// force and what they said -- so toggling an unrelated term's scope does not
 /// throw away every cached translation.
-export function glossarySignature(entries) {
+export function glossarySignature(entries: readonly GlossaryTerm[] | null | undefined): string {
     const usable = usableEntries(entries);
     if (usable.length === 0) {
         return '';

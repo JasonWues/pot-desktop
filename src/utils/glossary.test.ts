@@ -2,7 +2,21 @@ import { describe, expect, it } from 'vitest';
 
 import { applyGlossaryToConfig, applyGlossaryToResult, glossaryInstruction, glossarySignature } from './glossary';
 
-const entry = (term, replacement) => ({ term, replacement });
+import type { GlossaryTerm, PromptMessage, ServiceConfig } from '../types/services';
+
+const entry = (term: string, replacement: string): GlossaryTerm => ({ term, replacement });
+
+// `applyGlossaryToConfig` legitimately returns the config it was handed, which
+// may be undefined, so its return type is `ServiceConfig | undefined`. Each test
+// below has already established that this call took the appending branch; this
+// says so once instead of littering `!` through every assertion, and it fails
+// the test rather than the type check if that stops being true.
+function promptOf(config: ServiceConfig | undefined): PromptMessage[] {
+    if (!config?.promptList) {
+        throw new Error('expected the glossary to have produced a promptList');
+    }
+    return config.promptList;
+}
 
 describe('applyGlossaryToResult', () => {
     it('rewrites a term and leaves the rest alone', () => {
@@ -57,22 +71,22 @@ describe('applyGlossaryToConfig', () => {
                 { role: 'user', content: '$text' },
             ],
         };
-        const applied = applyGlossaryToConfig(config, 'openai', entries);
+        const applied = promptOf(applyGlossaryToConfig(config, 'openai', entries));
 
-        expect(applied.promptList[0].content).toContain('You are a translation engine.');
-        expect(applied.promptList[0].content).toContain('"bug" -> "缺陷"');
+        expect(applied[0].content).toContain('You are a translation engine.');
+        expect(applied[0].content).toContain('"bug" -> "缺陷"');
         // The turn carrying the text is untouched, and so is the saved config.
-        expect(applied.promptList[1]).toEqual({ role: 'user', content: '$text' });
+        expect(applied[1]).toEqual({ role: 'user', content: '$text' });
         expect(config.promptList[0].content).toBe('You are a translation engine.');
     });
 
     it('understands Gemini’s parts array', () => {
         const config = { promptList: [{ role: 'user', parts: [{ text: 'Prime.' }] }] };
-        const applied = applyGlossaryToConfig(config, 'geminipro', entries);
+        const applied = promptOf(applyGlossaryToConfig(config, 'geminipro', entries));
 
-        expect(applied.promptList[0].parts[0].text).toContain('Prime.');
-        expect(applied.promptList[0].parts[0].text).toContain('"bug" -> "缺陷"');
-        expect(applied.promptList[0].role).toBe('user');
+        expect(applied[0].parts?.[0]?.text).toContain('Prime.');
+        expect(applied[0].parts?.[0]?.text).toContain('"bug" -> "缺陷"');
+        expect(applied[0].role).toBe('user');
     });
 
     it('leaves a service that reads no prompt exactly as it was', () => {

@@ -1,3 +1,4 @@
+// @ts-check
 import { LazyStore } from '@tauri-apps/plugin-store';
 import { appConfigDir, join } from '@tauri-apps/api/path';
 import { watch } from '@tauri-apps/plugin-fs';

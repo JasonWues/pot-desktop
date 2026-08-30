@@ -1,9 +1,12 @@
+// @ts-check
 import { fetch, Body } from './http';
 import { invoke } from '@tauri-apps/api/core';
 import { store } from './store';
 
 // https://fanyi-api.baidu.com/product/113
+/** @param {string} text */
 async function baidu_detect(text) {
+    /** @type {Record<string, string>} */
     const lang_map = {
         zh: 'zh_cn',
         cht: 'zh_tw',
@@ -38,7 +41,7 @@ async function baidu_detect(text) {
         }),
     });
     if (res.ok) {
-        let result = res.data;
+        let result = /** @type {any} */ (res.data);
         if (result.lan && result.lan in lang_map) {
             return lang_map[result.lan];
         }
@@ -47,7 +50,9 @@ async function baidu_detect(text) {
 }
 // 腾讯只支持这么多语言
 // https://cloud.tencent.com/document/product/551/15619
+/** @param {string} text */
 async function tencent_detect(text) {
+    /** @type {Record<string, string>} */
     const lang_map = {
         zh: 'zh_cn',
         en: 'en',
@@ -77,7 +82,7 @@ async function tencent_detect(text) {
         }),
     });
     if (res.ok) {
-        let result = res.data;
+        let result = /** @type {any} */ (res.data);
         if (result.translate && result.translate.source && result.translate.source in lang_map) {
             return lang_map[result.translate.source];
         }
@@ -85,7 +90,9 @@ async function tencent_detect(text) {
     return 'en';
 }
 // https://cloud.google.com/translate/docs/languages?hl=zh-cn
+/** @param {string} text */
 async function google_detect(text) {
+    /** @type {Record<string, string>} */
     const lang_map = {
         'zh-CN': 'zh_cn',
         'zh-TW': 'zh_tw',
@@ -132,7 +139,7 @@ async function google_detect(text) {
         }
     );
     if (res.ok) {
-        const result = res.data;
+        const result = /** @type {any} */ (res.data);
         if (result[2] && result[2] in lang_map) {
             return lang_map[result[2]];
         }
@@ -140,7 +147,9 @@ async function google_detect(text) {
     return 'en';
 }
 // https://niutrans.com/documents/contents/trans_text#languageList
+/** @param {string} text */
 async function niutrans_detect(text) {
+    /** @type {Record<string, string>} */
     const lang_map = {
         zh: 'zh_cn',
         cht: 'zh_cn',
@@ -178,7 +187,7 @@ async function niutrans_detect(text) {
         },
     });
     if (res.ok) {
-        const result = res.data;
+        const result = /** @type {any} */ (res.data);
         if (result['language'] && result['language'] in lang_map) {
             return lang_map[result['language']];
         }
@@ -186,7 +195,9 @@ async function niutrans_detect(text) {
     return 'en';
 }
 // https://yandex.com/dev/translate/doc/en/concepts/api-overview
+/** @param {string} text */
 async function yandex_detect(text) {
+    /** @type {Record<string, string>} */
     const lang_map = {
         zh: 'zh_cn',
         en: 'en',
@@ -219,7 +230,7 @@ async function yandex_detect(text) {
         },
     });
     if (res.ok) {
-        const result = res.data;
+        const result = /** @type {any} */ (res.data);
         if (result['lang'] && result['lang'] in lang_map) {
             return lang_map[result['lang']];
         }
@@ -227,7 +238,9 @@ async function yandex_detect(text) {
     return 'en';
 }
 // https://learn.microsoft.com/en-us/azure/ai-services/translator/language-support
+/** @param {string} text */
 async function bing_detect(text) {
+    /** @type {Record<string, string>} */
     const lang_map = {
         'zh-Hans': 'zh_cn',
         'zh-Hant': 'zh_tw',
@@ -295,7 +308,7 @@ async function bing_detect(text) {
         });
 
         if (res.ok) {
-            let result = res.data;
+            let result = /** @type {any} */ (res.data);
             if (result[0].language && result[0].language in lang_map) {
                 return lang_map[result[0].language];
             }
@@ -304,10 +317,16 @@ async function bing_detect(text) {
     return 'en';
 }
 
+/** @param {string} text */
 async function local_detect(text) {
     return await invoke('lang_detect', { text: text });
 }
 
+/**
+ * Identify the language of `text` with whichever engine the user configured.
+ * @param {string} text
+ * @returns {Promise<string>} a Gloss language code
+ */
 export default async function detect(text) {
     let langDetectEngine = (await store.get('translate_detect_engine')) ?? 'baidu';
 

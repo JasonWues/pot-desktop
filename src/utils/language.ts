@@ -31,7 +31,7 @@ export const languageList = [
     'nl',
     'uk',
     'he',
-];
+] as const;
 
 // https://flagicons.lipis.dev/
 export enum LanguageFlag {

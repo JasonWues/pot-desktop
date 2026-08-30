@@ -1,3 +1,4 @@
+// @ts-check
 /*
   Single source of truth for the theme names, so the Settings dropdown and the
   next-themes provider cannot drift apart. That matters more than it looks:

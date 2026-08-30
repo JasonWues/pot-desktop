@@ -12,7 +12,8 @@
         "updater": "node updater/updater.mjs",
         "updater:fixRuntime": "node updater/updater-for-fix-runtime.mjs",
         "test": "vitest run",
-        "test:watch": "vitest"
+        "test:watch": "vitest",
+        "typecheck": "tsc -p tsconfig.json"
     },
     "dependencies": {
         "@hello-pangea/dnd": "^18.0.1",
@@ -57,6 +58,8 @@
         "@tauri-apps/cli": "^2.1.0",
         "@testing-library/jest-dom": "^7.0.1",
         "@testing-library/react": "^16.3.2",
+        "@types/react": "^19.2.18",
+        "@types/react-dom": "^19.2.5",
         "@vitejs/plugin-react": "^6.0.5",
         "jsdom": "^30.0.1",
         "prettier": "3.9.6",

@@ -1,3 +1,4 @@
+// @ts-check
 import { bytesToHex, utf8ToBytes } from '@noble/hashes/utils.js';
 import { md5 as nobleMd5, sha1 as nobleSha1 } from '@noble/hashes/legacy.js';
 import { sha256 as nobleSha256 } from '@noble/hashes/sha2.js';
@@ -18,14 +19,17 @@ import { hmac as nobleHmac } from '@noble/hashes/hmac.js';
 // - crypto-js returned a WordArray, which stringified to hex by default. noble
 //   returns a Uint8Array, so the hex step is explicit -- see `toHex`.
 
+/** @param {string | Uint8Array} input */
 function toBytes(input) {
     return typeof input === 'string' ? utf8ToBytes(input) : input;
 }
 
+/** @param {string | Uint8Array} message */
 export function md5(message) {
     return nobleMd5(toBytes(message));
 }
 
+/** @param {string | Uint8Array} message */
 export function sha256(message) {
     return nobleSha256(toBytes(message));
 }
@@ -34,10 +38,23 @@ export function sha256(message) {
 // `CryptoJS.HmacSHA256` took the *message* first, so a mechanical rename at the
 // call sites would have signed the key with the message and still returned a
 // plausible-looking digest.
+/**
+ * Note the argument order: the **key** comes first, where `CryptoJS.HmacSHA256`
+ * took the message first. A mechanical rename at a call site would have signed
+ * the key with the message and still returned a plausible digest.
+ *
+ * @param {string | Uint8Array} key
+ * @param {string | Uint8Array} message
+ */
 export function hmacSha256(key, message) {
     return nobleHmac(nobleSha256, toBytes(key), toBytes(message));
 }
 
+/**
+ * Key first, as in `hmacSha256`.
+ * @param {string | Uint8Array} key
+ * @param {string | Uint8Array} message
+ */
 export function hmacSha1(key, message) {
     return nobleHmac(nobleSha1, toBytes(key), toBytes(message));
 }
@@ -48,6 +65,7 @@ export const toHex = bytesToHex;
 // into a binary string first. Built in a loop rather than with a spread, which
 // passes every byte as an argument and overflows the stack on a large input --
 // and one of these hashes an entire image.
+/** @param {Uint8Array} bytes */
 export function toBase64(bytes) {
     let binary = '';
     for (const byte of bytes) {
@@ -56,6 +74,7 @@ export function toBase64(bytes) {
     return btoa(binary);
 }
 
+/** @param {string} base64 */
 export function base64ToBytes(base64) {
     const binary = atob(base64);
     const bytes = new Uint8Array(binary.length);
@@ -69,6 +88,7 @@ export function base64ToBytes(base64) {
 // base64 that decodes to UTF-8 text, which is how the iflytek services return
 // recognised text. `TextDecoder` rather than a noble helper -- noble 2 dropped
 // the `bytesToUtf8` that used to be in its utils.
+/** @param {string} base64 */
 export function base64ToUtf8(base64) {
     return new TextDecoder().decode(base64ToBytes(base64));
 }

@@ -1,12 +1,25 @@
 import Database from '@tauri-apps/plugin-sql';
 import { md5, toHex } from './crypto';
 
+import type { GlossaryInput, GlossaryRow, ServiceConfig } from '../types/services';
+
+/** A row of the history table, as `SELECT *` returns it. */
+export interface HistoryRow {
+    id: number;
+    text: string;
+    source: string;
+    target: string;
+    service: string;
+    result: string;
+    timestamp: number;
+}
+
 // Single shared handle. The schema used to be created from the error path of the
 // first failed INSERT, which meant nothing could rely on a table existing (and
 // `clearData` dropping the history table left the app in that state on purpose).
 // Everything that touches sqlite now goes through `getDatabase`, so the tables
 // and their indexes are guaranteed before the first query.
-let databasePromise = null;
+let databasePromise: Promise<Database> | null = null;
 
 const SCHEMA = [
     `CREATE TABLE IF NOT EXISTS history(
@@ -41,7 +54,7 @@ const SCHEMA = [
     )`,
 ];
 
-export async function getDatabase() {
+export async function getDatabase(): Promise<Database> {
     if (databasePromise === null) {
         databasePromise = (async () => {
             const db = await Database.load('sqlite:history.db');
@@ -58,7 +71,13 @@ export async function getDatabase() {
     return databasePromise;
 }
 
-export async function addToHistory(text, source, target, service, result) {
+export async function addToHistory(
+    text: string,
+    source: string,
+    target: string,
+    service: string,
+    result: string
+): Promise<void> {
     const db = await getDatabase();
     await db.execute(
         'INSERT into history (text, source, target, service, result, timestamp) VALUES ($1, $2, $3, $4, $5, $6)',
@@ -81,7 +100,18 @@ const SEPARATOR = '\u0000';
 // The service config is part of the key, so editing a prompt, model, or API
 // endpoint misses the cache instead of replaying a result the new settings
 // would not have produced.
-export function buildCacheKey({ instanceKey, config, from, to, detect, text, glossary }) {
+export interface CacheKeyParts {
+    instanceKey: string;
+    config?: ServiceConfig;
+    from: string;
+    to: string;
+    detect?: string;
+    text: string;
+    /** `glossarySignature(...)`; absent or empty when the user keeps no terms. */
+    glossary?: string;
+}
+
+export function buildCacheKey({ instanceKey, config, from, to, detect, text, glossary }: CacheKeyParts): string {
     // Still MD5, and still hex. This is a cache key, not a security boundary --
     // but changing either would change every key, so every user's existing cache
     // would miss once and be rebuilt for no benefit.
@@ -97,14 +127,17 @@ export function buildCacheKey({ instanceKey, config, from, to, detect, text, glo
     return toHex(md5(parts.join(SEPARATOR)));
 }
 
-export async function getCachedTranslation(key, ttlDays) {
+export async function getCachedTranslation(key: string, ttlDays: number): Promise<string | null> {
     const db = await getDatabase();
     const oldest = Date.now() - ttlDays * 24 * 60 * 60 * 1000;
-    const rows = await db.select('SELECT result FROM cache WHERE key = $1 AND timestamp > $2', [key, oldest]);
+    const rows = await db.select<Array<{ result: string }>>(
+        'SELECT result FROM cache WHERE key = $1 AND timestamp > $2',
+        [key, oldest]
+    );
     return rows.length > 0 ? rows[0].result : null;
 }
 
-export async function setCachedTranslation(key, result) {
+export async function setCachedTranslation(key: string, result: string): Promise<void> {
     const db = await getDatabase();
     await db.execute('INSERT OR REPLACE INTO cache (key, result, timestamp) VALUES ($1, $2, $3)', [
         key,
@@ -123,13 +156,13 @@ export async function setCachedTranslation(key, result) {
     }
 }
 
-export async function getCacheCount() {
+export async function getCacheCount(): Promise<number> {
     const db = await getDatabase();
-    const rows = await db.select('SELECT COUNT(*) AS count FROM cache');
+    const rows = await db.select<Array<{ count: number }>>('SELECT COUNT(*) AS count FROM cache');
     return rows[0]?.count ?? 0;
 }
 
-export async function clearCache() {
+export async function clearCache(): Promise<void> {
     const db = await getDatabase();
     await db.execute('DELETE FROM cache');
 }
@@ -137,9 +170,9 @@ export async function clearCache() {
 // Ordered by id so the rows arrive the same way every time. `glossarySignature`
 // hashes them into the cache key, and an unstable order would change that key
 // without anything having changed.
-export async function listGlossary() {
+export async function listGlossary(): Promise<GlossaryRow[]> {
     const db = await getDatabase();
-    return db.select('SELECT * FROM glossary ORDER BY id');
+    return db.select<GlossaryRow[]>('SELECT * FROM glossary ORDER BY id');
 }
 
 /// The entries that apply to one translation. 'all' is the wildcard on either
@@ -149,9 +182,9 @@ export async function listGlossary() {
 /// `from` should be the language actually being translated out of: with the
 /// source set to auto that is the detected language, not the literal 'auto',
 /// which no user would think to scope a term to.
-export async function getActiveGlossary(from, to) {
+export async function getActiveGlossary(from?: string, to?: string): Promise<GlossaryRow[]> {
     const db = await getDatabase();
-    return db.select(
+    return db.select<GlossaryRow[]>(
         `SELECT * FROM glossary
          WHERE enabled = 1
            AND (from_lang = 'all' OR from_lang = $1)
@@ -161,7 +194,13 @@ export async function getActiveGlossary(from, to) {
     );
 }
 
-export async function addGlossaryEntry({ term, replacement, fromLang = 'all', toLang = 'all', enabled = true }) {
+export async function addGlossaryEntry({
+    term,
+    replacement,
+    fromLang = 'all',
+    toLang = 'all',
+    enabled = true,
+}: GlossaryInput): Promise<void> {
     const db = await getDatabase();
     await db.execute(
         `INSERT INTO glossary (term, replacement, from_lang, to_lang, enabled, timestamp)
@@ -170,7 +209,10 @@ export async function addGlossaryEntry({ term, replacement, fromLang = 'all', to
     );
 }
 
-export async function updateGlossaryEntry(id, { term, replacement, fromLang, toLang, enabled }) {
+export async function updateGlossaryEntry(
+    id: number,
+    { term, replacement, fromLang, toLang, enabled }: GlossaryInput
+): Promise<void> {
     const db = await getDatabase();
     await db.execute(
         `UPDATE glossary SET term = $1, replacement = $2, from_lang = $3, to_lang = $4, enabled = $5 WHERE id = $6`,
@@ -178,7 +220,7 @@ export async function updateGlossaryEntry(id, { term, replacement, fromLang, toL
     );
 }
 
-export async function deleteGlossaryEntry(id) {
+export async function deleteGlossaryEntry(id: number): Promise<void> {
     const db = await getDatabase();
     await db.execute('DELETE FROM glossary WHERE id = $1', [id]);
 }

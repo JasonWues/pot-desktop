@@ -1,3 +1,4 @@
+// @ts-check
 // Named prompt presets for the LLM-backed translate services.
 //
 // Those services already accept a `promptList`, but it lives in each instance's
@@ -12,6 +13,7 @@
 // a language pair and have nowhere to put an instruction.
 export const PROMPT_SERVICES = ['openai', 'ollama', 'chatglm', 'geminipro'];
 
+/** @param {string} serviceName */
 export function supportsPrompt(serviceName) {
     return PROMPT_SERVICES.includes(serviceName);
 }
@@ -68,6 +70,7 @@ export const AI_PRESETS = [
     },
 ];
 
+/** @param {string} id */
 export function getPreset(id) {
     return AI_PRESETS.find((p) => p.id === id) ?? AI_PRESETS[0];
 }
@@ -78,6 +81,11 @@ export function getPreset(id) {
 /// with the settings UI, and the cache key is derived from whatever is passed to
 /// the service, so a preset has to produce its own object or it would both
 /// corrupt the saved config and collide in the cache with a plain translation.
+/**
+ * @param {import("../types/services").ServiceConfig | undefined} instanceConfig
+ * @param {string} serviceName
+ * @param {string} presetId
+ */
 export function applyPreset(instanceConfig, serviceName, presetId) {
     const preset = getPreset(presetId);
     if (preset.promptList === null || !supportsPrompt(serviceName)) {

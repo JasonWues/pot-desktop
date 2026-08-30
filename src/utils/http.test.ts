@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 // (the request the services actually make) or what went back in (the Tauri 1
 // response shape).
 const tauriFetch = vi.fn();
-vi.mock('@tauri-apps/plugin-http', () => ({ fetch: (...args) => tauriFetch(...args) }));
+vi.mock('@tauri-apps/plugin-http', () => ({ fetch: (...args: unknown[]) => tauriFetch(...args) }));
 
 const { Body, ResponseType, fetch, http } = await import('./http');
 
@@ -13,7 +13,7 @@ const { Body, ResponseType, fetch, http } = await import('./http');
 // party `.potext` plugin, so the shape here is not an internal convenience --
 // changing it breaks plugins that this repository cannot see or update.
 
-const respondWith = (bodyText, init = {}) => {
+const respondWith = (bodyText: BodyInit | null, init: ResponseInit = {}) => {
     tauriFetch.mockResolvedValue(new Response(bodyText, { status: 200, ...init }));
 };
 

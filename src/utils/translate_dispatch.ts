@@ -2,10 +2,20 @@ import { error as logError } from '@tauri-apps/plugin-log';
 
 import { applyGlossaryToConfig, applyGlossaryToResult, glossarySignature } from './glossary';
 import { getServiceName, whetherPluginService } from './service_instance';
-import * as builtinServices from '../services/translate';
+import * as builtinInfo from '../services/translate/info';
 import { applyPreset, DEFAULT_PRESET } from './ai_presets';
 import { invoke_plugin } from './invoke_plugin';
 import { getActiveGlossary } from './db';
+
+import type {
+    GlossaryResolvedService,
+    TranslateServiceModule,
+    LanguageMap,
+    ResolvedService,
+    ServiceConfig,
+    ServiceInstanceKey,
+    SetResult,
+} from '../types/services';
 
 // The steps between "the user picked a service" and "the service was called",
 // which the Translate window and the Recognize window's in-place overlay both
@@ -28,7 +38,19 @@ import { getActiveGlossary } from './db';
  * it from different places -- a map the Translate window already holds, and the
  * store for the overlay.
  */
-export function resolveService(instanceKey, { pluginList, savedConfig, preset = DEFAULT_PRESET, stream } = {}) {
+export interface ResolveOptions {
+    /** The installed `.potext` services, keyed by type then name. */
+    pluginList?: Record<string, Record<string, { language: LanguageMap }>>;
+    savedConfig?: ServiceConfig;
+    preset?: string;
+    /** `false` asks a streaming service not to stream. See `callService`. */
+    stream?: boolean;
+}
+
+export function resolveService(
+    instanceKey: ServiceInstanceKey,
+    { pluginList, savedConfig, preset = DEFAULT_PRESET, stream }: ResolveOptions = {}
+): ResolvedService {
     const serviceName = getServiceName(instanceKey);
     const isPlugin = whetherPluginService(instanceKey);
 
@@ -60,9 +82,22 @@ export function resolveService(instanceKey, { pluginList, savedConfig, preset = 
 
     // Plugins declare their languages in info.json, built-in services in a
     // Language enum; both are keyed by Gloss's own language codes.
-    const languageMap = isPlugin
-        ? pluginList['translate'][serviceName].language
-        : builtinServices[serviceName].Language;
+    //
+    // The guard is not decoration: `pluginList` is optional here because a caller
+    // resolving a built-in service has no reason to have it, and both real call
+    // sites read it out of React state that is empty on the first render. Without
+    // this, resolving a plugin one tick too early threw
+    // `Cannot read properties of undefined` from inside a subscript.
+    let languageMap: LanguageMap;
+    if (isPlugin) {
+        const plugin = pluginList?.['translate']?.[serviceName];
+        if (!plugin) {
+            throw `Plugin service ${serviceName} is not installed, or the plugin list has not loaded yet`;
+        }
+        languageMap = plugin.language;
+    } else {
+        languageMap = builtinLanguages(serviceName);
+    }
 
     return { instanceKey, serviceName, isPlugin, config, languageMap };
 }
@@ -75,7 +110,10 @@ export function resolveService(instanceKey, { pluginList, savedConfig, preset = 
  * `from` should be the language actually being translated out of: with the
  * source set to auto that is the detected language, not the literal 'auto'.
  */
-export async function withGlossary(resolved, { from, to }) {
+export async function withGlossary(
+    resolved: ResolvedService,
+    { from, to }: { from?: string; to?: string }
+): Promise<GlossaryResolvedService> {
     // A broken glossary must never stop a translation, so a failed read is
     // simply an empty one.
     const entries = await getActiveGlossary(from, to).catch((e) => {
@@ -97,7 +135,7 @@ export async function withGlossary(resolved, { from, to }) {
         ...resolved,
         config,
         glossary: glossarySignature(entries),
-        applyGlossary: (value) => (wentIntoPrompt ? value : applyGlossaryToResult(value, entries)),
+        applyGlossary: (value: string) => (wentIntoPrompt ? value : applyGlossaryToResult(value, entries)),
     };
 }
 
@@ -109,7 +147,39 @@ export async function withGlossary(resolved, { from, to }) {
  * wanted", which is only safe alongside `stream: false` from `resolveService`;
  * on its own the streaming services abort and resolve with '[STREAM]'.
  */
-export async function callService(resolved, text, from, to, { detect, setResult = null } = {}) {
+/**
+ * Each built-in service's implementation, as a loader rather than a module.
+ * `import.meta.glob` is lazy by default, so Rollup gives every service its own
+ * chunk and the Translate window fetches exactly the one it is about to call --
+ * where a static barrel put all 21, plus their `Config.jsx` forms and therefore
+ * React and HeroUI, in the chunk every window shares.
+ */
+const implementations = import.meta.glob<TranslateServiceModule>('../services/translate/*/index.jsx');
+
+async function builtinService(serviceName: string): Promise<TranslateServiceModule> {
+    const load = implementations[`../services/translate/${serviceName}/index.jsx`];
+    if (!load) {
+        throw `Unknown translate service: ${serviceName}`;
+    }
+    return load();
+}
+
+/** The metadata barrel is static and tiny; only the implementation is deferred. */
+function builtinLanguages(serviceName: string): LanguageMap {
+    const entry = (builtinInfo as unknown as Record<string, { Language?: LanguageMap }>)[serviceName];
+    if (!entry?.Language) {
+        throw `Unknown translate service: ${serviceName}`;
+    }
+    return entry.Language;
+}
+
+export async function callService(
+    resolved: ResolvedService,
+    text: string,
+    from: string,
+    to: string,
+    { detect, setResult = null }: { detect?: string; setResult?: SetResult } = {}
+): Promise<unknown> {
     const { serviceName, isPlugin, config, languageMap } = resolved;
 
     if (isPlugin) {
@@ -119,7 +189,8 @@ export async function callService(resolved, text, from, to, { detect, setResult 
         return func(text, languageMap[from], languageMap[to], { config, detect, setResult, utils });
     }
 
-    return builtinServices[serviceName].translate(text, languageMap[from], languageMap[to], {
+    const service = await builtinService(serviceName);
+    return service.translate(text, languageMap[from] as string, languageMap[to] as string, {
         config,
         detect,
         setResult,

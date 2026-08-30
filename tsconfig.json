@@ -1,0 +1,40 @@
+{
+    // Type checking is a separate step from the build. Vite transpiles TS with
+    // esbuild, which strips types without ever looking at them -- so before this
+    // file existed, `vite build` accepted `const x: number = 'nope'` and exited
+    // 0, and the 45 `.ts` files in the tree carried annotations nothing verified.
+    // `pnpm typecheck` is what actually checks them, and CI runs it.
+    "compilerOptions": {
+        "target": "ES2022",
+        "lib": ["ES2022", "DOM", "DOM.Iterable"],
+        "module": "ESNext",
+        "moduleResolution": "bundler",
+        "jsx": "react-jsx",
+
+        "strict": true,
+        "noEmit": true,
+        "skipLibCheck": true,
+        "esModuleInterop": true,
+        "resolveJsonModule": true,
+        "forceConsistentCasingInFileNames": true,
+
+        // `allowJs` so the checked files can resolve imports into the 160 `.jsx`
+        // files, and `checkJs: false` so those files are not themselves checked.
+        // A file opts in with a `// @ts-check` docblock on its first line, which
+        // is how this spreads: one file at a time, no flag day, and never a
+        // commit that has to fix 16000 lines to stay green.
+        "allowJs": true,
+        "checkJs": false,
+
+        // `isolatedModules` matches what esbuild actually does at build time, so
+        // a construct tsc allows but the bundler cannot compile fails here
+        // instead of in a Tauri build. The 44 `enum`s in the tree are fine; a
+        // `const enum` would not be, which is the point.
+        "isolatedModules": true,
+
+        // `import.meta.glob`, which `translate_dispatch` uses to defer the service
+        // implementations, is a Vite extension to import.meta.
+        "types": ["vite/client"]
+    },
+    "include": ["src/**/*", "vitest.setup.js", "vite.config.js", "vitest.config.js"]
+}

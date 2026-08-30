@@ -1,3 +1,4 @@
+// @ts-check
 import { type, arch as archFn, version } from '@tauri-apps/plugin-os';
 import { getVersion } from '@tauri-apps/api/app';
 
@@ -16,7 +17,10 @@ const OS_TYPE_MAP = {
 
 export async function initEnv() {
     const osTypeV2 = type();
-    osType = OS_TYPE_MAP[osTypeV2] ?? osTypeV2;
+    // `type()` is typed as a union of the three platform strings plus the mobile
+    // ones, and the map only carries the three desktop keys -- which is the point:
+    // anything else falls through to the v2 name unchanged.
+    osType = /** @type {Record<string, string>} */ (OS_TYPE_MAP)[osTypeV2] ?? osTypeV2;
     arch = archFn();
     osVersion = version();
     appVersion = await getVersion();
