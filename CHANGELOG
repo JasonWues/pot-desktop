@@ -1,24 +1,23 @@
-## 4.1.0 (2026-08-25)
+## 4.2.0 (2026-08-26)
 
-### New feature:
-
--   renamed to Gloss, with a new icon drawn for it
--   glossary: terms you want rendered a particular way, scoped by language pair. LLM services get them as an instruction so the model applies them while translating; every other engine has them applied to the result
--   in-place image translation on Linux, via tesseract TSV output (it was Windows only)
--   a test suite, run on every PR
-
-### Improved:
-
--   both translate paths now share one dispatch, so a change to how a translation is prepared has one place to go
--   service settings forms are built from shared parts, and all 43 are covered by a test
--   faster Ctrl+C selection, and one less window flashing on Windows
--   the translate window opens at 440x580
+This one is mostly internal: nothing about how Gloss is used changes, but
+several things that could have gone wrong quietly no longer can.
 
 ### Bugs fixed:
 
--   in-place image translation painted the literal string `[STREAM]` over the image, and cached it
--   `http://*` in the capability scope matched only the protocol's default port, which broke the Recognize window's translate button, the Anki collection service on 8765, and every self-hosted endpoint
--   toasts drew the library's white default under a dark theme, and a page with a modal open drew each toast twice
--   the tray icon was the full-colour app icon with `iconAsTemplate` set, which macOS reduced to a filled black square in the menu bar
--   selection COM and clipboard fixes, and a Linux session with no `XDG_SESSION_TYPE` no longer fails to read the selection
--   ChatGLM now goes through the plugin's fetch, so the proxy setting reaches it
+-   the window placement fallback could panic. `primary_monitor()` may legitimately answer "none" — an RDP session that disconnected, every display asleep, a monitor hotplug — and it was reached only after the cursor had already failed to land on any known monitor, so it crashed in exactly the state it existed to cover. Gloss now lets the OS place the window instead
+-   a hand-edited `server_port` of the wrong type took the local server down before it started, and the PopClip and SnipDo extensions silently did nothing for the rest of the session
+-   a panic while holding one of the three internal locks used to poison it for the rest of the process, leaving that part of the app dead until restart
+-   deleting a service instance ran its "does this key exist" check against a promise, which is always true, so the check never actually ran
+-   picking a plugin translate service before the plugin list had loaded threw instead of waiting
+
+### Improved:
+
+-   every window now loads only its own code. One 1.8 MB bundle used to serve all five, so the updater dialog pulled in the Translate window, the Recognize window and the screenshot overlay before it could paint. Translating fetches the one service being called rather than all 21
+-   settings are read once per key per window instead of once per component. The translate window renders one panel per configured service, and each was separately reading and subscribing to the same window-wide settings
+
+### Internal:
+
+-   TypeScript is now actually checked. Vite strips types without verifying them, so nothing had ever checked the `.ts` files in the tree; `pnpm typecheck` runs in CI
+-   the service, glossary and dispatch contracts are described in one place, and the five modules where types earn their keep were migrated
+-   test coverage went from 103 to 113, including the config hook, which had none
