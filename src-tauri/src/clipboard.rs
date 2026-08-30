@@ -1,4 +1,5 @@
 use crate::window::text_translate;
+use crate::LockExt;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Mutex;
 use std::time::Duration;
@@ -25,7 +26,7 @@ static MONITOR_RUNNING: AtomicBool = AtomicBool::new(false);
 pub fn start_clipboard_monitor(app_handle: tauri::AppHandle) {
     {
         let state = app_handle.state::<ClipboardMonitorEnableWrapper>();
-        let _enabled = state.0.lock().unwrap();
+        let _enabled = state.0.lock_recover();
         if MONITOR_RUNNING.swap(true, Ordering::SeqCst) {
             return;
         }
@@ -35,7 +36,7 @@ pub fn start_clipboard_monitor(app_handle: tauri::AppHandle) {
         loop {
             {
                 let state = app_handle.state::<ClipboardMonitorEnableWrapper>();
-                let enabled = state.0.lock().unwrap();
+                let enabled = state.0.lock_recover();
                 if !enabled.contains("true") {
                     MONITOR_RUNNING.store(false, Ordering::SeqCst);
                     break;

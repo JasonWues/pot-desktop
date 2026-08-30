@@ -7,12 +7,22 @@ use std::thread;
 use tauri_plugin_notification::NotificationExt;
 use tiny_http::{Request, Response, Server};
 
+pub const DEFAULT_SERVER_PORT: i64 = 60828;
+
 pub fn start_server() {
-    let port = match get("server_port") {
-        Some(v) => v.as_i64().unwrap(),
+    // `server_port` comes out of config.json, which the user can edit by hand, so
+    // a value of the wrong JSON type is ordinary input rather than a bug. It used
+    // to be `as_i64().unwrap()`, which panicked here -- above the spawn, and so
+    // above the `catch_unwind` below that exists to keep exactly this server
+    // alive. A string in that key took the whole local server down before it
+    // started, and the PopClip and SnipDo extensions in `.scripts/` silently did
+    // nothing for the rest of the session. A key that is missing and a key that
+    // does not parse now get the same treatment: default, and write it back.
+    let port = match get("server_port").and_then(|v| v.as_i64()) {
+        Some(v) => v,
         None => {
-            set("server_port", 60828);
-            60828
+            set("server_port", DEFAULT_SERVER_PORT);
+            DEFAULT_SERVER_PORT
         }
     };
     thread::spawn(move || {

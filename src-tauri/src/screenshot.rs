@@ -1,3 +1,4 @@
+use crate::LockExt;
 use crate::APP;
 use dirs::cache_dir;
 use image::codecs::png::{CompressionType, FilterType, PngEncoder};
@@ -73,7 +74,7 @@ fn capture_to_cache() -> Result<(), String> {
 
 // Start capturing in the background. Called before the overlay window is built.
 pub fn start_capture() {
-    let mut pending = PENDING_CAPTURE.lock().unwrap();
+    let mut pending = PENDING_CAPTURE.lock_recover();
     // A capture already in flight would be for an overlay that never opened;
     // joining it here keeps at most one capture thread alive at a time.
     if let Some(previous) = pending.take() {
@@ -86,7 +87,7 @@ pub fn start_capture() {
 // that opening the overlay through any other path still produces an image.
 #[tauri::command(async)]
 pub fn screenshot() -> Result<(), String> {
-    let pending = PENDING_CAPTURE.lock().unwrap().take();
+    let pending = PENDING_CAPTURE.lock_recover().take();
     match pending {
         Some(handle) => handle
             .join()

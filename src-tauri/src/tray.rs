@@ -5,6 +5,7 @@ use crate::window::input_translate;
 use crate::window::ocr_recognize;
 use crate::window::ocr_translate;
 use crate::window::updater_window;
+use crate::LockExt;
 use log::{info, warn};
 use tauri::menu::{CheckMenuItemBuilder, Menu, MenuBuilder, MenuEvent, MenuItemBuilder};
 use tauri::menu::SubmenuBuilder;
@@ -429,8 +430,7 @@ fn on_clipboard_monitor_click(app: &AppHandle) {
     let state = app.state::<ClipboardMonitorEnableWrapper>();
     state
         .0
-        .lock()
-        .unwrap()
+        .lock_recover()
         .replace_range(.., &current.to_string());
     if current {
         start_clipboard_monitor(app.clone());

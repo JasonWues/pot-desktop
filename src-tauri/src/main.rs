@@ -49,6 +49,26 @@ pub static APP: OnceLock<tauri::AppHandle> = OnceLock::new();
 // Text to be translated
 pub struct StringWrapper(pub Mutex<String>);
 
+// `lock().unwrap()` turns one panic into a permanent one: the mutex stays
+// poisoned for the rest of the process, so every later lock panics too and the
+// subsystem behind it is dead until restart. That is the right default when a
+// panic could leave the guarded value half-updated -- but none of the three
+// mutexes here can be caught that way. `StringWrapper` and
+// `ClipboardMonitorEnableWrapper` are whole-value replacements
+// (`replace_range(.., ..)`) or copies out (`to_string()`), and `PENDING_CAPTURE`
+// is a `take()`/assign of an `Option<JoinHandle>`. There is no intermediate
+// state for a panic to strand, so recovering the value is strictly better than
+// inheriting the poison.
+pub trait LockExt<T> {
+    fn lock_recover(&self) -> std::sync::MutexGuard<'_, T>;
+}
+
+impl<T> LockExt<T> for Mutex<T> {
+    fn lock_recover(&self) -> std::sync::MutexGuard<'_, T> {
+        self.lock().unwrap_or_else(|e| e.into_inner())
+    }
+}
+
 // A panic in a background thread -- the http server, the clipboard monitor, a
 // hotkey callback -- writes to stderr and nowhere else. Release builds are
 // `windows_subsystem = "windows"` and so have no stderr at all, which is how the

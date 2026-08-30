@@ -1,5 +1,6 @@
 use crate::config::StoreWrapper;
 use crate::error::Error;
+use crate::LockExt;
 use crate::StringWrapper;
 use crate::APP;
 use log::{error, info};
@@ -9,7 +10,7 @@ use tauri::Manager;
 
 #[tauri::command]
 pub fn get_text(state: tauri::State<StringWrapper>) -> String {
-    return state.0.lock().unwrap().to_string();
+    return state.0.lock_recover().to_string();
 }
 
 #[tauri::command]

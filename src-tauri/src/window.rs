@@ -2,6 +2,7 @@ use std::fs;
 
 use crate::config::get;
 use crate::config::set;
+use crate::LockExt;
 use crate::StringWrapper;
 use crate::APP;
 use dirs::cache_dir;
@@ -44,11 +45,28 @@ pub fn get_mouse_position() -> tauri::PhysicalPosition<i32> {
     }
 }
 
-// Get monitor where the mouse is currently located
-fn get_current_monitor(x: i32, y: i32) -> Monitor {
+// Get monitor where the mouse is currently located.
+//
+// `None` when the platform can report no monitor at all. That is not a bug to
+// crash on: `primary_monitor` answers `Ok(None)` on a machine that genuinely has
+// none right now -- an RDP session that disconnected, every display asleep, the
+// moment between a hotplug removing one and the next arriving. It used to be two
+// stacked `unwrap()`s, and in the branch that only runs once the cursor has
+// already failed to land on any known monitor, so the fallback panicked in
+// exactly the state it existed to cover.
+fn get_current_monitor(x: i32, y: i32) -> Option<Monitor> {
     info!("Mouse position: {}, {}", x, y);
     let daemon_window = get_daemon_window();
-    let monitors = daemon_window.available_monitors().unwrap();
+    let monitors = match daemon_window.available_monitors() {
+        Ok(v) => v,
+        Err(e) => {
+            warn!(
+                "Failed to list monitors ({}), letting the OS place the window",
+                e
+            );
+            return None;
+        }
+    };
 
     for m in monitors {
         let size = m.size();
@@ -60,22 +78,33 @@ fn get_current_monitor(x: i32, y: i32) -> Monitor {
             && y <= (position.y + size.height as i32)
         {
             info!("Current Monitor: {:?}", m);
-            return m;
+            return Some(m);
         }
     }
     warn!("Current Monitor not found, using primary monitor");
-    daemon_window.primary_monitor().unwrap().unwrap()
+    match daemon_window.primary_monitor() {
+        Ok(Some(m)) => Some(m),
+        Ok(None) => {
+            warn!("No primary monitor either, letting the OS place the window");
+            None
+        }
+        Err(e) => {
+            warn!(
+                "Failed to get the primary monitor ({}), letting the OS place the window",
+                e
+            );
+            None
+        }
+    }
 }
 
 // Creating a window on the mouse monitor
 fn build_window(label: &str, title: &str) -> (WebviewWindow, bool) {
     let mouse_position = get_mouse_position();
-    let current_monitor = get_current_monitor(mouse_position.x, mouse_position.y);
     // `position()` on the builder is logical, the monitor reports physical, so the
     // two have to be reconciled or the window lands off-screen on a scaled setup.
-    let position = current_monitor
-        .position()
-        .to_logical::<f64>(current_monitor.scale_factor());
+    let position = get_current_monitor(mouse_position.x, mouse_position.y)
+        .map(|m| m.position().to_logical::<f64>(m.scale_factor()));
 
     let app_handle = APP.get().unwrap();
     match app_handle.get_webview_window(label) {
@@ -91,7 +120,6 @@ fn build_window(label: &str, title: &str) -> (WebviewWindow, bool) {
                 label,
                 tauri::WebviewUrl::App("index.html".into()),
             )
-            .position(position.x, position.y)
             // No `--disable-web-security`: Tauri 2 runs its IPC over
             // `http://ipc.localhost` and identifies the calling webview by the
             // request's `Origin` header, which that flag makes WebView2 drop. Every
@@ -100,6 +128,13 @@ fn build_window(label: &str, title: &str) -> (WebviewWindow, bool) {
             .focused(true)
             .title(title)
             .visible(false);
+
+            // Anchored to the monitor under the cursor when there is one. With
+            // none to anchor to, leaving `position` unset lets the OS choose,
+            // which beats forcing a coordinate that may itself be off-screen.
+            if let Some(position) = position {
+                builder = builder.position(position.x, position.y);
+            }
 
             #[cfg(target_os = "macos")]
             {
@@ -262,7 +297,7 @@ pub fn selection_translate() {
         let app_handle = APP.get().unwrap();
         // Write into State
         let state: tauri::State<StringWrapper> = app_handle.state();
-        state.0.lock().unwrap().replace_range(.., &text);
+        state.0.lock_recover().replace_range(.., &text);
     }
 
     let window = translate_window();
@@ -275,8 +310,7 @@ pub fn input_translate() {
     let state: tauri::State<StringWrapper> = app_handle.state();
     state
         .0
-        .lock()
-        .unwrap()
+        .lock_recover()
         .replace_range(.., "[INPUT_TRANSLATE]");
     let window = translate_window();
     let position_type = match get("translate_window_position") {
@@ -294,7 +328,7 @@ pub fn text_translate(text: String) {
     let app_handle = APP.get().unwrap();
     // Clear State
     let state: tauri::State<StringWrapper> = app_handle.state();
-    state.0.lock().unwrap().replace_range(.., &text);
+    state.0.lock_recover().replace_range(.., &text);
     let window = translate_window();
     window.emit("new_text", text).unwrap();
 }
@@ -304,8 +338,7 @@ pub fn image_translate() {
     let state: tauri::State<StringWrapper> = app_handle.state();
     state
         .0
-        .lock()
-        .unwrap()
+        .lock_recover()
         .replace_range(.., "[IMAGE_TRANSLATE]");
     let window = translate_window();
     window.emit("new_text", "[IMAGE_TRANSLATE]").unwrap();
