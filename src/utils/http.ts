@@ -87,7 +87,12 @@ function toBlobPart(file: FilePart['file']): BlobPart | string {
         return file;
     }
     if (file instanceof Uint8Array || file instanceof ArrayBuffer) {
-        return file;
+        // A bare `Uint8Array` is `Uint8Array<ArrayBufferLike>`, which admits a
+        // `SharedArrayBuffer` backing that a `Blob` cannot take -- TypeScript 7
+        // enforces that where 5.6 did not. Nothing here produces one: these come
+        // from a caller's own array or from `new Uint8Array(number[])` below, and
+        // the app never allocates shared memory.
+        return file as BlobPart;
     }
     if (Array.isArray(file)) {
         return new Uint8Array(file);
