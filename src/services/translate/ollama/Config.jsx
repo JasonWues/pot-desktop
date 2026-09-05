@@ -9,6 +9,7 @@ import {
 import { INSTANCE_NAME_CONFIG_KEY } from '../../../utils/service_instance';
 import ServiceConfigForm from '../../../components/ServiceConfigForm';
 import React, { useEffect, useState } from 'react';
+import { open } from '@tauri-apps/plugin-shell';
 import { useTranslation } from 'react-i18next';
 import { Ollama } from 'ollama/browser';
 
@@ -79,20 +80,12 @@ function OllamaFields({ config, setConfig }) {
     return (
         <>
             {installedModels === null && (
-                <Card
-                    isBlurred
-                    className='border-none bg-danger/20 dark:bg-danger/10'
-                    shadow='sm'
-                >
+                <Card className='border-none bg-danger/20 dark:bg-danger/10'>
                     <CardContent>
                         <div>
                             {t('services.translate.ollama.install_ollama')}
                             <br />
-                            <Link
-                                isExternal
-                                href='https://ollama.com/download'
-                                color='primary'
-                            >
+                            <Link onPress={() => open('https://ollama.com/download')}>
                                 {t('services.translate.ollama.install_ollama_link')}
                             </Link>
                         </div>
@@ -153,11 +146,7 @@ function OllamaFields({ config, setConfig }) {
                     </InputGroup>
                 </TextField>
             </ConfigItem>
-            <Card
-                isBlurred
-                className='border-none bg-success/20 dark:bg-success/10'
-                shadow='sm'
-            >
+            <Card className='border-none bg-success/20 dark:bg-success/10'>
                 <CardContent>
                     {/* See the Updater window for the same shape: v3 drops
                         `label`, `showValueLabel` and `classNames`, so the
@@ -179,11 +168,7 @@ function OllamaFields({ config, setConfig }) {
                         </ProgressBar>
                     )}
                     <div className='flex justify-center'>
-                        <Link
-                            isExternal
-                            href='https://ollama.com/library'
-                            color='primary'
-                        >
+                        <Link onPress={() => open('https://ollama.com/library')}>
                             {t('services.translate.ollama.supported_models')}
                         </Link>
                     </div>

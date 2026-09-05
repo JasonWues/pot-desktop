@@ -36,7 +36,6 @@ export default function Config() {
     return (
         <>
             <Card
-                shadow='none'
                 className={`${
                     transparent ? 'bg-background/90' : 'bg-surface'
                 } float-left w-[230px] h-screen rounded-none ${osType === 'Linux' ? 'rounded-l-[10px] border-1' : ''} border-r-2 border-r-border-secondary select-none cursor-default flex flex-col`}

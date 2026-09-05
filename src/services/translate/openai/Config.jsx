@@ -1,5 +1,4 @@
 import PromptListEditor, { CHAT_PROMPT_SCHEMA } from '../../../components/ServiceConfigForm/PromptListEditor';
-import { Card, CardContent, Link } from '@heroui/react';
 import { INSTANCE_NAME_CONFIG_KEY } from '../../../utils/service_instance';
 import ServiceConfigForm from '../../../components/ServiceConfigForm';
 import { useTranslation } from 'react-i18next';
@@ -86,32 +85,13 @@ export function Config(props) {
                             value={config['apiKey']}
                             onChange={(value) => setConfig({ ...config, apiKey: value })}
                         />
-                        <Card
-                            isBlurred
-                            className='border-none bg-success/20 dark:bg-success/10'
-                            shadow='sm'
-                        >
-                            <CardContent>
-                                <div>
-                                    推荐
-                                    <Link
-                                        isExternal
-                                        href='https://aihubmix.com/register?aff=trJY'
-                                        color='primary'
-                                    >
-                                        AiHubMix
-                                    </Link>
-                                    的OpenAI API 密钥，速度飞快，经济实惠，1美元的OpenAI API 额度只需人民币6.3元
-                                    <Link
-                                        isExternal
-                                        href='https://pot-app.com/ads/aihubmix.html'
-                                        color='primary'
-                                    >
-                                        配置文档
-                                    </Link>
-                                </div>
-                            </CardContent>
-                        </Card>
+                        {/* Upstream carried a promo card for a third-party API
+                            reseller here: hardcoded Chinese in an otherwise
+                            translated form, and an affiliate link crediting the
+                            upstream author. Removed rather than translated --
+                            a settings page is a poor place to advertise, and
+                            keeping it would have every Gloss user earning
+                            referrals for someone else. */}
                         {/* Azure names the deployment in the request path, so it has no model field of its own. */}
                         <TextConfigField
                             hidden={config.service === 'azure'}
