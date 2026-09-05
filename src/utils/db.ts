@@ -31,8 +31,27 @@ const SCHEMA = [
         result TEXT NOT NULL,
         timestamp INTEGER NOT NULL
     )`,
-    // The history page always orders by recency and pages with OFFSET.
-    `CREATE INDEX IF NOT EXISTS idx_history_timestamp ON history(timestamp DESC)`,
+    // The history page always orders by recency and pages with OFFSET. The
+    // ordering is `timestamp DESC, id DESC`, so the tiebreak goes in the index
+    // too and the whole ORDER BY is satisfied by walking it.
+    //
+    // Renamed rather than redefined: `CREATE INDEX IF NOT EXISTS` does nothing
+    // at all when an index of that name already exists, whatever columns it has,
+    // so an existing install would have silently kept the timestamp-only one.
+    `DROP INDEX IF EXISTS idx_history_timestamp`,
+    `CREATE INDEX IF NOT EXISTS idx_history_recent ON history(timestamp DESC, id DESC)`,
+    // The two filter dropdowns are built from `SELECT DISTINCT service` and
+    // `SELECT DISTINCT target`, and the dropdowns then filter on those same two
+    // columns. Both were a full scan of the table plus a sort.
+    //
+    // The recency columns are carried along rather than indexing the filter
+    // column alone, because a filtered page orders by them: on `history(service)`
+    // sqlite finds the matching rows by index and then sorts every one of them
+    // in a temp B-tree to take twenty. With the ordering in the index the whole
+    // query is one covering search, and `SELECT DISTINCT service` still scans it
+    // as a covering index -- service is the leading column either way.
+    `CREATE INDEX IF NOT EXISTS idx_history_service ON history(service, timestamp DESC, id DESC)`,
+    `CREATE INDEX IF NOT EXISTS idx_history_target ON history(target, timestamp DESC, id DESC)`,
     `CREATE TABLE IF NOT EXISTS cache(
         key TEXT PRIMARY KEY,
         result TEXT NOT NULL,

@@ -103,6 +103,13 @@ export default function History() {
 
     useEffect(() => {
         loadPluginList();
+        // What the table contains, not what the user is looking at. It changes
+        // only when rows are added or removed, so it is loaded once here and
+        // again from `deleteItem`/`clearData` -- it used to sit in the effect
+        // below, where the two `SELECT DISTINCT` scans it makes ran again on
+        // every keystroke and every page change, for an answer that could not
+        // have moved.
+        loadFilterOptions();
     }, []);
 
     // Filter changes restart paging; without this a narrowed result set can
@@ -113,10 +120,7 @@ export default function History() {
 
     useEffect(() => {
         // Debounced because this also runs on every keystroke in the search box.
-        const timer = setTimeout(() => {
-            getData();
-            loadFilterOptions();
-        }, 250);
+        const timer = setTimeout(getData, 250);
         return () => clearTimeout(timer);
     }, [search, serviceFilter, targetFilter, page]);
 
